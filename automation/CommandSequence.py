@@ -138,6 +138,15 @@ class CommandSequence:
         command = ('DUMP_PAGE_SOURCE', suffix)
         self.commands_with_timeout.append((command, timeout))
 
+    def detect_webbot_detection(self, suffix='', timeout=30):
+        """Scans source page for signs of web bot detection"""
+        self.total_timeout += timeout
+        if not self.contains_get_or_browse:
+            raise CommandExecutionError("No get or browse request preceding "
+                                        "the dump page source command", self)
+        command = ('DETECT_WEBBOT_DETECTION', suffix)
+        self.commands_with_timeout.append((command, timeout))
+
     def recursive_dump_page_source(self, suffix='', timeout=30):
         """Dumps rendered source of current page visit to 'sources' dir.
         Unlike `dump_page_source`, this includes iframe sources. Archive is

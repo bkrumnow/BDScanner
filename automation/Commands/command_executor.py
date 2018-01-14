@@ -48,7 +48,13 @@ def execute_command(command, webdriver, browser_settings, browser_params,
             webdriver, browser_params, manager_params)
 
     if command[0] == 'DUMP_PAGE_SOURCE':
+        print("hmmzz %s" % (str(command[2])))
         browser_commands.dump_page_source(
+            visit_id=command[2], driver=webdriver,
+            manager_params=manager_params, suffix=command[1])
+
+    if command[0] == 'DETECT_WEBBOT_DETECTION':
+        browser_commands.detect_webbot_detection(
             visit_id=command[2], driver=webdriver,
             manager_params=manager_params, suffix=command[1])
 

@@ -15,6 +15,7 @@ import time
 import sys
 import gzip
 import os
+from detection import Scanner
 
 from ..SocketInterface import clientsocket
 from ..MPLogger import loggingclient
@@ -396,6 +397,10 @@ def dump_page_source(visit_id, driver, manager_params, suffix=''):
         f.write(driver.page_source.encode('utf8'))
         f.write(b'\n')
 
+
+def detect_webbot_detection(visit_id, driver, manager_params, suffix=''):
+    scanner = Scanner.Scanner()
+    scanner.scan(driver)
 
 def recursive_dump_page_source(visit_id, driver, manager_params, suffix=''):
     """Dump a compressed html tree for the current page visit"""
