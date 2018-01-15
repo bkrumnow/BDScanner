@@ -1,0 +1,49 @@
+{
+  "searchPatterns": {
+    "Distil": [
+      "95.100.59.245",
+      "104.70.243.66",
+      "23.202.161.241",
+      "distil"
+    ],
+    "Captcha": ["captcha", "The quick brown fox jumps over the lazy dog."],
+    "WebBot": [
+      "$cdc_",
+      "$wdc_",
+      "__webdriver_evaluate",
+      "__selenium_evaluate",
+      "__webdriver_script_function",
+      "__webdriver_script_func",
+      "__webdriver_script_fn",
+      "__fxdriver_evaluate",
+      "__driver_unwrapped",
+      "__webdriver_unwrapped",
+      "__driver_evaluate",
+      "__selenium_unwrapped",
+      "__fxdriver_unwrapped",
+      "_phantom",
+      "__nightmare",
+      "_selenium",
+      "callPhantom",
+      "callSelenium",
+      "_Selenium_IDE_Recorder",
+      "selenium",
+      "webdriver",
+      "driver"
+    ],
+    "Navigator": [
+      "window.navigator",
+      ".navigator"
+    ],
+    "Browser": [
+      "Modernizr"
+    ],
+    "Graphics": [
+      ".width == 0",
+      ".width === 0",
+      ".height === 0",
+      ".height == 0",
+      "webgl"
+    ]
+  }
+}
