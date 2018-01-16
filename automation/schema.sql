@@ -86,3 +86,19 @@ CREATE TABLE IF NOT EXISTS CrawlHistory (
     dtg DATETIME DEFAULT (CURRENT_TIMESTAMP),
     FOREIGN KEY(crawl_id) REFERENCES crawl(id));
 
+/* Bot detection tables */
+CREATE TABLE IF NOT EXISTS Scripts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    visit_id INTEGER NOT NULL,
+    name TEXT,
+    level INTEGER,
+    date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(visit_id) REFERENCES site_visits(id));
+
+CREATE TABLE IF NOT EXISTS DetectionPatterns (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    script_id INTEGER NOT NULL,
+    pattern TEXT,
+    detected_value TEXT,
+    date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(script_id) REFERENCES Scripts(id));

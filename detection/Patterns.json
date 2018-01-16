@@ -8,8 +8,8 @@
     ],
     "Captcha": ["captcha", "The quick brown fox jumps over the lazy dog."],
     "WebBot": [
-      "$cdc_",
-      "$wdc_",
+      "$cdc",
+      "$wdc",
       "__webdriver_evaluate",
       "__selenium_evaluate",
       "__webdriver_script_function",
@@ -29,7 +29,10 @@
       "_Selenium_IDE_Recorder",
       "selenium",
       "webdriver",
-      "driver"
+      "driver",
+      "_IDE",
+      "_Recorder",
+      "Sequentum"
     ],
     "Navigator": [
       "window.navigator",

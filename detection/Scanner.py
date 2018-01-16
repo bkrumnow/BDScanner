@@ -1,6 +1,8 @@
 import urllib2
 import jsbeautifier
 import json
+import re, binascii
+from detection import PatternChecker
 
 with open('detection/Patterns.json') as data_file:
    patterns = json.load(data_file)
@@ -25,8 +27,8 @@ class Scanner:
 
     def downloadFile(self, src, counter):
         #'https://www.stubhub.com/zwxsutztwbeffxbyzcquv.js'
-        response = urllib2.urlopen(src)
-        html = response.read()
+        response = urllib2.urlopen('file:detection/zwxsutztwbeffxbyzcquv.js')
+        html = response.read().decode('utf-8')
 
         if html:
             #print("download %s %s %s" % (src, counter, html[:8]))
@@ -36,8 +38,7 @@ class Scanner:
 
 
     def analyse(self, data, identifier):
-        print("@@Analyse", identifier)
-
+        #print("Analyse %s" % (identifier))
         #beautifier
         try:
             res = jsbeautifier.beautify(data)
@@ -46,8 +47,21 @@ class Scanner:
             res = data
 
         #pattern matching
-        patternTopics = ["Distil", "Captcha", "WebBot", "Navigator", "Browser", "Graphics"]
+        patternTopics = ["WebBot"] # ["Distil", "Captcha", "WebBot", "Navigator", "Browser", "Graphics"]
 
         for topic in patternTopics:
-            for searchTopic in patterns['searchPatterns'][topic]:
-                print("Search pattern %s" % (searchTopic))
+            for searchPatternTopic in patterns['searchPatterns'][topic]:
+                if (PatternChecker.checkPattern(res.lower(), searchPatternTopic.lower())):
+                    print("Search pattern %s" % (searchPatternTopic))
+
+        #hexadecimal
+        hexPattern = r'\\x([0-9A-Fa-f]{2})'
+        #m = re.search(hexaPattern, data)
+        regex = re.compile(hexPattern, re.IGNORECASE)
+        hexTranslated = ''
+        for match in regex.finditer(data):
+            hexCharacter = match.group(1)
+            hexTranslated += binascii.unhexlify(hexCharacter)
+
+        if len(hexTranslated) > 0:
+            self.analyse(hexTranslated, identifier)
