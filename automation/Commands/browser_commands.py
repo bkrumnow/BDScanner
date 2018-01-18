@@ -402,6 +402,14 @@ def detect_webbot_detection(visit_id, driver, manager_params, suffix=''):
     scanner = Scanner.Scanner()
     scanner.scan(driver)
 
+    tab_restart_browser(driver)  # kills window to avoid stray requests
+    sock = clientsocket()
+    sock.connect(*manager_params['aggregator_address'])
+
+    scanner.persistResults(sock, visit_id, manager_params)
+    # Close connection to db
+    sock.close()
+
 def recursive_dump_page_source(visit_id, driver, manager_params, suffix=''):
     """Dump a compressed html tree for the current page visit"""
     if suffix != '':

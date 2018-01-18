@@ -88,17 +88,18 @@ CREATE TABLE IF NOT EXISTS CrawlHistory (
 
 /* Bot detection tables */
 CREATE TABLE IF NOT EXISTS Scripts (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id TEXT PRIMARY KEY,
     visit_id INTEGER NOT NULL,
     name TEXT,
+    URL TEXT,
     level INTEGER,
     date DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(visit_id) REFERENCES site_visits(id));
 
 CREATE TABLE IF NOT EXISTS DetectionPatterns (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    script_id INTEGER NOT NULL,
+    script_id TEXT NOT NULL,
+    topic TEXT,
     pattern TEXT,
-    detected_value TEXT,
-    date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    value TEXT,
     FOREIGN KEY(script_id) REFERENCES Scripts(id));
