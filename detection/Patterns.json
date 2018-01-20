@@ -6,7 +6,7 @@
       "23.202.161.241",
       "distil"
     ],
-    "Captcha": ["captcha", "The quick brown fox jumps over the lazy dog."],
+    "Captcha": ["captcha"],
     "WebBot": [
       "$cdc",
       "$wdc",

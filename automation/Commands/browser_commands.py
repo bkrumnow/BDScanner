@@ -400,11 +400,14 @@ def dump_page_source(visit_id, driver, manager_params, suffix=''):
 
 def detect_webbot_detection(visit_id, driver, manager_params, suffix=''):
     scanner = Scanner.Scanner()
-    scanner.scan(driver)
+    scanner.scan(driver, visit_id)
 
-    tab_restart_browser(driver)  # kills window to avoid stray requests
-    sock = clientsocket()
-    sock.connect(*manager_params['aggregator_address'])
+    try:
+        tab_restart_browser(driver)  # kills window to avoid stray requests
+        sock = clientsocket()
+        sock.connect(*manager_params['aggregator_address'])
+    except:
+        print('Error socket connection to DB')
 
     scanner.persistResults(sock, visit_id, manager_params)
     # Close connection to db

@@ -1,5 +1,3 @@
-import mmap
-
 def checkPattern(data, pattern, scriptPath):
     try:
         if pattern in data:
