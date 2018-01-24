@@ -1,12 +1,19 @@
 {
   "searchPatterns": {
-    "Distil": [
-      "95.100.59.245",
-      "104.70.243.66",
-      "23.202.161.241",
-      "distil"
+    "Companies": [
+      "whiteops",
+      "distil",
+      "incapsula",
+      "akamai",
+      "cloudflare",
+      "spider.io",
+      "shape-security",
+      "vam-soft",
+      "whitehat",
+      "alienVault",
+      "perimeterx"
     ],
-    "Captcha": ["captcha"],
+    "Captcha": [],
     "WebBot": [
       "$cdc",
       "$wdc",
@@ -29,24 +36,41 @@
       "_Selenium_IDE_Recorder",
       "selenium",
       "webdriver",
-      "driver",
       "_IDE",
       "_Recorder",
-      "Sequentum"
+      "Sequentum",
+      "Phantom",
+      "PhantomJS",
+      "domAutomation",
+      "HeadlessChrome",
+      "slimer"
     ],
     "Navigator": [
-      "window.navigator",
-      ".navigator"
+      "navigator.plugins.length",
+      "navigator.onLine",
+      "navigator.languages"
     ],
     "Browser": [
-      "Modernizr"
+      "Modernizr['hairline']"
     ],
     "Graphics": [
-      ".width == 0",
-      ".width === 0",
-      ".height === 0",
-      ".height == 0",
-      "webgl"
+      "Brain Paul",
+      "Mesa OffScreen",
+      "image.width === 0",
+      "image.width == 0",
+      "image.height === 0",
+      "image.height == 0"
+    ],
+    "JSEngine": [
+      "Function.prototype.bind",
+      "Function.prototype.toString",
+      "window.Buffer",
+      "window.emit",
+      "window.spawn",
+      "outerWidth === 0",
+      "outerWidth == 0",
+      "outerHeight === 0",
+      "outerHeight == 0"
     ]
   }
 }

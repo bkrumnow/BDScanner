@@ -1,10 +1,33 @@
 from __future__ import absolute_import
 from automation import TaskManager, CommandSequence
 from six.moves import range
+from detection import Scanner
 
 # The list of sites that we wish to crawl
 NUM_BROWSERS = 1 #3
-sites = ['http://www.nu.nl/']
+#sites = ['http://www.nu.nl/']
+#sites = ['http://www.infojobs.net/']
+#sites = ['http://soundcloud.com']
+#sites = ['https://www.upwork.com']
+#sites = ['https://www.twitch.tv/']
+#sites = ['https://www.office.com/']
+#sites = ['https://ok.ru/']
+#sites = ['https://www.transavia.com/nl-NL/home/']
+#sites = ['https://www.wellsfargo.com/']
+#sites = ['https://www.eurowings.com/']
+sites = ['https://www.iberia.com/']
+
+        #LOCAL FILES
+src = 'file:detection/utag.js'
+        #src = 'file:detection/unknownhex.js'
+#        src = 'https://dev.visualwebsiteoptimizer.com/2.0/va-33a5ce6d810338ed1c4d5ec7d320b624.js'
+#        self.downloadFile(src)
+#        src = 'file:detection/async.js'
+#scanner = Scanner.Scanner()
+#scanner.downloadFile(src)
+
+
+
 
 #sites = ['http://www.example.com',
 #         'http://www.princeton.edu',
@@ -19,7 +42,7 @@ for i in range(NUM_BROWSERS):
     browser_params[i]['http_instrument'] = True
     # Enable flash for all three browsers
     browser_params[i]['disable_flash'] = False
-browser_params[0]['headless'] = True  # Launch only browser 0 headless
+browser_params[0]['headless'] = False  # Launch only browser 0 headless
 
 # Update TaskManager configuration (use this for crawl-wide settings)
 manager_params['data_directory'] = '~/OpenWPM/data'
@@ -31,15 +54,16 @@ manager = TaskManager.TaskManager(manager_params, browser_params)
 
 # Visits the sites with all browsers simultaneously
 for site in sites:
+
     command_sequence = CommandSequence.CommandSequence(site)
 
     # Start by visiting the page
-    command_sequence.get(sleep=0, timeout=120)
+    command_sequence.get(sleep=15, timeout=120)
 
-    # dump_profile_cookies/dump_flash_cookies closes the current tab.
+
     command_sequence.detect_webbot_detection(timeout=360)
-    #command_sequence.dump_page_source()
 
+    #command_sequence.save_screenshot('EndPrint', 1000)
     # index='**' synchronizes visits between the three browsers
     manager.execute_command_sequence(command_sequence, index='**')
 

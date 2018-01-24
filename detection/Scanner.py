@@ -15,13 +15,6 @@ class Scanner:
     visitId = None
     def scan(self, driver, visit_id):
         self.visitId = visit_id
-        #LOCAL FILES
-#        src = 'file:detection/zwxsutztwbeffxbyzcquv.js'
-        #src = 'file:detection/unknownhex.js'
-#        src = 'https://dev.visualwebsiteoptimizer.com/2.0/va-33a5ce6d810338ed1c4d5ec7d320b624.js'
-#        self.downloadFile(src)
-#        src = 'file:detection/async.js'
-#        self.downloadFile(src)
 
         #Scan Main page Source
         pageSource = driver.page_source
@@ -30,7 +23,11 @@ class Scanner:
         counter = 1
         for element in driver.find_elements_by_tag_name('script'):
             #Scan internal and external script contents
-            scriptSrc = element.get_attribute('src')
+
+            try:
+                scriptSrc = element.get_attribute('src')
+            except:
+                print("Error while obtaining src element attribute");
 
             if scriptSrc:
                 self.downloadFile(scriptSrc)
@@ -49,7 +46,7 @@ class Scanner:
             print("Could not open: %s" % src)
             return
 
-        print("source %s %s" % (src, contentEncoding))
+        #print("source %s" % (src))
         if contentEncoding and (contentEncoding.lower() == 'gzip'):
             try:
                 compressedstream = StringIO.StringIO(data)
@@ -61,10 +58,13 @@ class Scanner:
         try:
             html = data.decode('utf-8')
         except:
-            html = data
+            try:
+                html = data.decode('latin-1')
+            except:
+                html = data
 
         if html:
-            #print("download %s %s %s" % (src, counter, html[:8]))
+            #print("download %s %s" % (src, html[:8]))
             self.analyse(html, src.split('/')[-1], src)
         else:
             print("No content found %s" % (src))
@@ -78,6 +78,7 @@ class Scanner:
             res = data
 
         currentScript = None
+        print('Analyse %s' % identifier)
         currentScript = self.analysePatterns(currentScript, res, identifier, path)
 
         #hexadecimal
@@ -92,14 +93,14 @@ class Scanner:
                     translatedCharacter = binascii.unhexlify(hexCharacter).decode('utf-8');
                 except:
                     translatedCharacter = hexCharacter
-                    print("Could not unhexlify: %s" % (hexCharacter))
+                    #print("Could not unhexlify: %s %s" % (hexCharacter, match.group()))
 
                 #print("hexfound %s %s %s %s" % (match.group(), hexCharacter, match.group(1), binascii.unhexlify(hexCharacter)))
 
                 hexTranslated = hexTranslated + translatedCharacter
 
             if len(hexTranslated) > 0:
-                print("Hex Translated: %s" % (len(hexTranslated)))
+                #print("Hex Translated: %s %s" % (len(hexTranslated), hexTranslated))
                 self.analysePatterns(currentScript, hexTranslated, identifier, path)
         except:
             print('Exception while analysing for hexdecimal content')
@@ -111,7 +112,7 @@ class Scanner:
 
 
     def analysePatterns(self, currentScript, res, identifier, path):
-        patternTopics = ["Distil", "Captcha", "WebBot", "Browser"] #["Distil", "Captcha", "WebBot", "Navigator", "Browser", "Graphics"]
+        patternTopics = ["Companies", "Captcha", "WebBot", "Navigator", "Browser", "Graphics"]
         corruptFile = False
         for topic in patternTopics:
             if corruptFile:
