@@ -4,15 +4,22 @@ import json, gzip
 import StringIO
 import re, binascii
 import os
+import random
+import BotDetectionPattern
 from datetime import datetime
 from detection import PatternChecker, Script
 
-with open('detection/Patterns.json') as data_file:
-   patterns = json.load(data_file)
+#with open('detection/Patterns.json') as data_file:
+#   patterns = json.load(data_file)
 
 class Scanner:
-    scripts = []
-    visitId = None
+
+
+    def __init__(self):
+        self.scripts = []
+        self.visitId = None
+        self.botDetectionPattern = BotDetectionPattern.BotDetectionPattern()
+
     def scan(self, driver, visit_id):
         self.visitId = visit_id
 
@@ -38,15 +45,22 @@ class Scanner:
                 counter = counter +1
 
     def downloadFile(self, src):
+        data = ''
         try:
             response = urllib2.urlopen(src)
-            data = response.read()
+            CHUNK = 16 * 1024
+            while True:
+                chunk = response.read(CHUNK)
+                if not chunk:
+                    break
+                data = data + chunk;
+
             contentEncoding = response.info().getheader('Content-Encoding')
         except:
-            print("Could not open: %s" % src)
+            import sys
+            print("Could not open: %s" % sys.exc_info()[0])
             return
 
-        #print("source %s" % (src))
         if contentEncoding and (contentEncoding.lower() == 'gzip'):
             try:
                 compressedstream = StringIO.StringIO(data)
@@ -70,6 +84,21 @@ class Scanner:
             print("No content found %s" % (src))
 
 
+    def asciirepl(self, match):
+        # replace the hexadecimal characters with ascii characters
+        s = match.group(1)
+        value = ''
+        try:
+            value = binascii.unhexlify(s)
+        except:
+            value = '\\x' + s
+
+        return value
+
+    def reformat_content(self, data):
+        p = re.compile(r'\\x(\w{2})')
+        return p.sub(self.asciirepl, data)
+
     def analyse(self, data, identifier, path):
         try:
             res = jsbeautifier.beautify(data)
@@ -77,50 +106,32 @@ class Scanner:
             print("Could not beautify %s" % (identifier))
             res = data
 
-        currentScript = None
-        print('Analyse %s' % identifier)
-        currentScript = self.analysePatterns(currentScript, res, identifier, path)
-
-        #hexadecimal
         try:
-            hexPattern = r'\\x([0-9A-Fa-f]{2})'
-            regex = re.compile(hexPattern, re.IGNORECASE)
-            hexTranslated = ''
-            for match in regex.finditer(data):
-                hexCharacter = match.group(1)
-
-                try:
-                    translatedCharacter = binascii.unhexlify(hexCharacter).decode('utf-8');
-                except:
-                    translatedCharacter = hexCharacter
-                    #print("Could not unhexlify: %s %s" % (hexCharacter, match.group()))
-
-                #print("hexfound %s %s %s %s" % (match.group(), hexCharacter, match.group(1), binascii.unhexlify(hexCharacter)))
-
-                hexTranslated = hexTranslated + translatedCharacter
-
-            if len(hexTranslated) > 0:
-                #print("Hex Translated: %s %s" % (len(hexTranslated), hexTranslated))
-                self.analysePatterns(currentScript, hexTranslated, identifier, path)
+            res = self.reformat_content(res)
         except:
             print('Exception while analysing for hexdecimal content')
 
+        currentScript = None
+        currentScript = self.analysePatterns(currentScript, res, identifier, path)
+
         if currentScript:
             currentScript.URL = path
+
             self.scripts.append(currentScript)
+            print("append@@@ %s" % len(self.scripts))
             self.writeFile(identifier, res, str(self.visitId) + '/')
 
-
     def analysePatterns(self, currentScript, res, identifier, path):
-        patternTopics = ["Companies", "Captcha", "WebBot", "Navigator", "Browser", "Graphics"]
+        patternTopics = ["Companies", "Captcha", "WebBot", "Browser", "Graphics"]
         corruptFile = False
+        print('analyse patterns %s' % identifier)
+        lowerRes = res.lower();
         for topic in patternTopics:
             if corruptFile:
                 return
 
-            for searchPatternTopic in patterns['searchPatterns'][topic]:
-                searchpattern = searchPatternTopic.lower()
-                result = PatternChecker.checkPattern(res.lower(), searchpattern, path)
+            for searchPatternTopic in getattr(self.botDetectionPattern, topic):
+                result = PatternChecker.checkPattern(res, searchPatternTopic, path)
                 if result == -1:
                     corruptFile = True
                     return
@@ -128,7 +139,7 @@ class Scanner:
                 if (result):
                     if currentScript == None:
                         currentScript = Script.Script(identifier)
-                    currentScript.addDetectionPattern(topic, searchpattern)
+                    currentScript.addDetectionPattern(topic, searchPatternTopic)
         return currentScript
 
 
@@ -149,8 +160,11 @@ class Scanner:
             print("Error inserting detection record %s %s %s" % (scriptId, topic, pattern))
 
     def persistResults(self, sock, visit_id, manager_params):
+        print('PERSISTRESULTD %s' % len(self.scripts))
+        #print('self %s' % self)
         for script in self.scripts:
-            scriptId = str(visit_id) + '_' + script.identifier
+            print('persist Result %s' % visit_id)
+            scriptId = str(visit_id) + '_' + script.identifier + '_' + str(random.randint(1,101)*5)
             self.insertScript(sock, scriptId, visit_id, script.identifier, script.URL)
             for key, value in script.detectionPatterns.iteritems():
                 self.insertDetection(sock, scriptId, key, ','.join(value))
@@ -167,3 +181,8 @@ class Scanner:
                 file.write(data.encode('utf-8'))
         except:
             print("Could not write file %s" % name)
+
+    def printScripts(self):
+        for script in self.scripts:
+            for key, value in script.detectionPatterns.iteritems():
+                print("Key Value %s %s" % (key, ','.join(value)))

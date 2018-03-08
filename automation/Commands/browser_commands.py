@@ -399,14 +399,9 @@ def dump_page_source(visit_id, driver, manager_params, suffix=''):
 
 
 def detect_webbot_detection(visit_id, driver, manager_params, suffix=''):
+
     scanner = Scanner.Scanner()
     scanner.scan(driver, visit_id)
-#
-#      loginButton = webdriver.find_element_by_class_name('frontHero__loginButton')
-#        if loginButton:
-#            loginButton.click()
-#
-#        time.sleep(sleep)
 
     try:
         tab_restart_browser(driver)  # kills window to avoid stray requests
@@ -418,6 +413,7 @@ def detect_webbot_detection(visit_id, driver, manager_params, suffix=''):
     scanner.persistResults(sock, visit_id, manager_params)
     # Close connection to db
     sock.close()
+    del scanner;
 
 def recursive_dump_page_source(visit_id, driver, manager_params, suffix=''):
     """Dump a compressed html tree for the current page visit"""
