@@ -109,7 +109,7 @@ class Scanner:
         try:
             res = self.reformat_content(res)
         except:
-            print('Exception while analysing for hexdecimal content')
+            res = res
 
         currentScript = None
         currentScript = self.analysePatterns(currentScript, res, identifier, path)
@@ -122,16 +122,22 @@ class Scanner:
             self.writeFile(identifier, res, str(self.visitId) + '/')
 
     def analysePatterns(self, currentScript, res, identifier, path):
-        patternTopics = ["Companies", "Captcha", "WebBot", "Browser", "Graphics"]
+        #patternTopics = ["Companies", "Captcha", "WebBot", "Browser", "Graphics"]
+        patternTopics = ["Captcha", "WebBot", "Browser", "Graphics", "CompanyPattern"]
         corruptFile = False
-        print('analyse patterns %s' % identifier)
+        print('analyse patterns %s' % identifier[:15])
         lowerRes = res.lower();
         for topic in patternTopics:
             if corruptFile:
                 return
 
             for searchPatternTopic in getattr(self.botDetectionPattern, topic):
-                result = PatternChecker.checkPattern(res, searchPatternTopic, path)
+                if topic == "CompanyPattern":
+                    pattern = searchPatternTopic[1]
+                else:
+                    pattern = [searchPatternTopic]
+
+                result = PatternChecker.checkPattern(res, pattern, path)
                 if result == -1:
                     corruptFile = True
                     return
@@ -139,7 +145,11 @@ class Scanner:
                 if (result):
                     if currentScript == None:
                         currentScript = Script.Script(identifier)
-                    currentScript.addDetectionPattern(topic, searchPatternTopic)
+
+                    if topic == "CompanyPattern":
+                        currentScript.addCompanyPattern(searchPatternTopic)
+                    else:
+                        currentScript.addDetectionPattern(topic, searchPatternTopic)
         return currentScript
 
 
@@ -151,10 +161,10 @@ class Scanner:
         except:
             print("Error inserting script record %s %s" % (identifier, id))
 
-    def insertDetection(self,sock, scriptId, topic, pattern):
+    def insertDetection(self,sock, scriptId, topic, pattern, company):
         try:
-            query = ("INSERT INTO DetectionPatterns (script_id, topic, pattern, value) VALUES (?,?,?,?)",
-            (scriptId, topic, pattern, ''))
+            query = ("INSERT INTO DetectionPatterns (script_id, topic, pattern, value, company) VALUES (?,?,?,?,?)",
+            (scriptId, topic, pattern, '', company))
             sock.send(query)
         except:
             print("Error inserting detection record %s %s %s" % (scriptId, topic, pattern))
@@ -167,7 +177,7 @@ class Scanner:
             scriptId = str(visit_id) + '_' + script.identifier + '_' + str(random.randint(1,101)*5)
             self.insertScript(sock, scriptId, visit_id, script.identifier, script.URL)
             for key, value in script.detectionPatterns.iteritems():
-                self.insertDetection(sock, scriptId, key, ','.join(value))
+                self.insertDetection(sock, scriptId, key, ','.join(value), ','.join(script.companyPatterns))
 
     def writeFile(self, name, data, prefix=''):
         path = '/home/osboxes/OpenWPM/detection/files/' +prefix
@@ -177,12 +187,13 @@ class Scanner:
             pass
 
         try:
-            with open(path + name, 'w') as file:
+            with open(path + name[:14], 'w') as file:
                 file.write(data.encode('utf-8'))
         except:
             print("Could not write file %s" % name)
 
     def printScripts(self):
         for script in self.scripts:
+            print ("Company %s" % script.companyPatterns)
             for key, value in script.detectionPatterns.iteritems():
                 print("Key Value %s %s" % (key, ','.join(value)))

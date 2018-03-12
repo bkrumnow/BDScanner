@@ -102,4 +102,5 @@ CREATE TABLE IF NOT EXISTS DetectionPatterns (
     topic TEXT,
     pattern TEXT,
     value TEXT,
+    company TEXT,
     FOREIGN KEY(script_id) REFERENCES Scripts(id));

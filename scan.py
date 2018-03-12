@@ -6,15 +6,16 @@ import sys
 
 
 # The list of sites that we wish to crawl
-NUM_BROWSERS = 1
+NUM_BROWSERS = 8
 
         #LOCAL FILES
-from detection import Scanner
-src = 'file:detection/zwxsutztwbeffxbyzcquv.js'
+#from detection import Scanner
+#src = 'file:detection/zwxsutztwbeffxbyzcquv.js'
         #src = 'file:detection/unknownhex.js'
 #        src = 'https://dev.visualwebsiteoptimizer.com/2.0/va-33a5ce6d810338ed1c4d5ec7d320b624.js'
 #        self.downloadFile(src)
-#        src = 'file:detection/async.js'
+src = 'file:detection/async.js'
+#src = 'file:detection/player.js'
 #scanner = Scanner.Scanner()
 #scanner.downloadFile(src)
 #scanner.printScripts()
