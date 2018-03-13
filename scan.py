@@ -6,7 +6,7 @@ import sys
 
 
 # The list of sites that we wish to crawl
-NUM_BROWSERS = 8
+NUM_BROWSERS = 5
 
         #LOCAL FILES
 #from detection import Scanner
@@ -14,15 +14,18 @@ NUM_BROWSERS = 8
         #src = 'file:detection/unknownhex.js'
 #        src = 'https://dev.visualwebsiteoptimizer.com/2.0/va-33a5ce6d810338ed1c4d5ec7d320b624.js'
 #        self.downloadFile(src)
-src = 'file:detection/async.js'
+#src = 'file:detection/async.js'
+#src = 'file:detection/dstl-oprh.js'
 #src = 'file:detection/player.js'
+#
+#src = 'file:detection/webfont.js'
 #scanner = Scanner.Scanner()
 #scanner.downloadFile(src)
 #scanner.printScripts()
 #sys.exit('tempquitje')
 
 #fileReader = csv.reader(open('detection/alexa/top-1m.csv'), delimiter=',')
-fileReader = csv.reader(open('detection/verification/verificationSites.csv'), delimiter=',')
+fileReader = csv.reader(open('detection/verification/sucuri.csv'), delimiter=',')
 
 
 # Loads the manager preference and 3 copies of the default browser dictionaries
