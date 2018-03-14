@@ -18,14 +18,14 @@ NUM_BROWSERS = 5
 #src = 'file:detection/dstl-oprh.js'
 #src = 'file:detection/player.js'
 #
-#src = 'file:detection/webfont.js'
+#src = 'file:detection/42b5cc67'
 #scanner = Scanner.Scanner()
 #scanner.downloadFile(src)
 #scanner.printScripts()
 #sys.exit('tempquitje')
 
 #fileReader = csv.reader(open('detection/alexa/top-1m.csv'), delimiter=',')
-fileReader = csv.reader(open('detection/verification/sucuri.csv'), delimiter=',')
+fileReader = csv.reader(open('detection/verification/cloudflare.csv'), delimiter=',')
 
 
 # Loads the manager preference and 3 copies of the default browser dictionaries

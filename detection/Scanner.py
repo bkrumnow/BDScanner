@@ -23,9 +23,9 @@ class Scanner:
     def scan(self, driver, visit_id):
         self.visitId = visit_id
 
-        #Scan Main page Source
-        pageSource = driver.page_source
-        self.analyse(pageSource, 'index.html', 'index.html')
+        #Scan Main page Source (innerscripts are already seperated no use )
+        #pageSource = driver.page_source
+        #self.analyse(pageSource, 'index.html', 'index.html')
 
         counter = 1
         for element in driver.find_elements_by_tag_name('script'):
@@ -178,10 +178,9 @@ class Scanner:
             print("Error inserting detection record %s %s %s" % (scriptId, topic, pattern))
 
     def persistResults(self, sock, visit_id, manager_params):
-        print('PERSISTRESULTD %s' % len(self.scripts))
+        print('PERSIST SCRIPTS %s' % len(self.scripts))
         #print('self %s' % self)
         for script in self.scripts:
-            print('persist Result %s' % visit_id)
             scriptId = str(visit_id) + '_' + script.identifier + '_' + str(random.randint(1,101)*5)
             self.insertScript(sock, scriptId, visit_id, script.identifier, script.URL)
             for key, value in script.detectionPatterns.iteritems():

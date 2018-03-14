@@ -1,10 +1,12 @@
+import re
+
 class BotDetectionPattern:
 
   def __init__(self):
         self.WebBot = [
-            "$cdc",
-            "$wdc",
-            "$[a-z]dc",
+            "\$cdc",
+            "\$wdc",
+            "\$[a-z]dc",
             "webdriver_evaluate",
             "webdriver-evaluate",
             "selenium_evaluate",
@@ -63,7 +65,12 @@ class BotDetectionPattern:
             ('ShieldSquare', ['typeof a.__webdriver_script_fn ', '","j34":"', '"undefined" !== typeof a._Selenium_IDE_Recorder']),
             ('Bowser', ['} : /phantom/i.test\(e\) ?', 'name: "SlimerJS"', 'Bowser']),
             ('liveintent', ['name: "phantomjs",', '"./internal/default_filter"', '"./processors/stack": 10', 'o = r.appId || "mint-production-appId"']),
-            ('webfont_googleAPI', ['a.a.indexOf\("PhantomJS"\)', 'e = "PhantomJS"', 'a.a.indexOf\("PlayStation"\)', 'a.a.indexOf\("AdobeAIR"\)', 'Web Font Loader'])
+            ('webfont_googleAPI', ['a.a.indexOf\("PhantomJS"\)', 'e = "PhantomJS"', 'a.a.indexOf\("PlayStation"\)', 'a.a.indexOf\("AdobeAIR"\)', 'Web Font Loader']),
+            ('fox_browser', ['function getWindowsVersion\(s\)','/phantom/i.test\(ua\)', '/slimerjs/i.test\(ua\)', 'function detect\(ua\)']),
+            ('akamaicdc', ['in document || navigator.webdriver', '\$cdc_asdjflasutopfhvcZLmcfl_', '"callPhantom" in e || /PhantomJS/i.test']),
+            ('unknown_obf', [re.escape('var _ = ["opera", "Candara", "", "btoa", "HTMLMenuItemElement", "Vani", "timing", "Malgun Gothic", "navigator", "Calibri", "Opera", "screenX", "Shonar Bangla", "bt", "charCodeAt", "save", "[object SafariRemoteNotification]", "charAt", "1.0", "<div>", "textBaseline", "XMLHttpRequest", "7", "MS PGothic", "Noteworthy", "5.0", "getElementsByClassName", "src", "port", "compute", "Apple SD Gothic Neo", "hostname", "screenY", "Lucida Sans", "product", "AVENIR", "Synchro LET", "getImageData", "Vijaya", "Yu Gothic UI", "outerWidth", "1.4", "Skia", "ieps", "indexedDB", "AcroPDF.PDF.1", "ShockwaveFlash.ShockwaveFlash.7", ".", "number", "toHexStr", "bazadebezolkohpepadr", "Chrome IOS", "/akam/10/pixel_", "object", "exitEarly", "Big Caslon", "18pt Tahoma", "insertBefore", "location", "boolean", "chrome", "}", "Gill Sans", "documentElement", "encodeURIComponent", "screen", "description", "ap", "Safari", "profile", "oscpu", "childNodes", "drawImage", "open", "</div>", "documentMode", "name", "Microsoft.XMLHTTP", "text", "IE", "Monaco", "=", "fonts", "detachEvent", "Mona Lisa Solid ITC TT", "driver", "doNotTrack", "sr", "sessionStorage", "Abadi MT Condensed Light", "2.0", "pageXOffset", "ROTL", "1.9", "now", "ceil", "globalStorage", "urhehlevkedkilrobacf",')])
+
+
         ]
         self.Captcha = []
         self.Navigator = [
