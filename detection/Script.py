@@ -4,7 +4,11 @@ class Script:
         self.detectionPatterns = {}
         self.companyPatterns = []
         self.URL = ''
+        self.score = 0
 
+
+    def increaseScore(self, value):
+        self.score += value
 
     def addCompanyPattern(self, companyPattern):
         if companyPattern not in self.companyPatterns:

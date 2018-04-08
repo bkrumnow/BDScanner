@@ -6,6 +6,7 @@ import re, binascii
 import os
 import random
 import BotDetectionPattern
+from detectionPatterns import DocumentKeysDetectionPatterns, GeneralDetectionPatterns, NavigatorDetectionPatterns, WindowKeysDetectionPatterns
 from datetime import datetime
 from detection import PatternChecker, Script
 
@@ -18,6 +19,9 @@ class Scanner:
     def __init__(self):
         self.scripts = []
         self.visitId = None
+        self.scorePatterns = [];
+        self.scorePatterns.extend((GeneralDetectionPatterns.GeneralDetectionPatterns(), DocumentKeysDetectionPatterns.DocumentKeysDetectionPatterns(),
+        NavigatorDetectionPatterns.NavigatorDetectionPatterns(),WindowKeysDetectionPatterns.WindowKeysDetectionPatterns()))
         self.botDetectionPattern = BotDetectionPattern.BotDetectionPattern()
 
     def scan(self, driver, visit_id):
@@ -130,11 +134,28 @@ class Scanner:
             self.writeFile(identifier, res, str(self.visitId) + '/')
 
     def analysePatterns(self, currentScript, res, identifier, path):
-        #patternTopics = ["Companies", "Captcha", "WebBot", "Browser", "Graphics"]
-        patternTopics = ["Captcha", "WebBot", "Browser", "Graphics", "CompanyPattern"]
+        patternTopics = ["CompanyPattern"]
         corruptFile = False
         print('analyse patterns %s' % identifier[:15])
-        lowerRes = res.lower();
+
+        for detectionClass in self.scorePatterns:
+            if corruptFile:
+                return
+
+            for detectionPattern in detectionClass.patterns:
+                for pattern in detectionPattern[1]: #todo can this be more efficient
+                    result = PatternChecker.checkPattern(res, [pattern], path)
+                    if result == -1:
+                        corruptFile = True
+                        return
+
+                    if (result):
+                        if currentScript == None:
+                            currentScript = Script.Script(identifier)
+
+                        currentScript.increaseScore(detectionPattern[0])
+                        currentScript.addDetectionPattern('test', pattern)
+
         for topic in patternTopics:
             if corruptFile:
                 return

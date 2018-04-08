@@ -9,7 +9,7 @@ import sys
 NUM_BROWSERS = 5
 
         #LOCAL FILES
-#from detection import Scanner
+from detection import Scanner
 #src = 'file:detection/zwxsutztwbeffxbyzcquv.js'
         #src = 'file:detection/unknownhex.js'
 #        src = 'https://dev.visualwebsiteoptimizer.com/2.0/va-33a5ce6d810338ed1c4d5ec7d320b624.js'
@@ -18,14 +18,14 @@ NUM_BROWSERS = 5
 #src = 'file:detection/dstl-oprh.js'
 #src = 'file:detection/player.js'
 #
-#src = 'file:detection/42b5cc67'
-#scanner = Scanner.Scanner()
-#scanner.downloadFile(src)
-#scanner.printScripts()
-#sys.exit('tempquitje')
+src = 'file:detection/whitehat/b6be0a52-6193-'
+scanner = Scanner.Scanner()
+scanner.downloadFile(src)
+scanner.printScripts()
+sys.exit('tempquitje')
 
 #fileReader = csv.reader(open('detection/alexa/top-1m.csv'), delimiter=',')
-fileReader = csv.reader(open('detection/verification/cloudflare.csv'), delimiter=',')
+fileReader = csv.reader(open('detection/validation/alienvault.csv'), delimiter=',')
 
 
 # Loads the manager preference and 3 copies of the default browser dictionaries
