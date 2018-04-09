@@ -2,7 +2,8 @@ class NavigatorDetectionPatterns:
 
     def __init__(self):
         self.patterns = []
-        phantom = (1.4, ["maxTouchPoints",
+        self.name = "NavigatorAttr"
+        phantom = (1.4, "PhantomJS", ["maxTouchPoints",
                          "hardwareConcurrency",
                          "doNotTrack",
                          "geolocation",
@@ -15,7 +16,7 @@ class NavigatorDetectionPatterns:
                          "permissions",
                          "presentation",
                          "navigator.vendor"])
-        selenium = (1.4, ["webdriver"])
-        general = (1.4, ["navigator.appVersion", "navigator.userAgent", "navigator.vendor",
+        selenium = (1.4, "Selenium", ["webdriver"])
+        misc = (1.4, "Misc.", ["navigator.appVersion", "navigator.userAgent", "navigator.vendor",
         "navigator.onLine"]) #not documented
-        self.patterns.extend((phantom, selenium, general))
+        self.patterns.extend((phantom, selenium, misc))

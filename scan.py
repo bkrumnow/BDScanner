@@ -6,7 +6,7 @@ import sys
 
 
 # The list of sites that we wish to crawl
-NUM_BROWSERS = 5
+NUM_BROWSERS = 1
 
         #LOCAL FILES
 from detection import Scanner
@@ -18,14 +18,15 @@ from detection import Scanner
 #src = 'file:detection/dstl-oprh.js'
 #src = 'file:detection/player.js'
 #
-src = 'file:detection/whitehat/b6be0a52-6193-'
-scanner = Scanner.Scanner()
-scanner.downloadFile(src)
-scanner.printScripts()
-sys.exit('tempquitje')
+#src = 'file:detection/whitehat/b6be0a52-6193-'
+#src = 'file:detection/nu.nl/4751656579.js'
+#scanner = Scanner.Scanner()
+#scanner.downloadFile(src)
+#scanner.printScripts()
+#sys.exit('tempquitje')
 
 #fileReader = csv.reader(open('detection/alexa/top-1m.csv'), delimiter=',')
-fileReader = csv.reader(open('detection/validation/alienvault.csv'), delimiter=',')
+fileReader = csv.reader(open('detection/validation/boe.csv'), delimiter=',')
 
 
 # Loads the manager preference and 3 copies of the default browser dictionaries

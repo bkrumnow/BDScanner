@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS site_visits (
     visit_id INTEGER PRIMARY KEY,
     crawl_id INTEGER NOT NULL,
     site_url VARCHAR(500) NOT NULL,
-    score integer,
+    score DECIMAL,
     FOREIGN KEY(crawl_id) REFERENCES crawl(id));
 
 /* Firefox Storage Vector Dumps */
@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS Scripts (
     name TEXT,
     URL TEXT,
     level INTEGER,
-    score integer,
+    score DECIMAL,
     date DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(visit_id) REFERENCES site_visits(id));
 

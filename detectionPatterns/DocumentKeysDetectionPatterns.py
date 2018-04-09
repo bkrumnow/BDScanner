@@ -2,7 +2,8 @@ class DocumentKeysDetectionPatterns:
 
     def __init__(self):
         self.patterns = []
-        phantom = (1.4, ["origin",
+        self.name = "DocumentKeys"
+        phantom = (1.4, "PhantomJS", ["origin",
                          "xmlEncoding",
                          "xmlVersion",
                          "xmlStandalone",
@@ -58,12 +59,12 @@ class DocumentKeysDetectionPatterns:
                          "onwebkitanimationiteration",
                          "onwebkitanimationstart",
                          "onwebkittransitionend"])
-        seleniumChrome  = (1.4, ["\$cdc","\$wdc","\$[a-z]dc"])
-        nightmare = (1.4, ["onvisibilitychange", "onshow"])
-        seleniumIE = (1.4, ["__IE_DEVTOOLBAR_CONSOLE_EVAL_ERROR", "__IE_DEVTOOLBAR_CONSOLE_EVAL_ERRORCODE",
+        seleniumChrome  = (1.4, "SelChromeChromium", ["\$cdc","\$wdc","\$[a-z]dc"])
+        nightmare = (1.4, "Nightmare", ["onvisibilitychange", "onshow"])
+        seleniumIE = (1.4, "SelIE", ["__IE_DEVTOOLBAR_CONSOLE_EVAL_ERROR", "__IE_DEVTOOLBAR_CONSOLE_EVAL_ERRORCODE",
         "__webdriver_script_fn"])
-        general = (1.4, ["_IDE([^a-zA-z]|_)", "callSelenium", "_Selenium_IDE_Recorder","selenium",
+        misc = (1.4, "Misc.", ["_IDE([^a-zA-z]|_)", "callSelenium", "_Selenium_IDE_Recorder","selenium",
         "nightmare","_selenium", "fxdriver_evaluate","driver_unwrapped", "webdriver_unwrapped",
         "driver_evaluate", "selenium_unwrapped","fxdriver_unwrapped", "webdriver_evaluate", "webdriver-evaluate",
         "selenium_evaluate", "webdriver_script_function", "webdriver_script_func"])
-        self.patterns.extend((phantom, seleniumChrome, nightmare, seleniumIE, general))
+        self.patterns.extend((phantom, seleniumChrome, nightmare, seleniumIE, misc))

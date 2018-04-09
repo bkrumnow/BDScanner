@@ -2,7 +2,8 @@ class WindowKeysDetectionPatterns:
 
     def __init__(self):
         self.patterns = []
-        phantom = (1.4, [
+        self.name = "WindowKeys"
+        phantom = (1.4, "PhantomJS", [
             "origin",
             "customElements",
             "external",
@@ -58,13 +59,13 @@ class WindowKeysDetectionPatterns:
             "webkitConvertPointFromPageToNode",
             "webkitCancelRequestAnimationFrame",
         ])
-        nightmare = (1.4, ["__nightmare", "onshow"])
-        general = (1.4, ["window.chrome", "window.attr", "onbeforeprint", "onafterprint", "onmessageerror",
+        nightmare = (1.4, "Nightmare", ["__nightmare", "onshow"])
+        misc = (1.4, "Misc", ["window.chrome", "window.attr", "onbeforeprint", "onafterprint", "onmessageerror",
         "onappinstalled", "onbeforeinstallprompt",
         "getMatchedCSSRules", #missing
         "console",
         ])
-        seleniumIE = (1.4, ["__BROWSERTOOLS_CONSOLE_SAFEFUNC", "__BROWSERTOOLS_CONSOLE_BREAKMODE_FUNC",
+        seleniumIE = (1.4, "SelIE", ["__BROWSERTOOLS_CONSOLE_SAFEFUNC", "__BROWSERTOOLS_CONSOLE_BREAKMODE_FUNC",
         "__BROWSERTOOLS_CONSOLE","__BROWSERTOOLS_EMULATIONTOOLS_ADDED","__BROWSERTOOLS_DOMEXPLORER_ADDED",
         "__BROWSERTOOLS_MEMORYANALYZER_ADDED","$0","$1","$2","$3","$4","__BROWSERTOOLS_NETWORK_TOOL_ADDED","__BROWSERTOOLS_DEBUGGER"])
-        self.patterns.extend((phantom, nightmare, general, seleniumIE))
+        self.patterns.extend((phantom, nightmare, misc, seleniumIE))
