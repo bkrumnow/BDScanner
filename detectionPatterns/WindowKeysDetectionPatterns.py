@@ -4,7 +4,7 @@ class WindowKeysDetectionPatterns:
         self.patterns = []
         self.name = "WindowKeys"
         phantom = (1.4, "PhantomJS", [
-            "origin",
+#            "origin",
             "customElements",
             "external",
             "onanimationend",
@@ -42,10 +42,10 @@ class WindowKeysDetectionPatterns:
             "speechSynthesis",
             "webkitRequestFileSystem",
             "webkitResolveLocalFileSystemURL",        
-            "TEMPORARY",
-            "PERSISTENT",
+            ("TEMPORARY",'C'),
+            ("PERSISTENT",'C'),
             "offscreenBuffering", #added
-            "event",
+#            "event",
             "webkitIndexedDB",
             "ontouchmove",
             "ontouchstart",
@@ -63,9 +63,10 @@ class WindowKeysDetectionPatterns:
         misc = (1.4, "Misc", ["window.chrome", "window.attr", "onbeforeprint", "onafterprint", "onmessageerror",
         "onappinstalled", "onbeforeinstallprompt",
         "getMatchedCSSRules", #missing
-        "console",
+#        ".console",
         ])
-        seleniumIE = (1.4, "SelIE", ["__BROWSERTOOLS_CONSOLE_SAFEFUNC", "__BROWSERTOOLS_CONSOLE_BREAKMODE_FUNC",
-        "__BROWSERTOOLS_CONSOLE","__BROWSERTOOLS_EMULATIONTOOLS_ADDED","__BROWSERTOOLS_DOMEXPLORER_ADDED",
-        "__BROWSERTOOLS_MEMORYANALYZER_ADDED","$0","$1","$2","$3","$4","__BROWSERTOOLS_NETWORK_TOOL_ADDED","__BROWSERTOOLS_DEBUGGER"])
+        seleniumIE = (1.4, "SelIE", [("__BROWSERTOOLS_CONSOLE_SAFEFUNC",'C'), ("__BROWSERTOOLS_CONSOLE_BREAKMODE_FUNC",'C'),
+        ("__BROWSERTOOLS_CONSOLE",'C'),("__BROWSERTOOLS_EMULATIONTOOLS_ADDED",'C'),("__BROWSERTOOLS_DOMEXPLORER_ADDED",'C'),
+        ("__BROWSERTOOLS_MEMORYANALYZER_ADDED","$0","$1","$2","$3","$4",'C'),("__BROWSERTOOLS_NETWORK_TOOL_ADDED",'C'),
+        ("__BROWSERTOOLS_DEBUGGER",'C')])
         self.patterns.extend((phantom, nightmare, misc, seleniumIE))

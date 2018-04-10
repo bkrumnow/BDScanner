@@ -142,7 +142,19 @@ class Scanner:
 
             for detectionPattern in detectionClass.patterns:
                 for pattern in detectionPattern[2]: #todo can this be more efficient
-                    result = PatternChecker.checkPattern(res, [pattern], path)
+                    ignoreCase = True
+                    patternType = type(pattern)
+                    if (patternType is tuple):
+                        pattern = pattern[0];
+                        ignoreCase = False
+
+                    if type(pattern) is str:
+                        valueToCheck = [pattern]
+                    else:
+                        valueToCheck = pattern
+                        pattern = ','.join(pattern)
+
+                    result = PatternChecker.checkPattern(res, valueToCheck, path, ignoreCase)
                     if result == -1:
                         corruptFile = True
                         return
@@ -157,7 +169,7 @@ class Scanner:
         #now we have a pattern detected .. is it from a company?
         if currentScript:
             for companyPattern in self.botDetectionPattern.CompanyPattern:
-                companyResult = PatternChecker.checkPattern(res, companyPattern[1], path)
+                companyResult = PatternChecker.checkPattern(res, companyPattern[1], path, True)
 
                 if companyResult:
                     currentScript.addCompanyPattern(companyPattern)

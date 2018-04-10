@@ -19,7 +19,7 @@ from detection import Scanner
 #src = 'file:detection/player.js'
 #
 #src = 'file:detection/whitehat/b6be0a52-6193-'
-#src = 'file:detection/nu.nl/4751656579.js'
+#src = 'file:detection/nu.nl/modernizr.js'
 #scanner = Scanner.Scanner()
 #scanner.downloadFile(src)
 #scanner.printScripts()

@@ -3,8 +3,7 @@ class DocumentKeysDetectionPatterns:
     def __init__(self):
         self.patterns = []
         self.name = "DocumentKeys"
-        phantom = (1.4, "PhantomJS", ["origin",
-                         "xmlEncoding",
+        phantom = (1.4, "PhantomJS", ["xmlEncoding",
                          "xmlVersion",
                          "xmlStandalone",
                          "selectedStylesheetSet",
@@ -61,7 +60,7 @@ class DocumentKeysDetectionPatterns:
                          "onwebkittransitionend"])
         seleniumChrome  = (1.4, "SelChromeChromium", ["\$cdc","\$wdc","\$[a-z]dc"])
         nightmare = (1.4, "Nightmare", ["onvisibilitychange", "onshow"])
-        seleniumIE = (1.4, "SelIE", ["__IE_DEVTOOLBAR_CONSOLE_EVAL_ERROR", "__IE_DEVTOOLBAR_CONSOLE_EVAL_ERRORCODE",
+        seleniumIE = (1.4, "SelIE", [("__IE_DEVTOOLBAR_CONSOLE_EVAL_ERROR",'C'), ("__IE_DEVTOOLBAR_CONSOLE_EVAL_ERRORCODE",'C'),
         "__webdriver_script_fn"])
         misc = (1.4, "Misc.", ["_IDE([^a-zA-z]|_)", "callSelenium", "_Selenium_IDE_Recorder","selenium",
         "nightmare","_selenium", "fxdriver_evaluate","driver_unwrapped", "webdriver_unwrapped",

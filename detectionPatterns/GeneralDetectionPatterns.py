@@ -26,12 +26,27 @@ class GeneralDetectionPatterns:
     "plugins.length == 0", "plugins.length === 0", "x-pnacl"])
     stackTrace = (0.2, "StackTrace", [".stack"])
     webSecurity = (0.1, "WebSecurity", [])
-    popupSuppression = (1, "PopupSuppression", ["Date.now", "alert"])
+    popupSuppression = (1, "PopupSuppression", [["Date.now", "alert"]])
     mimeTypes = (1.4, "MimeTypes", ["mimeTypes"])
     languages = (1.6, "Languages", ["navigator.languages"])
     images = (0.1, "Images", ["Brain Paul", "Mesa OffScreen", "image.width === 0", "image.width == 0", "image.height === 0","image.height == 0"])
     misc = (0.1, "Misc", ["Function.prototype.bind", "Function.prototype.toString", "window.Buffer", "window.emit", "window.spawn",
     "outerWidth === 0", "outerWidth == 0", "outerHeight === 0","outerHeight == 0", "Modernizr['hairline']"])
     blackList = (2.0, "BlackList", ['Mozilla/4.0 (Windows NT 6.2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.70 Safari/537.17']) #VAMSOFT
-    self.patterns.extend((userAgent, colorDepth,hardWareConcurrency,canvas,webgl,liedLanguages,touchSupport,fonts,flashSupport,plugins,
-    stackTrace,webSecurity,popupSuppression,mimeTypes,languages,images,misc,blackList))
+
+    self.patterns.extend((userAgent,
+    colorDepth,
+    hardWareConcurrency,
+    canvas,webgl,
+    liedLanguages,
+    touchSupport,
+    fonts,
+    flashSupport,plugins,
+#    stackTrace,
+    webSecurity,
+    popupSuppression,
+    mimeTypes,
+    languages,
+    images,
+    misc,
+    blackList))

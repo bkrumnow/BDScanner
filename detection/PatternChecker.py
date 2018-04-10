@@ -1,6 +1,6 @@
 import re
 
-def checkPattern(data, patterns, scriptPath):
+def checkPattern(data, patterns, scriptPath, ignoreCase):
     try:
         retValue = 0
 
@@ -10,7 +10,12 @@ def checkPattern(data, patterns, scriptPath):
 #            if '_Selenium_IDE_Recorder' in pattern:
 #                print ('comparing %s %s' % (pattern, data))
 
-            if re.search(compiledPattern.pattern, data, re.IGNORECASE):
+            if ignoreCase:
+                result = re.search(compiledPattern.pattern, data, re.IGNORECASE)
+            else:
+                result = re.search(compiledPattern.pattern, data)
+
+            if result:
                 retValue = 1
             else:
                 retValue = 0
