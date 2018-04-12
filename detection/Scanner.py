@@ -4,7 +4,6 @@ import json, gzip
 import StringIO
 import re, binascii
 import os, sys
-import random
 import BotDetectionPattern
 from detectionPatterns import DocumentKeysDetectionPatterns, GeneralDetectionPatterns, NavigatorDetectionPatterns, WindowKeysDetectionPatterns
 from datetime import datetime
@@ -14,7 +13,8 @@ from detection import PatternChecker, Script
 #   patterns = json.load(data_file)
 
 class Scanner:
-    def __init__(self):
+    def __init__(self, db):
+        self.db = db
         self.scripts = []
         self.visitId = None
         self.scorePatterns = [];
@@ -38,13 +38,20 @@ class Scanner:
             except:
                 print("Error while obtaining src element attribute");
 
+#            if counter > 4:
+#                self.db.scripts = self.scripts
+#                return;
+
             if scriptSrc:
+#                counter = counter +1
                 self.downloadFile(scriptSrc)
             else:
                 outerHTML = element.get_attribute('outerHTML')
                 fileName = 'inlineScript' + str(counter)
                 self.analyse(outerHTML, fileName, fileName)
                 counter = counter +1
+
+        self.db.scripts = self.scripts
 
     def downloadFile(self, src):
         data = ''
@@ -129,7 +136,7 @@ class Scanner:
 
             self.scripts.append(currentScript)
             print("append@@@ %s" % len(self.scripts))
-            self.writeFile(identifier, res, str(self.visitId) + '/')
+            self.db.writeFile(identifier, res, str(self.visitId) + '/')
 
     def analysePatterns(self, currentScript, res, identifier, path):
         patternTopics = ["CompanyPattern"]
@@ -164,7 +171,7 @@ class Scanner:
                             currentScript = Script.Script(identifier)
 
                         currentScript.increaseScore(detectionPattern[0])
-                        currentScript.addDetectionPattern(detectionClass.name + '_' + detectionPattern[1], pattern)
+                        currentScript.addDetectionPattern(detectionClass.name + '_' + detectionPattern[1], pattern, detectionPattern[0])
 
         #now we have a pattern detected .. is it from a company?
         if currentScript:
@@ -176,63 +183,3 @@ class Scanner:
 
             print("script score %s" % currentScript.score)
         return currentScript
-
-
-    def insertScript(self, sock, id, visit_id, identifier, URL, score):
-        try:
-            query = ("INSERT INTO Scripts (id, visit_id, name, URL, level, score) VALUES (?,?,?,?,?,?)",
-            (id, visit_id, identifier, URL, 0, score))
-            sock.send(query)
-        except:
-            print("Error inserting script record %s %s" % (identifier, id))
-
-    def insertDetection(self, sock, scriptId, topic, pattern, company):
-        try:
-            query = ("INSERT INTO DetectionPatterns (script_id, topic, pattern, value, company) VALUES (?,?,?,?,?)",
-            (scriptId, topic, pattern, '', company))
-            sock.send(query)
-        except:
-            print("Error inserting detection record %s %s %s" % (scriptId, topic, pattern))
-
-    def updateSiteVisit(self, sock, score, visitId):
-        try:
-            query = ("UPDATE site_visits SET score=? WHERE visit_id=?",
-            (score, visitId))
-            sock.send(query)
-        except:
-            print("Error updating site_visit record %s %s %s" % (score, visitId, sys.exc_info()[0]))
-
-
-    def persistResults(self, sock, visit_id, manager_params):
-        print('PERSIST SCRIPTS %s' % len(self.scripts))
-        highestScore =0
-        #print('self %s' % self)
-        for script in self.scripts:
-            if script.score > highestScore:
-                highestScore = script.score
-
-            scriptId = str(visit_id) + '_' + script.identifier + '_' + str(random.randint(1,101)*5)
-            self.insertScript(sock, scriptId, visit_id, script.identifier, script.URL, script.score)
-            for key, value in script.detectionPatterns.iteritems():
-                self.insertDetection(sock, scriptId, key, ','.join(value), ','.join(script.companyPatterns))
-        self.updateSiteVisit(sock, highestScore, visit_id)
-
-
-    def writeFile(self, name, data, prefix=''):
-        path = '/home/osboxes/OpenWPM/detection/files/' +prefix
-        try:
-            os.makedirs(path)
-        except:
-            pass
-
-        try:
-            with open(path + name[:14], 'w') as file:
-                file.write(data.encode('utf-8'))
-        except:
-            print("Could not write file %s" % name)
-
-    def printScripts(self):
-        for script in self.scripts:
-            print ("Company %s" % script.companyPatterns)
-            for key, value in script.detectionPatterns.iteritems():
-                print("Key Value %s %s" % (key, ','.join(value)))

@@ -75,7 +75,11 @@ class BotDetectionPattern:
             ('Segmentify_BrowserFP', [re.escape('var r, i = n(/(ipod|iphone|ipad)/i).toLowerCase(),'), re.escape('version: n(/slimerjs\/(\d+(\.\d+)?)/i)')]),
             ('AkamaiBlockBotsUA', [re.escape('/Mozilla\/5\.0\s\(Windows\sNT\s6\.1;\sWOW64;\sTrident\/7\.0;\sSLCC2;\s\.NET\sCLR\s2\.0\.50727;\s\.NET\sCLR\s3\.5\.30729;\s\.NET\sCLR\s3\.0\.30729;\s\.NET4\.0C;\s\.NET4\.0E;\srv:11\.0\)\slike\sGecko/i) || navigator.userAgent.match(/Mozilla\/5\.0\s\(Windows\sNT\s6\.1;\sWOW64;\srv:45\.0\)\sGecko\/20100101\sFirefox\/45\.0/i) || navigator.userAgent.match(/PTST/i)')]),
             ('AkamaiBlockBotsUA2', [re.escape('\sWOW64;'), 'Block bot agents', 'AKM-41']),
-            ('modernizr', ['Modernizr._config.classPrefix', 'Modernizr.addTest', re.escape('Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Min')])
+            ('modernizr', ['Modernizr._config.classPrefix', 'Modernizr.addTest', re.escape('Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Min')]),
+            ('gigyaFP', ['gigya','navigator.mimeTypes']),
+            ('Tealium_utag', ['tealium universal tag', 'navigator.plugins.length', 'screen.colorDepth']),
+            ('JW Player', ['JW Player','navigator.userAgent', 'navigator.plugins.length']),
+            ('SnapABug', ['SnapABug', 'SnapEngage'])
         ]
         self.Captcha = []
         self.Navigator = [

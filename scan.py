@@ -10,6 +10,7 @@ NUM_BROWSERS = 1
 
         #LOCAL FILES
 from detection import Scanner
+from detection.db import DB
 #src = 'file:detection/zwxsutztwbeffxbyzcquv.js'
         #src = 'file:detection/unknownhex.js'
 #        src = 'https://dev.visualwebsiteoptimizer.com/2.0/va-33a5ce6d810338ed1c4d5ec7d320b624.js'
@@ -20,14 +21,12 @@ from detection import Scanner
 #
 #src = 'file:detection/whitehat/b6be0a52-6193-'
 #src = 'file:detection/nu.nl/modernizr.js'
-#scanner = Scanner.Scanner()
+#db = DB.DB()
+#scanner = Scanner.Scanner(db)
 #scanner.downloadFile(src)
-#scanner.printScripts()
+#db.scripts = scanner.scripts
+#db.printScripts()
 #sys.exit('tempquitje')
-
-#fileReader = csv.reader(open('detection/alexa/top-1m.csv'), delimiter=',')
-fileReader = csv.reader(open('detection/validation/boe.csv'), delimiter=',')
-
 
 # Loads the manager preference and 3 copies of the default browser dictionaries
 manager_params, browser_params = TaskManager.load_default_params(NUM_BROWSERS)
@@ -48,6 +47,9 @@ manager_params['log_directory'] = '~/OpenWPM/data'
 # Instantiates the measurement platform
 # Commands time out by default after 60 seconds
 manager = TaskManager.TaskManager(manager_params, browser_params)
+
+#fileReader = csv.reader(open('detection/alexa/top-1m.csv'), delimiter=',')
+fileReader = csv.reader(open('detection/validation/zenedge.csv'), delimiter=',')
 
 # Visits the sites with all browsers simultaneously
 for (index, url) in fileReader:

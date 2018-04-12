@@ -1,3 +1,5 @@
+import DetectionPattern
+
 class Script:
     def __init__(self, id):
         self.identifier = id
@@ -14,14 +16,12 @@ class Script:
         if companyPattern not in self.companyPatterns:
             self.companyPatterns.append(companyPattern[0])
 
-    def addDetectionPattern(self, topic, searchPattern):
-        searchPatterns = []
+    def addDetectionPattern(self, topic, searchPattern, score):
         if topic in self.detectionPatterns:
-            searchPatterns = self.detectionPatterns[topic];
+            detectionPattern = self.detectionPatterns[topic];
+            detectionPattern.score = detectionPattern.score + score;
+            detectionPattern.patterns.append(searchPattern)
+#            if searchPattern not in searchPatterns:
+            self.detectionPatterns[topic] = detectionPattern
         else:
-            searchPatterns = []
-
-        if searchPattern not in searchPatterns:
-            searchPatterns.append(searchPattern)
-
-        self.detectionPatterns[topic] = searchPatterns
+            self.detectionPatterns[topic] = DetectionPattern.DetectionPattern(score, searchPattern)

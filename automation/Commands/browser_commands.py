@@ -16,6 +16,7 @@ import sys
 import gzip
 import os
 from detection import Scanner
+from detection.db import DB
 
 from ..SocketInterface import clientsocket
 from ..MPLogger import loggingclient
@@ -400,7 +401,8 @@ def dump_page_source(visit_id, driver, manager_params, suffix=''):
 
 def detect_webbot_detection(visit_id, driver, manager_params, suffix=''):
 
-    scanner = Scanner.Scanner()
+    db = DB.DB()
+    scanner = Scanner.Scanner(db)
     scanner.scan(driver, visit_id)
 
     try:
@@ -410,7 +412,9 @@ def detect_webbot_detection(visit_id, driver, manager_params, suffix=''):
     except:
         print('Error socket connection to DB')
 
-    scanner.persistResults(sock, visit_id, manager_params)
+
+    db.persistResults(sock, visit_id, manager_params)
+
     # Close connection to db
     sock.close()
     del scanner;

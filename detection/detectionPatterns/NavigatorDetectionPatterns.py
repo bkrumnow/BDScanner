@@ -3,7 +3,7 @@ class NavigatorDetectionPatterns:
     def __init__(self):
         self.patterns = []
         self.name = "NavigatorAttr"
-        phantom = (1.4, "PhantomJS", ["maxTouchPoints",
+        phantom = (0.2, "PhantomJS", ["maxTouchPoints",
                          "hardwareConcurrency",
                          "doNotTrack",
                          "geolocation",
