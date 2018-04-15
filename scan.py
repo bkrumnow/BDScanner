@@ -6,7 +6,7 @@ import sys
 
 
 # The list of sites that we wish to crawl
-NUM_BROWSERS = 1
+NUM_BROWSERS = 4
 
         #LOCAL FILES
 from detection import Scanner
@@ -20,7 +20,7 @@ from detection.db import DB
 #src = 'file:detection/player.js'
 #
 #src = 'file:detection/whitehat/b6be0a52-6193-'
-#src = 'file:detection/nu.nl/modernizr.js'
+#src = 'file:detection/2026481316.js'
 #db = DB.DB()
 #scanner = Scanner.Scanner(db)
 #scanner.downloadFile(src)
@@ -49,7 +49,7 @@ manager_params['log_directory'] = '~/OpenWPM/data'
 manager = TaskManager.TaskManager(manager_params, browser_params)
 
 #fileReader = csv.reader(open('detection/alexa/top-1m.csv'), delimiter=',')
-fileReader = csv.reader(open('detection/validation/zenedge.csv'), delimiter=',')
+fileReader = csv.reader(open('detection/validation/getastra.csv'), delimiter=',')
 
 # Visits the sites with all browsers simultaneously
 for (index, url) in fileReader:

@@ -48,7 +48,7 @@ class DB:
         self.updateSiteVisit(sock, highestScore, visit_id)
 
 
-    def writeFile(self, name, data, prefix='local'):
+    def writeFile(self, name, data, prefix):
         path = '/home/osboxes/OpenWPM/detection/files/' +prefix
         try:
             os.makedirs(path)
@@ -56,7 +56,7 @@ class DB:
             pass
 
         try:
-            with open(path + name[:14], 'w') as file:
+            with open(path + name, 'w') as file:
                 file.write(data.encode('utf-8'))
         except:
             print("Could not write file %s" % name)
@@ -64,5 +64,5 @@ class DB:
     def printScripts(self):
         for script in self.scripts:
             print ("Company %s" % script.companyPatterns)
-            for key, value in script.detectionPatterns.iteritems():
-                print("Key Value %s %s" % (key, ','.join(value)))
+            for key, detectionPattern in script.detectionPatterns.iteritems():
+                print("Pattern %s %s %s" % (key, ','.join(detectionPattern.patterns), detectionPattern.score))

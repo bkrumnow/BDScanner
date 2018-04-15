@@ -3,7 +3,7 @@ class GeneralDetectionPatterns:
   def __init__(self):
     self.patterns = []
     self.name = "General"
-    userAgent = (1, "UserAgent", [
+    userAgent = (3.0, "UserAgent", [
         "PhantomJS",
         "HeadlessChrome",
         "electron(?![a-zA-z])",
@@ -23,7 +23,7 @@ class GeneralDetectionPatterns:
     flashSupport = (0.6, "FlashSupport", ["___fp_swf_loaded", "swfobject.embedSWF", "allowScriptAccess"]) #not documented
     plugins = (1.4, "Plugins", ["navigator.plugins", "navigator.plugins.length",
     "window.ActiveXObject",  "plugins == 0", "plugins === 0",
-    "plugins.length == 0", "plugins.length === 0", "x-pnacl"])
+    "plugins.length == 0", "plugins.length === 0", "x-pnacl", "Shockwave Flash", "ShockwaveFlash.ShockwaveFlash"])
     stackTrace = (0.2, "StackTrace", [".stack"])
     webSecurity = (0.1, "WebSecurity", [])
     popupSuppression = (1, "PopupSuppression", [["Date.now", "alert"]])

@@ -58,11 +58,11 @@ class DocumentKeysDetectionPatterns:
                          "onwebkitanimationiteration",
                          "onwebkitanimationstart",
                          "onwebkittransitionend"])
-        seleniumChrome  = (1.4, "SelChromeChromium", ["\$cdc","\$wdc","\$[a-z]dc"])
-        nightmare = (1.4, "Nightmare", ["onvisibilitychange"])
-        seleniumIE = (1.4, "SelIE", [("__IE_DEVTOOLBAR_CONSOLE_EVAL_ERROR",'C'), ("__IE_DEVTOOLBAR_CONSOLE_EVAL_ERRORCODE",'C'),
+        seleniumChrome  = (4.0, "SelChromeChromium", ["\$cdc","\$wdc","\$[a-z]dc"])
+        nightmare = (0.2, "Nightmare", ["onvisibilitychange"])
+        seleniumIE = (4.0, "SelIE", [("__IE_DEVTOOLBAR_CONSOLE_EVAL_ERROR",'C'), ("__IE_DEVTOOLBAR_CONSOLE_EVAL_ERRORCODE",'C'),
         "__webdriver_script_fn"])
-        misc = (1.4, "Misc.", ["_IDE([^a-zA-z]|_)", "callSelenium", "_Selenium_IDE_Recorder","selenium",
+        misc = (4.0, "Misc.", ["_IDE([^a-zA-z]|_)", "callSelenium", "_Selenium_IDE_Recorder","selenium",
         "nightmare","_selenium", "fxdriver_evaluate","driver_unwrapped", "webdriver_unwrapped",
         "driver_evaluate", "selenium_unwrapped","fxdriver_unwrapped", "webdriver_evaluate", "webdriver-evaluate",
         "selenium_evaluate", "webdriver_script_function", "webdriver_script_func"])

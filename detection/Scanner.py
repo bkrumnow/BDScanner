@@ -47,7 +47,7 @@ class Scanner:
                 self.downloadFile(scriptSrc)
             else:
                 outerHTML = element.get_attribute('outerHTML')
-                fileName = 'inlineScript' + str(counter)
+                fileName = 'inlineScript' + str(counter) + '.js'
                 self.analyse(outerHTML, fileName, fileName)
                 counter = counter +1
 
@@ -95,8 +95,16 @@ class Scanner:
                 html = data
 
         if html:
-            #print("download %s %s" % (src, html[:8]))
-            self.analyse(html, src.split('/')[-1], src)
+            fileName = src.split('/')[-1];
+            if fileName:
+                if not fileName.endswith('.js'):
+                    fileName = fileName[:20] + '.js';
+                else:
+                    fileName = fileName[:20]
+
+                self.analyse(html, fileName, src)
+            else:
+                print("Filename could not be extracted %s" % (src))
         else:
             print("No content found %s" % (src))
 
@@ -134,14 +142,23 @@ class Scanner:
         if currentScript:
             currentScript.URL = path
 
-            self.scripts.append(currentScript)
-            print("append@@@ %s" % len(self.scripts))
-            self.db.writeFile(identifier, res, str(self.visitId) + '/')
+            if currentScript.score >= 1:
+              #now we have a pattern detected .. is it from a company?
+                for companyPattern in self.botDetectionPattern.CompanyPattern:
+                    companyResult = PatternChecker.checkPattern(res, companyPattern[1], path, True)
+
+                    if companyResult:
+                        currentScript.addCompanyPattern(companyPattern)
+
+                self.scripts.append(currentScript)
+                print("append@@@ %s %s %s" % (len(self.scripts), identifier, currentScript.score))
+
+                self.db.writeFile(identifier, res, str(self.visitId) + '/')
 
     def analysePatterns(self, currentScript, res, identifier, path):
         patternTopics = ["CompanyPattern"]
         corruptFile = False
-        print('analyse patterns %s' % identifier[:15])
+        print('analyse patterns %s' % identifier)
 
         for detectionClass in self.scorePatterns:
             if corruptFile:
@@ -173,13 +190,4 @@ class Scanner:
                         currentScript.increaseScore(detectionPattern[0])
                         currentScript.addDetectionPattern(detectionClass.name + '_' + detectionPattern[1], pattern, detectionPattern[0])
 
-        #now we have a pattern detected .. is it from a company?
-        if currentScript:
-            for companyPattern in self.botDetectionPattern.CompanyPattern:
-                companyResult = PatternChecker.checkPattern(res, companyPattern[1], path, True)
-
-                if companyResult:
-                    currentScript.addCompanyPattern(companyPattern)
-
-            print("script score %s" % currentScript.score)
         return currentScript
