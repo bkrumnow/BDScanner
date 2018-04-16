@@ -16,7 +16,7 @@ class NavigatorDetectionPatterns:
                          "permissions",
                          "presentation",
                          "navigator.vendor"])
-        selenium = (4.0, "Selenium", ["webdriver"])
+        selenium = (12.0, "Selenium", ["webdriver"])
         misc = (0.2, "Misc.", ["navigator.appVersion", "navigator.userAgent", "navigator.vendor",
         "navigator.onLine"]) #not documented
         self.patterns.extend((phantom, selenium, misc))

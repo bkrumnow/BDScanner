@@ -6,7 +6,7 @@ class BotDetectionPattern:
         self.WebBot = [
 #            "\$cdc",
 #            "\$wdc",
-#            "\$[a-z]dc",
+#            "\$[a-z]dc_",
 #            "webdriver_evaluate",
 #            "webdriver-evaluate",
 #            "selenium_evaluate",
@@ -81,10 +81,14 @@ class BotDetectionPattern:
             ('Tealium_utag', ['tealium universal tag', 'navigator.plugins.length', 'screen.colorDepth']),
             ('JW Player', ['JW Player','navigator.userAgent', 'navigator.plugins.length']),
             ('SnapABug', ['SnapABug', 'SnapEngage']),
+            ('SnapABug2?', ['Please leave us a message. 24/7 support is available for Enterprise and Premium', 'window.ActiveXObject', 'navigator.language']),
             ('optimizely', ['optimizely', re.escape('|ovibrowser|bolt|iron|vivaldi|iridium|phantomjs')]),
-            ('fingerprinterjs', ['fingerprinter', 'hasLiedResolutionKey', 'hasLiedBrowserKey']),
+            ('fingerprinterjs', ['webglKey', 'hasLiedResolutionKey', 'hasLiedBrowserKey', 'hasLiedOsKey']),
             ('bat.bing.com', ['bat.bing.com', 'addFraudSignals']),
-            ('Facebook', ['window.FB', 'facebook'])
+            ('Facebook', ['window.FB', 'facebook']),
+            ('PubAds', ['googletag.impl.pubads', 'window.navigator.plugins', 'ShockwaveFlash.ShockwaveFlash']),
+            ('SegmentAnalytics', ['phantomjs-prebuilt', 'karma-phantomjs-launcher']),
+            ('WebEngage', ['webengage/ua', re.escape('Google Page Speed Insights", "Site24x7", "PhantomJS"')])
         ]
         self.Captcha = []
         self.Navigator = [

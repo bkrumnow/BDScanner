@@ -4,9 +4,8 @@ from six.moves import range
 import csv
 import sys
 
-
 # The list of sites that we wish to crawl
-NUM_BROWSERS = 4
+NUM_BROWSERS = 6
 
         #LOCAL FILES
 from detection import Scanner
@@ -65,6 +64,7 @@ for (index, url) in fileReader:
     #command_sequence.save_screenshot('EndPrint', 1000)
     # index='**' synchronizes visits between the three browsers
     manager.execute_command_sequence(command_sequence, index=None)
+    del command_sequence
 
 # Shuts down the browsers and waits for the data to finish logging
 manager.close()

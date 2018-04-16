@@ -7,6 +7,7 @@ class Script:
         self.companyPatterns = []
         self.URL = ''
         self.score = 0
+        self.obfuscated = False
 
 
     def increaseScore(self, value):

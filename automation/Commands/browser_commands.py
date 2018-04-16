@@ -412,12 +412,15 @@ def detect_webbot_detection(visit_id, driver, manager_params, suffix=''):
     except:
         print('Error socket connection to DB')
 
-
     db.persistResults(sock, visit_id, manager_params)
 
     # Close connection to db
     sock.close()
-    del scanner;
+
+    # Delete instantiated objects
+    del db
+    del scanner
+    del sock
 
 def recursive_dump_page_source(visit_id, driver, manager_params, suffix=''):
     """Dump a compressed html tree for the current page visit"""

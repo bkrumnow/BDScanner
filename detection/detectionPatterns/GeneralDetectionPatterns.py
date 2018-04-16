@@ -3,7 +3,7 @@ class GeneralDetectionPatterns:
   def __init__(self):
     self.patterns = []
     self.name = "General"
-    userAgent = (3.0, "UserAgent", [
+    userAgent = (12.0, "UserAgent", [
         "PhantomJS",
         "HeadlessChrome",
         "electron(?![a-zA-z])",

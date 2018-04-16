@@ -90,6 +90,7 @@ CREATE TABLE IF NOT EXISTS CrawlHistory (
 /* Bot detection tables */
 CREATE TABLE IF NOT EXISTS Scripts (
     id TEXT PRIMARY KEY,
+    obfuscated BOOLEAN,
     visit_id INTEGER NOT NULL,
     name TEXT,
     URL TEXT,

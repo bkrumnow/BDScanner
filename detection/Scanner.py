@@ -6,11 +6,7 @@ import re, binascii
 import os, sys
 import BotDetectionPattern
 from detectionPatterns import DocumentKeysDetectionPatterns, GeneralDetectionPatterns, NavigatorDetectionPatterns, WindowKeysDetectionPatterns
-from datetime import datetime
 from detection import PatternChecker, Script
-
-#with open('detection/Patterns.json') as data_file:
-#   patterns = json.load(data_file)
 
 class Scanner:
     def __init__(self, db):
@@ -125,6 +121,7 @@ class Scanner:
         return p.sub(self.asciirepl, data)
 
     def analyse(self, data, identifier, path):
+        obfuscated = False
         try:
             res = jsbeautifier.beautify(data)
         except:
@@ -133,6 +130,7 @@ class Scanner:
 
         try:
             res = self.reformat_content(res)
+            obfuscated = True
         except:
             res = res
 
@@ -140,10 +138,11 @@ class Scanner:
         currentScript = self.analysePatterns(currentScript, res, identifier, path)
 
         if currentScript:
+            currentScript.obfuscated = obfuscated
             currentScript.URL = path
 
-            if currentScript.score >= 1:
-              #now we have a pattern detected .. is it from a company?
+            if currentScript.score >= 12:
+              #now that we have a pattern detected .. is it from a company?
                 for companyPattern in self.botDetectionPattern.CompanyPattern:
                     companyResult = PatternChecker.checkPattern(res, companyPattern[1], path, True)
 
@@ -156,7 +155,6 @@ class Scanner:
                 self.db.writeFile(identifier, res, str(self.visitId) + '/')
 
     def analysePatterns(self, currentScript, res, identifier, path):
-        patternTopics = ["CompanyPattern"]
         corruptFile = False
         print('analyse patterns %s' % identifier)
 

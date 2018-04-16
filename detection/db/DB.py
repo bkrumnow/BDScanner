@@ -7,10 +7,10 @@ class DB:
     def __init__(self):
         self.scripts = []
 
-    def insertScript(self, sock, id, visit_id, identifier, URL, score, company):
+    def insertScript(self, sock, id, visit_id, identifier, URL, score, company, obfuscated):
         try:
-            query = ("INSERT INTO Scripts (id, visit_id, name, URL, level, score, company) VALUES (?,?,?,?,?,?,?)",
-            (id, visit_id, identifier, URL, 0, score, company))
+            query = ("INSERT INTO Scripts (id, visit_id, name, URL, level, score, company, obfuscated) VALUES (?,?,?,?,?,?,?,?)",
+            (id, visit_id, identifier, URL, 0, score, company, obfuscated))
             sock.send(query)
         except:
             print("Error inserting script record %s %s" % (identifier, id))
@@ -42,7 +42,7 @@ class DB:
 
             scriptId = str(visit_id) + '_' + script.identifier + '_' + str(random.randint(1,101)*5)
             company = ','.join(script.companyPatterns)
-            self.insertScript(sock, scriptId, visit_id, script.identifier, script.URL, script.score, company)
+            self.insertScript(sock, scriptId, visit_id, script.identifier, script.URL, script.score, company, script.obfuscated)
             for key, detectionPattern in script.detectionPatterns.iteritems():
                 self.insertDetection(sock, scriptId, key, ','.join(detectionPattern.patterns), company, detectionPattern.score)
         self.updateSiteVisit(sock, highestScore, visit_id)
