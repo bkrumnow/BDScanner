@@ -57,7 +57,7 @@ class WindowKeysDetectionPatterns:
             "webkitConvertPointFromPageToNode",
             "webkitCancelRequestAnimationFrame",
         ])
-        phantomWebbot = (12.0, "PhantomJSWebbot", ["_phantom", "callPhantom",])
+        phantomWebbot = (12.0, "PhantomJSWebbot", ["_phantom(?![a-zA-z-])", "callPhantom",])
         nightmare = (12.0, "Nightmare", ["__nightmare"])
         misc = (1.4, "Misc", ["window.chrome", "window.attr", "onbeforeprint", "onafterprint", "onmessageerror",
         "onappinstalled", "onbeforeinstallprompt",

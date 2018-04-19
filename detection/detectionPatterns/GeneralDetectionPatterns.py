@@ -1,34 +1,36 @@
+import re
+
 class GeneralDetectionPatterns:
 
   def __init__(self):
     self.patterns = []
     self.name = "General"
     userAgent = (12.0, "UserAgent", [
-        "PhantomJS",
+        "PhantomJS(?![a-zA-z-])",
         "HeadlessChrome",
         "electron(?![a-zA-z])",
         "WOW64",
         "WOW32",
         "domAutomation",
         "slimer", "Sequentum"]) #not documented
-    colorDepth = (0.1, "ColorDepth", ["colorDepth", "screen.colorDepth", "window.screen.colorDepth"]);
-    hardWareConcurrency = (0.1, "HardwareConcurrency", ["navigator.hardwareConcurrency", "hardwareConcurrency"])
+    colorDepth = (0.1, "ColorDepth", ["colorDepth == 32", "screen.colorDepth", "window.screen.colorDepth"]);
+    hardWareConcurrency = (0.1, "HardwareConcurrency", ["navigator.hardwareConcurrency", "hardwareConcurrency == -1"])
     canvas = (1.2, "Canvas", ["createElement('canvas')", "canvas.getContext", "canvas.toDataURL"])
     webgl = (0.6, "WebGL", ["getContext\('webgl'\)", "getContext\('experimental-webgl'\)",
     "getSupportedExtensions", "createBuffer", "bindBuffer", "createProgram", "createShader",
     "getExtension('WEBGL_debug_renderer_info')"])
-    liedLanguages = (1, "LiedLanguages", ["navigator.language"])
+    liedLanguages = (1, "LiedLanguages", ["navigator.language", re.escape("navigator.languages["), "navigator.language.substr"])
     touchSupport = (0.1, "TouchSupport", ["navigator.maxTouchPoints", "maxTouchPoints", "createEvent('TouchEvent')"])
-    fonts = (0.1, "Fonts", ["style.fontFamily", "style.fontSize", "offsetHeight", "offsetWidth"])
+    fonts = (0.1, "Fonts", ["style.fontFamily", "style.fontSize", ".offsetHeight", ".offsetWidth"])
     flashSupport = (0.6, "FlashSupport", ["___fp_swf_loaded", "swfobject.embedSWF", "allowScriptAccess"]) #not documented
-    plugins = (1.4, "Plugins", ["navigator.plugins", "navigator.plugins.length",
+    plugins = (1.4, "Plugins", ["navigator.plugins.length",
     "window.ActiveXObject",  "plugins == 0", "plugins === 0",
-    "plugins.length == 0", "plugins.length === 0", "x-pnacl", "Shockwave Flash", "ShockwaveFlash.ShockwaveFlash"])
+    "plugins.length == 0", "plugins.length === 0", "plugins.length == 'undefined'", "plugins.length === 'undefined'","x-pnacl", "Shockwave Flash", "ShockwaveFlash.ShockwaveFlash"])
     stackTrace = (0.2, "StackTrace", [".stack"])
     webSecurity = (0.1, "WebSecurity", [])
     popupSuppression = (1, "PopupSuppression", [["Date.now", "alert"]])
     mimeTypes = (1.4, "MimeTypes", ["mimeTypes"])
-    languages = (1.6, "Languages", ["navigator.languages"])
+    languages = (1.6, "Languages", ["!navigator.languages", "navigator.languages.length", "navigator.languages === 'undefined'"])
     images = (0.1, "Images", ["Brain Paul", "Mesa OffScreen", "image.width === 0", "image.width == 0", "image.height === 0","image.height == 0"])
     misc = (0.1, "Misc", ["Function.prototype.bind", "Function.prototype.toString", "window.Buffer", "window.emit", "window.spawn",
     "outerWidth === 0", "outerWidth == 0", "outerHeight === 0","outerHeight == 0", "Modernizr['hairline']"])

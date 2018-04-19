@@ -9,10 +9,6 @@ class Script:
         self.score = 0
         self.obfuscated = False
 
-
-    def increaseScore(self, value):
-        self.score += value
-
     def addCompanyPattern(self, companyPattern):
         if companyPattern not in self.companyPatterns:
             self.companyPatterns.append(companyPattern[0])

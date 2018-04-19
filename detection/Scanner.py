@@ -6,7 +6,7 @@ import re, binascii
 import os, sys
 import BotDetectionPattern
 from detectionPatterns import DocumentKeysDetectionPatterns, GeneralDetectionPatterns, NavigatorDetectionPatterns, WindowKeysDetectionPatterns
-from detection import PatternChecker, Script
+from detection import PatternChecker, Script, ScoreCalculator
 
 class Scanner:
     def __init__(self, db):
@@ -91,6 +91,9 @@ class Scanner:
                 html = data
 
         if html:
+            if src.endswith('/'):
+                src = src[:-1]
+
             fileName = src.split('/')[-1];
             if fileName:
                 if not fileName.endswith('.js'):
@@ -140,6 +143,7 @@ class Scanner:
         if currentScript:
             currentScript.obfuscated = obfuscated
             currentScript.URL = path
+            ScoreCalculator.calculateScore(currentScript)
 
             if currentScript.score >= 12:
               #now that we have a pattern detected .. is it from a company?
@@ -185,7 +189,6 @@ class Scanner:
                         if currentScript == None:
                             currentScript = Script.Script(identifier)
 
-                        currentScript.increaseScore(detectionPattern[0])
                         currentScript.addDetectionPattern(detectionClass.name + '_' + detectionPattern[1], pattern, detectionPattern[0])
 
         return currentScript

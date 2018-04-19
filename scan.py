@@ -10,22 +10,22 @@ NUM_BROWSERS = 6
         #LOCAL FILES
 from detection import Scanner
 from detection.db import DB
-#src = 'file:detection/zwxsutztwbeffxbyzcquv.js'
+src = 'file:detection/zwxsutztwbeffxbyzcquv.js'
         #src = 'file:detection/unknownhex.js'
 #        src = 'https://dev.visualwebsiteoptimizer.com/2.0/va-33a5ce6d810338ed1c4d5ec7d320b624.js'
 #        self.downloadFile(src)
-#src = 'file:detection/async.js'
+src = 'file:detection/async.js'
 #src = 'file:detection/dstl-oprh.js'
 #src = 'file:detection/player.js'
 #
 #src = 'file:detection/whitehat/b6be0a52-6193-'
 #src = 'file:detection/2026481316.js'
-#db = DB.DB()
-#scanner = Scanner.Scanner(db)
-#scanner.downloadFile(src)
-#db.scripts = scanner.scripts
-#db.printScripts()
-#sys.exit('tempquitje')
+db = DB.DB()
+scanner = Scanner.Scanner(db)
+scanner.downloadFile(src)
+db.scripts = scanner.scripts
+db.printScripts()
+sys.exit('tempquitje')
 
 # Loads the manager preference and 3 copies of the default browser dictionaries
 manager_params, browser_params = TaskManager.load_default_params(NUM_BROWSERS)
