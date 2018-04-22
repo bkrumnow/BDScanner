@@ -125,11 +125,15 @@ class Scanner:
 
     def analyse(self, data, identifier, path):
         obfuscated = False
-        try:
-            res = jsbeautifier.beautify(data)
-        except:
-            print("Could not beautify %s" % (identifier))
-            res = data
+#        try:
+#            res = jsbeautifier.beautify(data)
+#        except:
+#            print("Could not beautify %s" % (identifier))
+#            res = data
+
+        res = data
+         #Remove comments
+        data = re.sub("\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$","" ,data, flags=re.MULTILINE);
 
         try:
             res = self.reformat_content(res)

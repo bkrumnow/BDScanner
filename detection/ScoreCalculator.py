@@ -24,8 +24,7 @@ categories['3'] = ['DocumentKeys_PhantomJS',
 ]
 
 #JS properties + value that can identify a web bot
-categories['4'] = ['General_',
-'General_ColorDepth',
+categories['4'] = ['General_ColorDepth',
 'General_HardwareConcurrency',
 'General_Canvas',
 'General_WebGL',
@@ -50,17 +49,22 @@ def calculateScore(script):
         amountOfPatterns = len(script.detectionPatterns[key].patterns)
 
         if key in categories['1']:
+#            print('#1 %s' % amountOfPatterns)
             script.score = script.score + (amountOfPatterns * 12.0)
 
         elif key in categories['2']:
+#            print('#2 %s' % amountOfPatterns)
             script.score = script.score + (amountOfPatterns * 12.0)
             if key == 'General_UserAgent':
                 userAgentCheck = True
         elif key in categories['3']:
             if userAgentCheck:
+#                print('#3 %s' % amountOfPatterns)
                 script.score = script.score + (amountOfPatterns * 0.2)
 
         elif key in categories['4']:
-            script.score = script.score + (amountOfPatterns * detectionPattern.score)
+#            print('@@@ %s %s' % (script.score, detectionPattern.score))
+            script.score = script.score + detectionPattern.score
+#            print('#4::: %s' % (script.score))
 
 
