@@ -4,7 +4,7 @@ from detection import FileCache
 import csv
 
 # The list of sites that we wish to crawl
-NUM_BROWSERS = 6
+NUM_BROWSERS = 1
 
 # Loads the manager preference and 3 copies of the default browser dictionaries
 manager_params, browser_params = TaskManager.load_default_params(NUM_BROWSERS)
@@ -26,8 +26,8 @@ manager_params['log_directory'] = '~/OpenWPM/data'
 # Commands time out by default after 60 seconds
 manager = TaskManager.TaskManager(manager_params, browser_params)
 
-fileReader = csv.reader(open('detection/alexa/top-1m.csv'), delimiter=',')
-#fileReader = csv.reader(open('detection/validation/getastra.csv'), delimiter=',')
+#fileReader = csv.reader(open('detection/alexa/top-1m.csv'), delimiter=',')
+fileReader = csv.reader(open('detection/validation/duplicates.csv'), delimiter=',')
 
 # Visits the sites with all browsers simultaneously
 
@@ -39,7 +39,7 @@ del fileReader
 
 fileCache = FileCache.FileCache()
 
-for i in range(0, len(urls), 20):
+for i in range(0, len(urls)):
     url = urls[i]
     print ("i %s %s" % (i, url))
 
@@ -47,7 +47,7 @@ for i in range(0, len(urls), 20):
 
     # Start by visiting the page
     command_sequence.get(sleep=15, timeout=120)
-    command_sequence.detect_webbot_detection(timeout=360, fileCache)
+    command_sequence.detect_webbot_detection(timeout=360)
 
     #command_sequence.save_screenshot('EndPrint', 1000)
     # index='**' synchronizes visits between the three browsers

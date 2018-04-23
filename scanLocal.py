@@ -3,14 +3,13 @@ from detection import Scanner
 from detection.db import DB
 import os
 from detection import FileManager, FileCache
-db = DB.DB()
 
 start = datetime.datetime.now()
-fileCache = FileCache.FileCache()
+db = DB.DB()
 
 def analyseFile(src):
         print ('\n######################################## %s' % src)
-        scanner = Scanner.Scanner(db, fileCache)
+        scanner = Scanner.Scanner(db)
         FileManager.downloadFile(src, scanner)
         db.scripts = scanner.scripts
         db.printScripts()
@@ -20,7 +19,7 @@ def analyseFile(src):
 
 for subdir, dirs, files in os.walk('detection/examples'):
     for file in files:
-        if file == 'async.js':
+#        if file == 'async.js':
             filepath = 'file:' + subdir + os.sep + file
             analyseFile(filepath)
 

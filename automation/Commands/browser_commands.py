@@ -400,7 +400,6 @@ def dump_page_source(visit_id, driver, manager_params, suffix=''):
 
 
 def detect_webbot_detection(visit_id, driver, manager_params, suffix=''):
-
     db = DB.DB()
     scanner = Scanner.Scanner(db)
     scanner.scan(driver, visit_id)

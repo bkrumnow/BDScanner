@@ -7,9 +7,8 @@ from detection import PatternChecker, Script, ScoreCalculator
 from detection import FileManager
 
 class Scanner:
-    def __init__(self, db, fileCache):
+    def __init__(self, db):
         self.db = db
-        self.fileCache = fileCache
         self.scripts = []
         self.visitId = None
         self.scorePatterns = [];
@@ -69,17 +68,12 @@ class Scanner:
                     if companyResult:
                         currentScript.addCompanyPattern(companyPattern)
 
-                #Is the file already in the cache present?
-
-
                 self.scripts.append(currentScript)
                 print("\n@append: %s %s %s" % (len(self.scripts), identifier, currentScript.score))
 
-                self.db.writeFile(identifier, res, str(self.visitId) + '/')
-
     def analysePatterns(self, currentScript, res, identifier, path):
         corruptFile = False
-        sys.stdout.write('.')
+        print('.')
 
         for detectionClass in self.scorePatterns:
             if corruptFile:
@@ -112,7 +106,7 @@ class Scanner:
 
                     if (result):
                         if currentScript == None:
-                            currentScript = Script.Script(identifier, len(res))
+                            currentScript = Script.Script(identifier, res)
 
                         currentScript.addDetectionPattern(detectionClass.name + '_' + detectionPattern[1], pattern, detectionPattern[0])
 

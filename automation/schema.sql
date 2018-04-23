@@ -96,7 +96,9 @@ CREATE TABLE IF NOT EXISTS Scripts (
     URL TEXT,
     level INTEGER,
     score DECIMAL,
+    duplicate TEXT,
     company TEXT,
+
     date DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(visit_id) REFERENCES site_visits(id));
 

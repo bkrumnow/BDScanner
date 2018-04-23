@@ -1,16 +1,17 @@
 import os
 import random
-from detection import DetectionPattern
+from detection import DetectionPattern, FileCache
 
 class DB:
+    fileCache = FileCache.FileCache()
 
     def __init__(self):
         self.scripts = []
 
-    def insertScript(self, sock, id, visit_id, identifier, URL, score, company, obfuscated):
+    def insertScript(self, sock, id, visit_id, identifier, URL, score, company, obfuscated, duplicate):
         try:
-            query = ("INSERT INTO Scripts (id, visit_id, name, URL, level, score, company, obfuscated) VALUES (?,?,?,?,?,?,?,?)",
-            (id, visit_id, identifier, URL, 0, score, company, obfuscated))
+            query = ("INSERT INTO Scripts (id, visit_id, name, URL, level, score, company, obfuscated, duplicate) VALUES (?,?,?,?,?,?,?,?,?)",
+            (id, visit_id, identifier, URL, 0, score, company, obfuscated, duplicate))
             sock.send(query)
         except:
             print("Error inserting script record %s %s" % (identifier, id))
@@ -37,14 +38,31 @@ class DB:
         highestScore =0
         #print('self %s' % self)
         for script in self.scripts:
+            DB.fileCache.addToCache(script)
+            print "Cache Len %s %s %s" % (len(DB.fileCache.files), hash(script), script.fromCache)
+            #When the file was not in the cache; download it
+#            if not script.fromCache:
+#                self.writeFile(identifier, res, str(self.visitId) + '/')
+
+
             if script.score > highestScore:
                 highestScore = script.score
 
             scriptId = str(visit_id) + '_' + script.identifier + '_' + str(random.randint(1,101)*5)
+            scriptHash = hash(script)
+            duplicate = ''
+            company = ''
+
+#            if script.fromCache:
+#                duplicate = self.fileCache.files[scriptHash]
+#            else:
+#            self.fileCache.files[scriptHash] = scriptId
             company = ','.join(script.companyPatterns)
-            self.insertScript(sock, scriptId, visit_id, script.identifier, script.URL, script.score, company, script.obfuscated)
-            for key, detectionPattern in script.detectionPatterns.iteritems():
-                self.insertDetection(sock, scriptId, key, ','.join(detectionPattern.patterns), company, detectionPattern.score)
+            self.insertScript(sock, scriptId, visit_id, script.identifier, script.URL, script.score, company, script.obfuscated, duplicate)
+
+            if not script.fromCache:
+                for key, detectionPattern in script.detectionPatterns.iteritems():
+                    self.insertDetection(sock, scriptId, key, ','.join(detectionPattern.patterns), company, detectionPattern.score)
         self.updateSiteVisit(sock, highestScore, visit_id)
 
 
@@ -64,5 +82,5 @@ class DB:
     def printScripts(self):
         for script in self.scripts:
             print ("Company %s" % script.companyPatterns)
-            for key, detectionPattern in script.detectionPatterns.iteritems():
-                print("Pattern %s %s %s" % (key, ','.join(detectionPattern.patterns), detectionPattern.score))
+#            for key, detectionPattern in script.detectionPatterns.iteritems():
+#                print("Pattern %s %s %s" % (key, ','.join(detectionPattern.patterns), detectionPattern.score))

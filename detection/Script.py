@@ -2,20 +2,23 @@ import DetectionPattern, ScoreCalculator
 
 class Script:
 
-    def __init__(self, id, fileLength):
+    def __init__(self, id, data):
         self.identifier = id
         self.detectionPatterns = {}
         self.companyPatterns = []
         self.URL = ''
         self.score = 0
         self.obfuscated = False
-        self.fileLength = fileLength
         self.detectionPatternHash = 0
         self.companyPatternHash = 0
+        self.fromCache = False
+        self.hash = None
+        self.data = data
 
     def addCompanyPattern(self, companyPattern):
         if companyPattern not in self.companyPatterns:
             self.companyPatterns.append(companyPattern[0])
+            self.companyPatternHash = self.companyPatternHash + hash(companyPattern[0]);
 
     def addDetectionPattern(self, topic, searchPattern, score):
 
@@ -23,7 +26,6 @@ class Script:
             detectionPattern = self.detectionPatterns[topic];
             detectionPattern.score = detectionPattern.score + score;
             detectionPattern.patterns.append(searchPattern)
-#            if searchPattern not in searchPatterns:
             self.detectionPatterns[topic] = detectionPattern
         else:
             self.detectionPatterns[topic] = DetectionPattern.DetectionPattern(score, searchPattern)
@@ -52,4 +54,6 @@ class Script:
             self.detectionPatternHash = self.detectionPatternHash + detectionPattern.hash
 
     def __hash__(self):
-            return hash((self.score, self.obfuscated, self.fileLength, self.detectionPatternsHash, self.companyPatternHash))
+            if not self.hash:
+                self.hash = hash((self.score, self.obfuscated, len(self.data), self.detectionPatternHash, self.companyPatternHash))
+            return self.hash
