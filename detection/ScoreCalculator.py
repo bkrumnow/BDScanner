@@ -1,4 +1,5 @@
 categories = {}
+preConditions = {}
 
 #Properties that are Web bot specific
 categories['1'] = ['DocumentKeys_SelChromeChromium',
@@ -11,7 +12,7 @@ categories['1'] = ['DocumentKeys_SelChromeChromium',
 ]
 
 #Values that are web bot specific
-categories['2'] = ['General_UserAgent',
+categories['2'] = ['General_UserAgent', 'General_UserAgentElectron', 'General_UserAgentWOW',
 'General_BlackList'
 ]
 
@@ -40,31 +41,30 @@ categories['4'] = ['General_ColorDepth',
 'General_Languages',
 'General_Images',
 'General_Misc',
-'NavigatorAttr_Misc.'
+'NavigatorAttr_Misc.',
+'NavigatorAttr_UserAgent'
 ]
 
-def calculateScore(script):
-    userAgentCheck = False
-    for key, detectionPattern in script.detectionPatterns.iteritems():
-        amountOfPatterns = len(script.detectionPatterns[key].patterns)
+preConditions['General_UserAgentWOW'] = ['NavigatorAttr_UserAgent']
 
-        if key in categories['1']:
+
+
+def getScore(key, amountOfPatterns, userAgentKey, detectionPattern):
+    score = 0
+    if key in categories['1']:
 #            print('#1 %s' % amountOfPatterns)
-            script.score = script.score + (amountOfPatterns * 12.0)
+        score = (amountOfPatterns * 12.0)
 
-        elif key in categories['2']:
+    elif key in categories['2']:
 #            print('#2 %s' % amountOfPatterns)
-            script.score = script.score + (amountOfPatterns * 12.0)
-            if key == 'General_UserAgent':
-                userAgentCheck = True
-        elif key in categories['3']:
-            if userAgentCheck:
+        score =  (amountOfPatterns * 12.0)
+    elif key in categories['3']:
+        if userAgentKey:
 #                print('#3 %s' % amountOfPatterns)
-                script.score = script.score + (amountOfPatterns * 0.2)
+            score = (amountOfPatterns * 0.2)
 
-        elif key in categories['4']:
+    elif key in categories['4']:
 #            print('@@@ %s %s' % (script.score, detectionPattern.score))
-            script.score = script.score + detectionPattern.score
+        score =  detectionPattern.score
 #            print('#4::: %s' % (script.score))
-
-
+    return score

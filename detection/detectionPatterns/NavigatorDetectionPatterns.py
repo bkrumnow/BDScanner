@@ -16,7 +16,9 @@ class NavigatorDetectionPatterns:
                          "permissions",
                          "presentation",
                          "navigator.vendor"])
-        selenium = (12.0, "Selenium", ["webdriver"])
-        misc = (0.2, "Misc.", ["navigator.appVersion", "navigator.userAgent", "navigator.vendor",
+        selenium = (12.0, "Selenium", ["webdriver(?![a-zA-z-])"])
+        userAgent = (0.2, 'UserAgent', ["navigator.userAgent", ['navigator', 'useragent']])
+        misc = (0.2, "Misc.", ["navigator.appVersion", "navigator.vendor",
         "navigator.onLine"]) #not documented
-        self.patterns.extend((phantom, selenium, misc))
+
+        self.patterns.extend((phantom, selenium, userAgent, misc))

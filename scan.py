@@ -1,5 +1,6 @@
 from automation import TaskManager, CommandSequence
 from six.moves import range
+from detection import FileCache
 import csv
 
 # The list of sites that we wish to crawl
@@ -36,6 +37,8 @@ for (index, url) in fileReader:
 	urls.append(url);
 del fileReader
 
+fileCache = FileCache.FileCache()
+
 for i in range(0, len(urls), 20):
     url = urls[i]
     print ("i %s %s" % (i, url))
@@ -44,7 +47,7 @@ for i in range(0, len(urls), 20):
 
     # Start by visiting the page
     command_sequence.get(sleep=15, timeout=120)
-    command_sequence.detect_webbot_detection(timeout=360)
+    command_sequence.detect_webbot_detection(timeout=360, fileCache)
 
     #command_sequence.save_screenshot('EndPrint', 1000)
     # index='**' synchronizes visits between the three browsers

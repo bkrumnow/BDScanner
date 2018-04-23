@@ -8,17 +8,16 @@ class GeneralDetectionPatterns:
     userAgent = (12.0, "UserAgent", [
         "PhantomJS(?![a-zA-z-])",
         "HeadlessChrome",
-        "electron(?![a-zA-z])",
-        "WOW64",
-        "WOW32",
         "domAutomation",
         "slimer", "Sequentum"]) #not documented
-    colorDepth = (0.1, "ColorDepth", ["colorDepth == 32", "screen.colorDepth", "window.screen.colorDepth"]);
+    userAgentElectron = (12.0,  "UserAgentElectron", ["'electron'", '"electron"', "\.electron"])
+    userAgentWOW = (8.0, "UserAgentWOW", [["WOW64", "WOW32"]])
+    colorDepth = (0.1, "ColorDepth", ["colorDepth == 32", "screen.colorDepth", "window.screen.colorDepth"])
     hardWareConcurrency = (0.1, "HardwareConcurrency", ["navigator.hardwareConcurrency", "hardwareConcurrency == -1"])
-    canvas = (1.2, "Canvas", ["createElement('canvas')", "canvas.getContext", "canvas.toDataURL"])
+    canvas = (1.2, "Canvas", ["createElement('canvas')", "canvas.getContext", "canvas.toDataURL", re.escape('"canvas").getContext("2d")')])
     webgl = (0.6, "WebGL", ["getContext\('webgl'\)", "getContext\('experimental-webgl'\)",
     "getSupportedExtensions", "createBuffer", "bindBuffer", "createProgram", "createShader",
-    "getExtension('WEBGL_debug_renderer_info')"])
+    "getExtension('WEBGL_debug_renderer_info')", re.escape('("experimental-webgl") : "WebGLRenderingContext"')])
     liedLanguages = (1, "LiedLanguages", ["navigator.language", re.escape("navigator.languages["), "navigator.language.substr"])
     touchSupport = (0.1, "TouchSupport", ["navigator.maxTouchPoints", "maxTouchPoints", "createEvent('TouchEvent')"])
     fonts = (0.1, "Fonts", ["style.fontFamily", "style.fontSize", ".offsetHeight", ".offsetWidth"])
@@ -37,6 +36,8 @@ class GeneralDetectionPatterns:
     blackList = (2.0, "BlackList", ['Mozilla/4.0 (Windows NT 6.2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.70 Safari/537.17']) #VAMSOFT
 
     self.patterns.extend((userAgent,
+    userAgentElectron,
+    userAgentWOW,
     colorDepth,
     hardWareConcurrency,
     canvas,webgl,
