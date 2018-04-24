@@ -1,5 +1,4 @@
 import json
-import StringIO
 import os, sys
 import BotDetectionPattern
 from detectionPatterns import DocumentKeysDetectionPatterns, GeneralDetectionPatterns, NavigatorDetectionPatterns, WindowKeysDetectionPatterns
@@ -15,6 +14,7 @@ class Scanner:
         self.scorePatterns.extend((GeneralDetectionPatterns.GeneralDetectionPatterns(), DocumentKeysDetectionPatterns.DocumentKeysDetectionPatterns(),
         NavigatorDetectionPatterns.NavigatorDetectionPatterns(),WindowKeysDetectionPatterns.WindowKeysDetectionPatterns()))
         self.botDetectionPattern = BotDetectionPattern.BotDetectionPattern()
+        self.visitUrls = []
 
     def scan(self, driver, visit_id):
         self.visitId = visit_id
@@ -30,7 +30,7 @@ class Scanner:
             try:
                 scriptSrc = element.get_attribute('src')
             except:
-                print("Error while obtaining src element attribute");
+                print("Error while obtaining src element attribute %s" % element.src);
 
 #            if counter > 4:
 #                self.db.scripts = self.scripts
@@ -38,7 +38,11 @@ class Scanner:
 
             if scriptSrc:
 #                counter = counter +1
+                if scriptSrc in self.visitUrls:
+                    continue
+
                 FileManager.downloadFile(scriptSrc, self)
+                self.visitUrls.append(scriptSrc)
             else:
                 outerHTML = element.get_attribute('outerHTML')
                 fileName = 'inlineScript' + str(counter) + '.js'
@@ -70,10 +74,12 @@ class Scanner:
 
                 self.scripts.append(currentScript)
                 print("\n@append: %s %s %s" % (len(self.scripts), identifier, currentScript.score))
+            else:
+                del currentScript
 
     def analysePatterns(self, currentScript, res, identifier, path):
         corruptFile = False
-        print('.')
+        print "."
 
         for detectionClass in self.scorePatterns:
             if corruptFile:

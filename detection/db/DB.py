@@ -1,17 +1,18 @@
 import os
 import random
-from detection import DetectionPattern, FileCache
+import sqlite3
+from detection import DetectionPattern, Globals
+from automation.utilities import db_utils
 
 class DB:
-    fileCache = FileCache.FileCache()
 
     def __init__(self):
         self.scripts = []
 
-    def insertScript(self, sock, id, visit_id, identifier, URL, score, company, obfuscated, duplicate):
+    def insertScript(self, sock, id, visit_id, identifier, URL, score, company, obfuscated, duplicate, hash):
         try:
-            query = ("INSERT INTO Scripts (id, visit_id, name, URL, level, score, company, obfuscated, duplicate) VALUES (?,?,?,?,?,?,?,?,?)",
-            (id, visit_id, identifier, URL, 0, score, company, obfuscated, duplicate))
+            query = ("INSERT INTO Scripts (id, visit_id, name, URL, level, score, company, obfuscated, duplicate, hash) VALUES (?,?,?,?,?,?,?,?,?,?)",
+            (id, visit_id, identifier, URL, 0, score, company, obfuscated, duplicate, hash))
             sock.send(query)
         except:
             print("Error inserting script record %s %s" % (identifier, id))
@@ -38,33 +39,29 @@ class DB:
         highestScore =0
         #print('self %s' % self)
         for script in self.scripts:
-            DB.fileCache.addToCache(script)
-            print "Cache Len %s %s %s" % (len(DB.fileCache.files), hash(script), script.fromCache)
-            #When the file was not in the cache; download it
-#            if not script.fromCache:
-#                self.writeFile(identifier, res, str(self.visitId) + '/')
-
 
             if script.score > highestScore:
                 highestScore = script.score
 
-            scriptId = str(visit_id) + '_' + script.identifier + '_' + str(random.randint(1,101)*5)
             scriptHash = hash(script)
+            existsInCache = self.checkCache(sock, scriptHash, manager_params)
+
             duplicate = ''
             company = ''
 
-#            if script.fromCache:
-#                duplicate = self.fileCache.files[scriptHash]
-#            else:
-#            self.fileCache.files[scriptHash] = scriptId
-            company = ','.join(script.companyPatterns)
-            self.insertScript(sock, scriptId, visit_id, script.identifier, script.URL, script.score, company, script.obfuscated, duplicate)
-
-            if not script.fromCache:
+            scriptId = str(visit_id) + '_' + script.identifier + '_' + str(random.randint(1,101)*5)
+            if existsInCache:
+                duplicate = existsInCache
+                scriptHash = -1
+            else:
+                self.writeFile(script.identifier, script.data, str(visit_id) + '/')
+                company = ','.join(script.companyPatterns)
                 for key, detectionPattern in script.detectionPatterns.iteritems():
                     self.insertDetection(sock, scriptId, key, ','.join(detectionPattern.patterns), company, detectionPattern.score)
-        self.updateSiteVisit(sock, highestScore, visit_id)
 
+            self.insertScript(sock, scriptId, visit_id, script.identifier, script.URL, script.score, company, script.obfuscated, duplicate, scriptHash)
+
+        self.updateSiteVisit(sock, highestScore, visit_id)
 
     def writeFile(self, name, data, prefix):
         path = '/home/osboxes/OpenWPM/detection/files/' +prefix
@@ -78,6 +75,14 @@ class DB:
                 file.write(data.encode('utf-8'))
         except:
             print("Could not write file %s" % name)
+
+
+    def checkCache(self, sock, scriptHash, manager_params):
+        rows = db_utils.query_db(manager_params['database_name'], "SELECT id FROM Scripts WHERE hash = " + str(scriptHash) + ";")
+        if not rows:
+            return None
+        else:
+            return rows[0]['id']
 
     def printScripts(self):
         for script in self.scripts:

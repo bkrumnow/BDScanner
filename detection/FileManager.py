@@ -1,4 +1,5 @@
 import urllib2, httplib
+import StringIO
 import gzip
 import sys
 #import jsbeautifier
@@ -28,23 +29,27 @@ def downloadFile(src, scanner):
             print("Could not open: %s %s" % (src,sys.exc_info()[0]))
             return
 
-        if contentEncoding and (contentEncoding.lower() == 'gzip'):
+        if contentEncoding:
             try:
-                compressedstream = StringIO.StringIO(data)
-                unzipper = gzip.GzipFile(fileobj=compressedstream)
-                data = unzipper.read()
+
+                if contentEncoding.lower() == 'gzip':
+                    compressedstream = StringIO.StringIO(data)
+                    unzipper = gzip.GzipFile(fileobj=compressedstream)
+                    data = unzipper.read()
+                else:
+                    print "Not supported encoding %s"  % contentEncoding
             except:
                 print("Not able to de-compress content %s" % (src))
 
-        try:
-            html = data.decode('utf-8')
-        except:
+        if data:
             try:
-                html = data.decode('latin-1')
+                html = data.decode('utf-8')
             except:
-                html = data
+                try:
+                    html = data.decode('latin-1')
+                except:
+                    html = data
 
-        if html:
             if src.endswith('/'):
                 src = src[:-1]
 

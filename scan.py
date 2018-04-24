@@ -1,10 +1,9 @@
 from automation import TaskManager, CommandSequence
 from six.moves import range
-from detection import FileCache
 import csv
 
 # The list of sites that we wish to crawl
-NUM_BROWSERS = 1
+NUM_BROWSERS = 2 #7
 
 # Loads the manager preference and 3 copies of the default browser dictionaries
 manager_params, browser_params = TaskManager.load_default_params(NUM_BROWSERS)
@@ -37,11 +36,9 @@ for (index, url) in fileReader:
 	urls.append(url);
 del fileReader
 
-fileCache = FileCache.FileCache()
-
 for i in range(0, len(urls)):
     url = urls[i]
-    print ("i %s %s" % (i, url))
+    print ("Command creation %s %s" % (i, url))
 
     command_sequence = CommandSequence.CommandSequence('http://' + url)
 

@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS Scripts (
     score DECIMAL,
     duplicate TEXT,
     company TEXT,
-
+    hash INTEGER NOT NULL,
     date DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(visit_id) REFERENCES site_visits(id));
 
@@ -111,3 +111,6 @@ CREATE TABLE IF NOT EXISTS DetectionPatterns (
     company TEXT,
     score DECIMAL,
     FOREIGN KEY(script_id) REFERENCES Scripts(id));
+
+
+CREATE INDEX IF NOT EXISTS hash_index ON Scripts (hash)

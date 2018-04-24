@@ -45,9 +45,10 @@ categories['4'] = ['General_ColorDepth',
 'NavigatorAttr_UserAgent'
 ]
 
+#Bot detection file literals
+categories['5'] = ['General_DistilMisc']
+
 preConditions['General_UserAgentWOW'] = ['NavigatorAttr_UserAgent']
-
-
 
 def getScore(key, amountOfPatterns, userAgentKey, detectionPattern):
     score = 0
@@ -63,7 +64,7 @@ def getScore(key, amountOfPatterns, userAgentKey, detectionPattern):
 #                print('#3 %s' % amountOfPatterns)
             score = (amountOfPatterns * 0.2)
 
-    elif key in categories['4']:
+    elif key in categories['4'] or key in categories['5']:
 #            print('@@@ %s %s' % (script.score, detectionPattern.score))
         score =  detectionPattern.score
 #            print('#4::: %s' % (script.score))
