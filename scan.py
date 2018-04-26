@@ -3,7 +3,7 @@ from six.moves import range
 import csv
 
 # The list of sites that we wish to crawl
-NUM_BROWSERS = 2 #7
+NUM_BROWSERS = 1
 
 # Loads the manager preference and 3 copies of the default browser dictionaries
 manager_params, browser_params = TaskManager.load_default_params(NUM_BROWSERS)
@@ -26,7 +26,7 @@ manager_params['log_directory'] = '~/OpenWPM/data'
 manager = TaskManager.TaskManager(manager_params, browser_params)
 
 #fileReader = csv.reader(open('detection/alexa/top-1m.csv'), delimiter=',')
-fileReader = csv.reader(open('detection/validation/duplicates.csv'), delimiter=',')
+fileReader = csv.reader(open('detection/validation/test.csv'), delimiter=',')
 
 # Visits the sites with all browsers simultaneously
 
@@ -45,6 +45,7 @@ for i in range(0, len(urls)):
     # Start by visiting the page
     command_sequence.get(sleep=15, timeout=120)
     command_sequence.detect_webbot_detection(timeout=360)
+
 
     #command_sequence.save_screenshot('EndPrint', 1000)
     # index='**' synchronizes visits between the three browsers

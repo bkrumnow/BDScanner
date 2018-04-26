@@ -15,6 +15,8 @@ import time
 import sys
 import gzip
 import os
+
+# WebBot Detection section
 from detection import Scanner
 from detection.db import DB
 
@@ -401,8 +403,7 @@ def dump_page_source(visit_id, driver, manager_params, suffix=''):
 
 def detect_webbot_detection(visit_id, driver, manager_params, suffix=''):
     db = DB.DB()
-    scanner = Scanner.Scanner(db)
-    scanner.scan(driver, visit_id)
+    scanner = Scanner.Scanner(db, driver, visit_id)
 
     try:
         tab_restart_browser(driver)  # kills window to avoid stray requests

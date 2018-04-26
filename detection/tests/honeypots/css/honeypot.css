@@ -1,0 +1,41 @@
+.absolutePositionClass{
+    position: absolute;
+    top: 3px;
+    left: -680px;
+}
+
+.displayNoneClass{
+    display: none;
+}
+
+.hiddenChildClass{
+    display: none;
+}
+
+.visibilityHiddenClass{
+    visibility: hidden;
+}
+
+.visibilityCollapseClass{
+    visibility: collapse;
+}
+
+.opacityClass{
+    opacity:0;
+}
+
+.layerz-indexClass{
+    position:relative;
+    z-index:-1;
+}
+
+.textIndentingClass{
+    text-indent:100%;
+    white-space:nowrap;
+    overflow:hidden;
+}
+
+.sizeClass{
+    width: 0px;
+    height: 0px
+}

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Honeypot test</title>
+    <link rel="stylesheet" type="text/css" href="css/honeypot.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="js/index.js"></script>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            // this function runs when the DOM is ready, i.e. when the document has been parsed
+               document.getElementById('jsDisplay').style.display = 'none'
+
+            $("#jqueryDisplay").css("display", "none");
+             $("#jqueryHide").hide();
+             hide();
+        });
+
+
+    </script>
+</head>
+<body>
+     <!--Element Area-->
+    <input id="typeHidden" type="hidden">
+
+    <input type="hidden" value="IHaveNoIdentifier">
+
+    <!--//CSS Area-->
+    <!--//Inline-->
+    <input id="absolutePosition" value="absolutePosition" style="position: absolute; top: 3px; left: -680px;">
+     <input id="absolutePositionClass" value="absolutePositionClass" class="absolutePositionClass">
+
+
+    <input id="displayNone" value="displayNone" style="display: none">
+     <input id="displayNoneClass" value="displayNoneClass" class="displayNoneClass">
+
+    <div style="display:none">
+        <input id="hiddenChild" value="hiddenChild">
+    </div>
+
+     <div class="hiddenChildClass">
+         <input id="hiddenChildClass" value="hiddenChildClass">
+     </div>
+
+
+     <input id="visibilityHidden" value="visibilityHidden" style="visibility: hidden">
+     <input id="visibilityHiddenClass" value="visibilityHiddenClass" class="visibilityHiddenClass">
+
+
+    <input id="visibilityCollapse" value="visibilityHidden" style="visibility: collapse">
+     <input id="visibilityCollapseClass" value="visibilityCollapseClass" class="visibilityCollapseClass">
+
+    <input id="opacity" value="opacity" style="opacity: 0">
+     <input id="opacityClass" value="opacityClass" class="opacityClass">
+
+    <span style="position:relative;z-index: 20;background-color: #cc0000">
+        <input id="layer z-index" value="layer z-index" style="position:relative; z-index:-1">
+    </span>
+
+    <span style="position:relative;z-index: 20;background-color: #cc0000">
+        <input id="layerz-indexClass" value="layerz-indexClass" class="layerz-indexClass">
+    </span>
+
+    <div style="text-indent:100%;white-space:nowrap;overflow:hidden;">
+        <input id="textIndenting" value="textIndenting" style="">
+    </div>
+
+     <div class="textIndentingClass">
+         <input id="textIndentingClass" value="textIndentingClass" style="">
+     </div>
+
+     <input id="size" value="size" autocomplete="off" style="width: 0px;height: 0px">
+     <input id="sizeClass" value="sizeClass" autocomplete="off" class="sizeClass">
+
+    <!-- JS section -->
+    <input id="jsDisplay" value="jsDisplay">
+    <input id="jsExternalDisplay" value="jsExternalDisplay">
+
+    <!-- JQuery -->
+    <input id="jqueryDisplay" value="jqueryDisplay" autocomplete="off">
+     <input id="jqueryHide" value="jqueryHide" autocomplete="off">
+     <input id="jqueryExternalDisplay" value="jqueryDisplay" autocomplete="off">
+     <input id="jqueryExternalHide" value="jqueryHide" autocomplete="off">
+
+    <!-- Name Section -->
+     <h6>Name Section</h6>
+     <input id="honeypot" value="honeypot" autocomplete="off">
+     <input name="honeypot" value="honeypot" autocomplete="off">
+     <input id="honey" value="honey" autocomplete="off">
+     <input name="honey" value="honey" autocomplete="off">
+     <input id="trap" value="trap" autocomplete="off">
+     <input name="trap" value="trap" autocomplete="off">
+     <input id="spam" value="spam" autocomplete="off">
+     <input name="spam" value="spam" autocomplete="off">
+     <input id="norobot" value="norobot" autocomplete="off">
+     <input name="norobot" value="norobot" autocomplete="off">
+     <input id="leaveempty" value="leaveempty" autocomplete="off">
+     <input name="leaveempty" value="leaveempty" autocomplete="off">
+     <input name="nohuman" class="nohuman">
+     <input name="nohuman" value="nohuman" autocomplete="off">
+     <input name="robots" value="robots" autocomplete="off">
+
+
+</body>
+</html>
