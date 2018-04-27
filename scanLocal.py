@@ -34,7 +34,7 @@ inlineStylePatterns = InlineStylePatterns.InlineStylePatterns()
 for pattern in inlineStylePatterns.patterns:
     for patternValue in pattern[2]:
         PatternChecker.checkPattern(data, patternValue, 'SCANlocal')
-print "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+print "@@@@@@@@@@@@@@@@Inline patterns @@@@@@@@@@@@@@@@@@@@@@@@@@"
 for parentPat in inlineStylePatterns.parentPatterns:
     for patternPatValue in parentPat[2]:
         if PatternChecker.checkPattern(data, patternPatValue, 'SCANlocalParent'):

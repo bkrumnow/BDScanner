@@ -9,7 +9,8 @@ from detection.honeypots import HoneypotScanner
 class Scanner:
     def __init__(self, db, driver, visit_id):
         self.db = db
-        self.scripts = []
+        self.detectionScripts = []
+        self.pageScripts = []
         self.visitId = visit_id
         self.scorePatterns = [];
         self.scorePatterns.extend((GeneralDetectionPatterns.GeneralDetectionPatterns(), DocumentKeysDetectionPatterns.DocumentKeysDetectionPatterns(),
@@ -23,69 +24,65 @@ class Scanner:
 
         counter = 1
 
+        for element in driver.find_elements_by_tag_name('script'):
+            #Scan internal and external script contents
+
+            try:
+                scriptSrc = element.get_attribute('src')
+            except:
+                scriptSrc = None
+
+#            if counter > 4:
+#                self.db.scripts = self.scripts
+#                return;
+
+            if scriptSrc:
+#                counter = counter +1
+                if scriptSrc in self.visitUrls:
+                    continue
+
+                FileManager.downloadFile(scriptSrc, self)
+                self.visitUrls.append(scriptSrc)
+            else:
+                outerHTML = element.get_attribute('outerHTML')
+                fileName = 'inlineScript' + str(counter) + '.js'
+                self.analyse(outerHTML, fileName, fileName)
+                counter = counter +1
+
+
         honeypotScanner = HoneypotScanner.HoneypotScanner(visit_id)
-
-        honeypotScanner.scan(driver);
-
-        fingerprint = False
-
-        if fingerprint:
-            for element in driver.find_elements_by_tag_name('script'):
-                #Scan internal and external script contents
-
-                try:
-                    scriptSrc = element.get_attribute('src')
-                except:
-                    scriptSrc = None
-
-    #            if counter > 4:
-    #                self.db.scripts = self.scripts
-    #                return;
-
-                if scriptSrc:
-    #                counter = counter +1
-                    if scriptSrc in self.visitUrls:
-                        continue
-
-                    FileManager.downloadFile(scriptSrc, self)
-                    self.visitUrls.append(scriptSrc)
-                else:
-                    outerHTML = element.get_attribute('outerHTML')
-                    fileName = 'inlineScript' + str(counter) + '.js'
-                    self.analyse(outerHTML, fileName, fileName)
-                    counter = counter +1
-
-        self.db.scripts = self.scripts
+        honeypotScanner.scan(driver, self.pageScripts);
+        self.db.scripts = self.detectionScripts
 
     def analyse(self, data, identifier, path):
         processedScript = FileManager.preProcessScript(data)
         res = processedScript[0]
-
-        currentScript = None
-        currentScript = self.analysePatterns(currentScript, res, identifier, path)
-
-        if currentScript:
-            currentScript.calculateScore()
-
-            if currentScript.score >= 12:
-                currentScript.obfuscated = processedScript[1]
-                currentScript.URL = path
-
-                #now that we have a pattern detected .. is it from a company?
-                for companyPattern in self.botDetectionPattern.CompanyPattern:
-                    companyResult = PatternChecker.checkPattern(res, companyPattern[1], path, True, False)
-
-                    if companyResult:
-                        currentScript.addCompanyPattern(companyPattern)
-
-                self.scripts.append(currentScript)
-                print("\n@append: %s %s %s" % (len(self.scripts), identifier, currentScript.score))
-            else:
-                del currentScript
+        self.pageScripts.append(res)
+        print "."
+#        currentScript = None
+#        currentScript = self.analysePatterns(currentScript, res, identifier, path)
+#
+#        if currentScript:
+#            currentScript.calculateScore()
+#
+#            if currentScript.score >= 12:
+#                currentScript.obfuscated = processedScript[1]
+#                currentScript.URL = path
+#
+#                #now that we have a pattern detected .. is it from a company?
+#                for companyPattern in self.botDetectionPattern.CompanyPattern:
+#                    companyResult = PatternChecker.checkPattern(res, companyPattern[1], path, True, False)
+#
+#                    if companyResult:
+#                        currentScript.addCompanyPattern(companyPattern)
+#
+#                self.detectionScripts.append(currentScript)
+#                print("\n@append: %s %s %s" % (len(self.scripts), identifier, currentScript.score))
+#            else:
+#                del currentScript
 
     def analysePatterns(self, currentScript, res, identifier, path):
         corruptFile = False
-        print "."
 
         for detectionClass in self.scorePatterns:
             if corruptFile:

@@ -2,21 +2,26 @@ class ScriptPatterns:
 
     def __init__(self):
         self.patterns = [];
-        self.jsPrefix = 'getelementbyid\([ ]?['|"]'
-        self.$Prefix = '\$\(["|']\#'
-        self.jsPostfixDisplay = '[ ]?['|"]\).style.display = ['|"]none['|"]'
-        self.$PostfixDisplay = '[ ]?['|"]\).css\(["|']display["|'][ ]?,[ ]?["|']none'
-        self.$PostfixHide = '[ ]?['|"]\).hide()'
+        self.jsPrefix = 'getelementbyid\([ ]?[\'|\"]'
+        self.jQueryPrefix = '\$\([\"|\']\#'
+        self.jsPostfixDisplay = '[ ]?[\'|\"]\).style.display = [\'|\"]none[\'|\"]'
+        self.jQueryPostfixDisplay = '[ ]?[\'|\"]\).css\([\"|\']display[\"|\'][ ]?,[ ]?[\"|\']none'
+        self.jQueryPostfixHide = '[ ]?[\'|\"]\).hide()'
 
-    def constructElementSpecificPatterns(identifier):
-        jsDisplay = self.jsPrefix + identifier + jsPostfixDisplay
-        $Display = self.$Prefix + identifier + $PostfixDisplay
-        $Hide = self.$Prefix + identifier + self.$PostfixHide
+    def constructElementSpecificPatterns(self, identifier):
+        self.patterns = []
+        jsDisplay = self.jsPrefix + identifier + self.jsPostfixDisplay
+        jQueryDisplay = self.jQueryPrefix + identifier + self.jQueryPostfixDisplay
+        jQueryHide = self.jQueryPrefix + identifier + self.jQueryPostfixHide
 
-        jsDisplayPattern = (12.0,  "JSDisplay", [jsHide])
-        $DisplayPattern = (12.0, "$Display", [$Display])
-        $HidePattern = (12.0, "$Display", [$Display])
+        jsDisplayPattern = (12.0,  "JSDisplay", [jsDisplay])
+        jQueryDisplayPattern = (12.0, "jQueryDisplay", [jQueryDisplay])
+        jQueryHidePattern = (12.0, "jQueryDisplay", [jQueryDisplay])
+
+#        print jsDisplay
+#        print jQueryDisplay
+#        print jQueryHide
 
         self.patterns.extend((jsDisplayPattern,
-        $DisplayPattern,
-        $HidePattern))
+        jQueryDisplayPattern,
+        jQueryHidePattern))

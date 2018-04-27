@@ -60,6 +60,7 @@ def downloadFile(src, scanner):
                 else:
                     fileName = fileName[:20]
 
+                print "filename %s" % fileName
                 scanner.analyse(html, fileName, src)
             else:
                 print("Filename could not be extracted %s" % (src))

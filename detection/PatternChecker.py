@@ -22,7 +22,7 @@ def checkPattern(data, patternObject, origin):
 
 
 def search(data, patterns, origin, ignoreCase, disjunction):
-    try:
+#    try:
         retValue = 0
 
         for value in patterns:
@@ -50,6 +50,6 @@ def search(data, patterns, origin, ignoreCase, disjunction):
         #        if 'electron' in value:
         #            print 'retvalue %s' % retValue
         return retValue
-    except:
-        print("Unknown data format %s %s" % (origin, patterns)) #, sys.exc_info()[0]))
-        return -1
+#    except:
+#        print("Unknown data format %s %s" % (origin, patterns)) #, sys.exc_info()[0]))
+#        return -1

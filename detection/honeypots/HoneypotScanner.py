@@ -1,4 +1,4 @@
-from patterns import InlineStylePatterns
+from patterns import InlineStylePatterns, ScriptPatterns, ExternalStylePatterns
 from detection import PatternChecker
 
 class HoneypotScanner:
@@ -6,8 +6,9 @@ class HoneypotScanner:
         self.visitId = visit_id
         self.honeypotElements = []
         self.inlineStylePatterns = InlineStylePatterns.InlineStylePatterns()
+        self.scriptPatterns = ScriptPatterns.ScriptPatterns()
 
-    def scan(self, driver):
+    def scan(self, driver, pageScripts):
         for element in driver.find_elements_by_tag_name('input'):
 
             id = self.getElementAtt(element, 'id')
@@ -16,7 +17,8 @@ class HoneypotScanner:
             type = self.getElementAtt(element, 'type')
             style = self.getElementAtt(element, 'style')
 
-            #1 check element stuff
+            #We assume that when there is no identifier it is not worth checking as
+            #Serverside is not able to check the value of it
             if not (id or name):
                 continue;
 
@@ -32,6 +34,13 @@ class HoneypotScanner:
 
             if len(categories) == 0:
                 self.checkParentInlineStyle(identifier, element, categories)
+
+            if len(categories) == 0 and elementClass:
+                self.checkCssStyle(identifier, driver, element, categories)
+
+#            if len(pageScripts) > 0 and len(categories) == 0 and id:
+#                self.checkScriptPatterns(id, pageScripts, categories)
+
             if (len(categories) > 0):
                 self.addHoneypotElement(id, name, categories)
 
@@ -70,6 +79,31 @@ class HoneypotScanner:
 
         if recur:
             self.checkParentInlineStyle(identifier, parentElement, categories)
+
+    def checkCssStyle(self, identifier, driver, element, categories):
+        properties = driver.execute_script('return window.getComputedStyle(arguments[0], null);', element)
+        if identifier == 'absolutePositionClass' :
+            print len(properties)
+            ExternalStylePatterns.checkStyleProperties(properties)
+
+#        if properties:
+#            for property in properties:
+#                print(element.value_of_css_property(property))
+
+
+#    def checkScriptPatterns(self, identifier, pageScripts, categories):
+#        #construct element specific selectors
+#        self.scriptPatterns.constructElementSpecificPatterns(identifier)
+#        for pattern in self.inlineStylePatterns.parentPatterns:
+#            found = False
+#            for patternValue in pattern[2]:
+#                for script in pageScripts:
+#                    if PatternChecker.checkPattern(script, patternValue, identifier):
+#                        categories.append(5)
+#                        found = True
+#                        break
+#                if found:
+#                    break
 
 
     def getElementAtt(self, element, att):
