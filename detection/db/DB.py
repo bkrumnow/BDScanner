@@ -8,6 +8,7 @@ class DB:
 
     def __init__(self):
         self.scripts = []
+        self.honeypotElements = []
 
     def insertScript(self, sock, id, visit_id, identifier, URL, score, company, obfuscated, duplicate, hash):
         try:
@@ -24,6 +25,14 @@ class DB:
             sock.send(query)
         except:
             print("Error inserting detection record %s %s %s" % (scriptId, topic, pattern))
+
+    def insertHoneypotElement(self, sock, visit_id, elementId, name, category, patterns, score):
+#        try:
+            query = ("INSERT INTO HoneypotElements (visit_id, element_id, name, categories, patterns, score) VALUES (?,?,?,?,?,?)",
+            (visit_id, elementId, name, category, patterns, score))
+            sock.send(query)
+#        except:
+#            print("Error inserting honeypot element record %s %s %s" % (visit_id, elementId, name))
 
     def updateSiteVisit(self, sock, score, visitId):
         try:
@@ -60,6 +69,11 @@ class DB:
                     self.insertDetection(sock, scriptId, key, ','.join(detectionPattern.patterns), company, detectionPattern.score)
 
             self.insertScript(sock, scriptId, visit_id, script.identifier, script.URL, script.score, company, script.obfuscated, duplicate, scriptHash)
+
+        print('PERSIST HONEYPOTS %s' % len(self.honeypotElements))
+        for honeypotElement in self.honeypotElements:
+            print honeypotElement
+            self.insertHoneypotElement(sock, visit_id, honeypotElement[0], honeypotElement[1], ','.join(honeypotElement[2]), ','.join(honeypotElement[3]), 12)
 
         self.updateSiteVisit(sock, highestScore, visit_id)
 

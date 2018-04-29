@@ -49,10 +49,9 @@ class Scanner:
                 self.analyse(outerHTML, fileName, fileName)
                 counter = counter +1
 
-
-        honeypotScanner = HoneypotScanner.HoneypotScanner(visit_id)
-        honeypotScanner.scan(driver, self.pageScripts);
         self.db.scripts = self.detectionScripts
+        honeypotScanner = HoneypotScanner.HoneypotScanner()
+        self.db.honeypotElements = honeypotScanner.scan(driver, self.pageScripts);
 
     def analyse(self, data, identifier, path):
         processedScript = FileManager.preProcessScript(data)

@@ -21,7 +21,7 @@ def checkPattern(data, patternObject, origin):
     return search(data, patterns, origin, ignoreCase, disjunction)
 
 
-def search(data, patterns, origin, ignoreCase, disjunction):
+def search(data, patterns, origin, ignoreCase =True, disjunction=False):
 #    try:
         retValue = 0
 

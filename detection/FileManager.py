@@ -2,8 +2,15 @@ import urllib2, httplib
 import StringIO
 import gzip
 import sys
+import json
+import os
 #import jsbeautifier
 import re, binascii
+from detection import PatternChecker
+
+config = {}
+with open(os.path.join('detection/configuration','config.json')) as json_data_file:
+    config = json.load(json_data_file)
 
 def downloadFile(src, scanner):
         data = ''
@@ -61,7 +68,10 @@ def downloadFile(src, scanner):
                     fileName = fileName[:20]
 
                 print "filename %s" % fileName
-                scanner.analyse(html, fileName, src)
+                if not PatternChecker.search(fileName, config['excludeFiles'], 'FileManagerExludeFiles'):
+                    scanner.analyse(html, fileName, src)
+                else:
+                    print "@@File excluded",fileName
             else:
                 print("Filename could not be extracted %s" % (src))
         else:

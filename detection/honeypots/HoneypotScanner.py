@@ -1,9 +1,9 @@
 from patterns import InlineStylePatterns, ScriptPatterns, ExternalStylePatterns
 from detection import PatternChecker
+from selenium.common.exceptions import StaleElementReferenceException
 
 class HoneypotScanner:
-    def __init__(self, visit_id):
-        self.visitId = visit_id
+    def __init__(self):
         self.honeypotElements = []
         self.inlineStylePatterns = InlineStylePatterns.InlineStylePatterns()
         self.scriptPatterns = ScriptPatterns.ScriptPatterns()
@@ -25,70 +25,102 @@ class HoneypotScanner:
             identifier = id if id else name
 
             categories = []
+            allPatterns = []
+
+            #1
             if type == 'hidden':
-                categories.append(1)
+                categories.append('type')
+                allPatterns.append('typeHidden')
 
-            self.checkLiterals(id, name, elementClass, categories)
+            #2
+            self.checkCategory('literals', lambda: self.checkLiterals(id, name, elementClass), categories, allPatterns)
+
+            #3
             if style:
-                self.checkInlineStyle(identifier, style, categories)
+                self.checkCategory('inlineStyle', lambda: self.checkInlineStyle(identifier, style), categories, allPatterns)
 
+            #4
+            if len(categories) == 0 and (elementClass or id):
+                self.checkCategory('externalStyle', lambda: self.checkExternalStyle(driver, identifier, element), categories, allPatterns)
+
+            #5
             if len(categories) == 0:
-                self.checkParentInlineStyle(identifier, element, categories)
-
-            if len(categories) == 0 and elementClass:
-                self.checkCssStyle(identifier, driver, element, categories)
-
-#            if len(pageScripts) > 0 and len(categories) == 0 and id:
-#                self.checkScriptPatterns(id, pageScripts, categories)
+                self.checkCategory('parentStyle', lambda: self.checkParentStyle(driver, identifier, element), categories, allPatterns)
 
             if (len(categories) > 0):
-                self.addHoneypotElement(id, name, categories)
+                self.honeypotElements.append((id, name, categories, allPatterns))
+#                print "@ %s %s" % (identifier, categories, patterns)
+        return self.honeypotElements
 
-            print "@ %s %s" % (identifier, categories)
+    def checkCategory(self, category, func, categories, allPatterns):
+        patterns = []
+        patterns = func()
+        if len(patterns) > 0:
+            categories.append(category)
+            allPatterns.extend((patterns))
 
-
-    def checkLiterals(self, id, name, elementClass, categories):
+    def checkLiterals(self, id, name, elementClass):
         obviousNames = ['honeypot', 'honey', 'trap', 'spam', 'norobot', 'leaveempty', 'nohuman', 'robots']
 
+        patterns = []
         for obvName in obviousNames:
             if id == obvName or name == obvName or elementClass == obvName:
-                categories.append(2)
+                patterns.append(obvName)
                 break
+        return patterns;
 
-    def checkInlineStyle(self, identifier, style, categories):
+    def checkInlineStyle(self, identifier, style):
+        patterns = []
         for pattern in self.inlineStylePatterns.patterns:
             for patternValue in pattern[2]:
                 if PatternChecker.checkPattern(style, patternValue, identifier):
-                    categories.append(3)
+                    patterns.append(pattern[1])
+        return patterns
 
-    def checkParentInlineStyle(self, identifier, element, categories):
+    def checkExternalStyle(self, driver, identifier, element):
+        properties = driver.execute_script('return window.getComputedStyle(arguments[0], null);', element)
+        return ExternalStylePatterns.checkStyleProperties(properties, False)
+
+    def checkParentStyle(self, driver, identifier, element):
+        patterns = []
         try:
             parentElement = element.find_element_by_xpath("..");
         except:
-            return
+            return patterns
 
-        recur = True
         style = self.getElementAtt(parentElement, 'style')
         if style:
             for pattern in self.inlineStylePatterns.parentPatterns:
                 for patternValue in pattern[2]:
                     if PatternChecker.checkPattern(style, patternValue, identifier):
-                        categories.append(4)
-                        recur = False
+                        patterns.append(pattern[1])
                         break
 
-        if recur:
-            self.checkParentInlineStyle(identifier, parentElement, categories)
+        #check external properties of parent
+#        if not found:
+#            try:
+#                found = self.checkExternalStyle(driver, identifier, parentElement, categories)
+#                parentElement = self.parentIsPresent(element)
+#            except StaleElementReferenceException:
+#                parentElement = self.parentIsPresent(element)
+#                print "second attempt", parentElement
+#
+#                found = self.checkExternalStyle(driver, identifier, parentElement, categories)
 
-    def checkCssStyle(self, identifier, driver, element, categories):
-        properties = driver.execute_script('return window.getComputedStyle(arguments[0], null);', element)
-        if identifier == 'absolutePositionClass' :
-            print len(properties)
-            ExternalStylePatterns.checkStyleProperties(properties)
+        if len(patterns) == 0: #check parent
+            patterns = self.checkParentStyle(driver, identifier, parentElement)
 
-#        if properties:
-#            for property in properties:
-#                print(element.value_of_css_property(property))
+        return patterns
+
+    def parentIsPresent(self, element, max_attempts=3):
+        attempt = 1
+        while True:
+            try:
+                return element.find_element_by_xpath("..")
+            except StaleElementReferenceException:
+                if attempt == max_attempts:
+                    raise
+                attempt += 1
 
 
 #    def checkScriptPatterns(self, identifier, pageScripts, categories):
@@ -113,7 +145,3 @@ class HoneypotScanner:
            attribute = None
 
         return attribute
-
-
-    def addHoneypotElement(self, id, name, category):
-        self.honeypotElements.append((id, name, category))
