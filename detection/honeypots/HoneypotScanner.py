@@ -1,6 +1,6 @@
 from patterns import InlineStylePatterns, ScriptPatterns, ExternalStylePatterns
 from detection import PatternChecker
-from selenium.common.exceptions import StaleElementReferenceException
+#from selenium.common.exceptions import StaleElementReferenceException
 
 class HoneypotScanner:
     def __init__(self):
@@ -78,8 +78,11 @@ class HoneypotScanner:
         return patterns
 
     def checkExternalStyle(self, driver, identifier, element):
-        properties = driver.execute_script('return window.getComputedStyle(arguments[0], null);', element)
-        return ExternalStylePatterns.checkStyleProperties(properties, False)
+        try:
+            properties = driver.execute_script('return window.getComputedStyle(arguments[0], null);', element)
+            return ExternalStylePatterns.checkStyleProperties(properties, False)
+        except:
+            return []
 
     def checkParentStyle(self, driver, identifier, element):
         patterns = []

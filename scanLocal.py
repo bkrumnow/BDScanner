@@ -11,34 +11,34 @@ db = DB.DB()
 
 def analyseFile(src):
         print ('\n######################################## %s' % src)
-        scanner = Scanner.Scanner(db)
+        scanner = Scanner.Scanner(db, None, 3)
         FileManager.downloadFile(src, scanner)
-        db.scripts = scanner.scripts
+        db.scripts = scanner.detectionScripts
         db.printScripts()
 
 #analyseFile('file:detection/examples/inlineScript9.js')
 
 
-#for subdir, dirs, files in os.walk('detection/examples'):
-#    for file in files:
-##        if file == 'asynec.js':
-#            filepath = 'file:' + subdir + os.sep + file
-#            analyseFile(filepath)
+for subdir, dirs, files in os.walk('detection/examples'):
+    for file in files:
+#        if file == 'asynec.js':
+            filepath = 'file:' + subdir + os.sep + file
+            analyseFile(filepath)
 
-
-file = open(os.path.join('detection/tests/honeypots','index.html'))
-data = file.read()
-
-inlineStylePatterns = InlineStylePatterns.InlineStylePatterns()
-
-for pattern in inlineStylePatterns.patterns:
-    for patternValue in pattern[2]:
-        PatternChecker.checkPattern(data, patternValue, 'SCANlocal')
-print "@@@@@@@@@@@@@@@@Inline patterns @@@@@@@@@@@@@@@@@@@@@@@@@@"
-for parentPat in inlineStylePatterns.parentPatterns:
-    for patternPatValue in parentPat[2]:
-        if PatternChecker.checkPattern(data, patternPatValue, 'SCANlocalParent'):
-            print "yes %s" % parentPat[1]
+#
+#file = open(os.path.join('detection/tests/honeypots','index.html'))
+#data = file.read()
+#
+#inlineStylePatterns = InlineStylePatterns.InlineStylePatterns()
+#
+#for pattern in inlineStylePatterns.patterns:
+#    for patternValue in pattern[2]:
+#        PatternChecker.checkPattern(data, patternValue, 'SCANlocal')
+#print "@@@@@@@@@@@@@@@@Inline patterns @@@@@@@@@@@@@@@@@@@@@@@@@@"
+#for parentPat in inlineStylePatterns.parentPatterns:
+#    for patternPatValue in parentPat[2]:
+#        if PatternChecker.checkPattern(data, patternPatValue, 'SCANlocalParent'):
+#            print "yes %s" % parentPat[1]
 
 end = datetime.datetime.now()
 

@@ -67,7 +67,6 @@ def downloadFile(src, scanner):
                 else:
                     fileName = fileName[:20]
 
-                print "filename %s" % fileName
                 if not PatternChecker.search(fileName, config['excludeFiles'], 'FileManagerExludeFiles'):
                     scanner.analyse(html, fileName, src)
                 else:

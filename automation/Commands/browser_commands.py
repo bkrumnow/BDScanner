@@ -409,18 +409,20 @@ def detect_webbot_detection(visit_id, driver, manager_params, suffix=''):
         tab_restart_browser(driver)  # kills window to avoid stray requests
         sock = clientsocket()
         sock.connect(*manager_params['aggregator_address'])
+
+
+        db.persistResults(sock, visit_id, manager_params)
+
+        # Close connection to db
+        sock.close()
+        del sock
     except:
         print('Error socket connection to DB')
-
-    db.persistResults(sock, visit_id, manager_params)
-
-    # Close connection to db
-    sock.close()
 
     # Delete instantiated objects
     del db
     del scanner
-    del sock
+
 
 def recursive_dump_page_source(visit_id, driver, manager_params, suffix=''):
     """Dump a compressed html tree for the current page visit"""

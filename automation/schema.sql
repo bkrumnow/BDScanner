@@ -90,7 +90,6 @@ CREATE TABLE IF NOT EXISTS CrawlHistory (
 /* Bot detection tables */
 CREATE TABLE IF NOT EXISTS Scripts (
     id TEXT PRIMARY KEY,
-    obfuscated BOOLEAN,
     visit_id INTEGER NOT NULL,
     name TEXT,
     URL TEXT,
@@ -99,7 +98,6 @@ CREATE TABLE IF NOT EXISTS Scripts (
     duplicate TEXT,
     company TEXT,
     hash INTEGER NOT NULL,
-    date DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(visit_id) REFERENCES site_visits(id));
 
 CREATE TABLE IF NOT EXISTS DetectionPatterns (
@@ -107,7 +105,6 @@ CREATE TABLE IF NOT EXISTS DetectionPatterns (
     script_id TEXT NOT NULL,
     topic TEXT,
     pattern TEXT,
-    value TEXT,
     company TEXT,
     score DECIMAL,
     FOREIGN KEY(script_id) REFERENCES Scripts(id));

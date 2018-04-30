@@ -8,7 +8,6 @@ class Script:
         self.companyPatterns = []
         self.URL = ''
         self.score = 0
-        self.obfuscated = False
         self.detectionPatternHash = 0
         self.companyPatternHash = 0
         self.fromCache = False
@@ -55,5 +54,5 @@ class Script:
 
     def __hash__(self):
             if not self.hash:
-                self.hash = hash((self.score, self.obfuscated, len(self.data), self.detectionPatternHash, self.companyPatternHash))
+                self.hash = hash((self.score, len(self.data), self.detectionPatternHash, self.companyPatternHash))
             return self.hash

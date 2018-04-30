@@ -10,18 +10,18 @@ class DB:
         self.scripts = []
         self.honeypotElements = []
 
-    def insertScript(self, sock, id, visit_id, identifier, URL, score, company, obfuscated, duplicate, hash):
+    def insertScript(self, sock, id, visit_id, identifier, URL, score, company, duplicate, hash):
         try:
-            query = ("INSERT INTO Scripts (id, visit_id, name, URL, level, score, company, obfuscated, duplicate, hash) VALUES (?,?,?,?,?,?,?,?,?,?)",
-            (id, visit_id, identifier, URL, 0, score, company, obfuscated, duplicate, hash))
+            query = ("INSERT INTO Scripts (id, visit_id, name, URL, level, score, company, duplicate, hash) VALUES (?,?,?,?,?,?,?,?,?)",
+            (id, visit_id, identifier, URL, 0, score, company, duplicate, hash))
             sock.send(query)
         except:
             print("Error inserting script record %s %s" % (identifier, id))
 
     def insertDetection(self, sock, scriptId, topic, pattern, company, score):
         try:
-            query = ("INSERT INTO DetectionPatterns (script_id, topic, pattern, value, company, score) VALUES (?,?,?,?,?,?)",
-            (scriptId, topic, pattern, '', company, score))
+            query = ("INSERT INTO DetectionPatterns (script_id, topic, pattern, company, score) VALUES (?,?,?,?,?)",
+            (scriptId, topic, pattern, company, score))
             sock.send(query)
         except:
             print("Error inserting detection record %s %s %s" % (scriptId, topic, pattern))
@@ -68,11 +68,10 @@ class DB:
                 for key, detectionPattern in script.detectionPatterns.iteritems():
                     self.insertDetection(sock, scriptId, key, ','.join(detectionPattern.patterns), company, detectionPattern.score)
 
-            self.insertScript(sock, scriptId, visit_id, script.identifier, script.URL, script.score, company, script.obfuscated, duplicate, scriptHash)
+            self.insertScript(sock, scriptId, visit_id, script.identifier, script.URL, script.score, company, duplicate, scriptHash)
 
         print('PERSIST HONEYPOTS %s' % len(self.honeypotElements))
         for honeypotElement in self.honeypotElements:
-            print honeypotElement
             self.insertHoneypotElement(sock, visit_id, honeypotElement[0], honeypotElement[1], ','.join(honeypotElement[2]), ','.join(honeypotElement[3]), 12)
 
         self.updateSiteVisit(sock, highestScore, visit_id)

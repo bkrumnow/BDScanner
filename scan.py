@@ -3,7 +3,7 @@ from six.moves import range
 import csv
 
 # The list of sites that we wish to crawl
-NUM_BROWSERS = 1
+NUM_BROWSERS = 7
 
 # Loads the manager preference and 3 copies of the default browser dictionaries
 manager_params, browser_params = TaskManager.load_default_params(NUM_BROWSERS)
@@ -25,8 +25,8 @@ manager_params['log_directory'] = '~/OpenWPM/data'
 # Commands time out by default after 60 seconds
 manager = TaskManager.TaskManager(manager_params, browser_params)
 
-#fileReader = csv.reader(open('detection/alexa/top-1m.csv'), delimiter=',')
-fileReader = csv.reader(open('detection/validation/test.csv'), delimiter=',')
+fileReader = csv.reader(open('detection/alexa/top-1m.csv'), delimiter=',')
+#fileReader = csv.reader(open('detection/validation/test.csv'), delimiter=',')
 
 # Visits the sites with all browsers simultaneously
 
@@ -36,7 +36,7 @@ for (index, url) in fileReader:
 	urls.append(url);
 del fileReader
 
-for i in range(0, len(urls)):
+for i in range(40001, len(urls), 20):
     url = urls[i]
     print ("Command creation %s %s" % (i, url))
 
@@ -52,7 +52,7 @@ for i in range(0, len(urls)):
     manager.execute_command_sequence(command_sequence, index=None)
     del command_sequence
 
-    if i >= 40000:
+    if i >= 80002:
         break;
 
 # Shuts down the browsers and waits for the data to finish logging
