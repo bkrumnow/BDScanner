@@ -73,7 +73,7 @@ class HoneypotScanner:
         patterns = []
         for pattern in self.inlineStylePatterns.patterns:
             for patternValue in pattern[2]:
-                if PatternChecker.checkPattern(style, patternValue, identifier):
+                if PatternChecker.checkPattern(style, patternValue, identifier)[0]:
                     patterns.append(pattern[1])
         return patterns
 
@@ -95,7 +95,7 @@ class HoneypotScanner:
         if style:
             for pattern in self.inlineStylePatterns.parentPatterns:
                 for patternValue in pattern[2]:
-                    if PatternChecker.checkPattern(style, patternValue, identifier):
+                    if PatternChecker.checkPattern(style, patternValue, identifier)[0]:
                         patterns.append(pattern[1])
                         break
 

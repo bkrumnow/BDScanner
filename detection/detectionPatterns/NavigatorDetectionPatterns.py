@@ -17,7 +17,7 @@ class NavigatorDetectionPatterns:
                          "presentation",
                          "navigator.vendor"])
         selenium = (12.0, "Selenium", ["webdriver(?![a-zA-z-])"])
-        userAgent = (0.2, 'UserAgent', ["navigator.userAgent", ['navigator', 'useragent']])
+        userAgent = (0.2, 'UserAgent', [([["navigator.userAgent"], ['navigator', 'useragent']], 'OR')])
         misc = (0.2, "Misc.", ["navigator.appVersion", "navigator.vendor",
         "navigator.onLine"]) #not documented
 

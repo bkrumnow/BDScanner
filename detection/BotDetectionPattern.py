@@ -4,6 +4,22 @@ class BotDetectionPattern:
 
   def __init__(self):
 
+
+        #HL+HF
+#        Akamai?? (Obfuscated)
+#          APU
+#   ParameterX
+#  Adscore
+#akamaicdc
+#Distil_CDN
+
+        #HL (+misc)
+#        Bowser
+#        Google_ima3
+
+        #Misc
+#        fingerprinterjs
+
         self.CompanyPattern = [
             ('Distil', ['Internet Explorer", "Firefox", "Chrome", "Chromium", "Safari", "MacIntel", "Win32", "Win64", "Windows", "WinNT", "OSX", "Linux", "eval", "O", "Snow Leopard", "Lion/Mountain Lion", "Yosemite", "Mavericks", "d", "XMLHttpRequest", "undefined", "Msxml2.XMLHTTP.6.0", "Msxml2.XMLHTTP.3.0", "Microsoft.XMLHTTP", "length", "substring", "slice", "n", "substr", "", "navigator", "toLowerCase", "a", "h", "replace", "t", "\$2\$1", "platform", "script", "object", "screen", "fonts", "cpu", "addEventListener", "__", "_", "uate", "__web", "__s", "__fx", "_unwrapped", "_script_", "tion", "_fn", "_S", "_IDE", "_Recorder", "_p", "_s", "P", "S", "e", "document", "match", "cache_", "300", "external", "Sequentum", "indexOf", "400", "s", "getAttribute", "documentElement", "500", "web", "600", "700", "POST", "open", "=", "send", "hostname", "location", "___dTL", "getElementById", "nodeName", "INPUT", "value", "audio", "progress", "video", "window", "media", "readystate", "loading", "load", "-", "attachEvent", "onload"']),
             ('Distil_CDN', ['|| window._phantom || window.__phantomas || window.callPhantom || 0 == navigator.onLine &&', 'n-distil.areyouahuman.com']),
@@ -14,7 +30,9 @@ class BotDetectionPattern:
             ('AsyncDistil', ['\$cdc_asdjflasutopfhvcZLmcfl_", "0", "{"sensor_data":"", "touchmove", "doadma_en", "readyState", ', '_ac = \[', '"Chrome Remote Desktop Viewer", "fonts", "callPhantom", "RTCPeerConnection", "attachEvent", "timezoneOffsetKey", "lang"']),
             ('Google_ima3', ['ima.bridge.getVideoMetadata', 'webdriver-evaluate', 'webdriver-evaluate-response']),
             ('ShieldSquare', ['typeof a.__webdriver_script_fn ', '","j34":"', '"undefined" !== typeof a._Selenium_IDE_Recorder']),
+            ('perfdrive', ['perfdrive.com', '_Selenium_IDE_Recorder', '.seleniumKey', re.escape('getAttribute("webdriver")')]),
             ('Bowser', ['/phantom/i.test\(', 'SlimerJS', 'Bowser']),
+            ('whatisit?', [re.escape('version:t(/silk\/(\d+(\.\d+)?)/i)}:/phantom/i.test(e)?n={name:"PhantomJS",phantom:o,version:t(/phantomjs\/(\d+')]),
             ('liveintent', ['name: "phantomjs",', '"./internal/default_filter"', '"./processors/stack": 10', 'o = r.appId || "mint-production-appId"']),
             ('webfont_googleAPI', ['a.a.indexOf\("PhantomJS"\)', 'e = "PhantomJS"', 'a.a.indexOf\("PlayStation"\)', 'a.a.indexOf\("AdobeAIR"\)', 'WebFont']),
             ('fox_browser', ['function getWindowsVersion\(s\)','/phantom/i.test\(ua\)', '/slimerjs/i.test\(ua\)', 'function detect\(ua\)']),
@@ -42,17 +60,20 @@ class BotDetectionPattern:
             ('WebEngage', ['webengage/ua', re.escape('Google Page Speed Insights", "Site24x7", "PhantomJS"')]),
             ('PixiMedia', ['case"flv":case"f4v":case"mp4":case"ogg":case"ogv":case"webm":case"video":case"dailymotion":return"video"']),
             ('dna', ['HttpConnection.xhrRequest', '__webdriver_evaluate"in document', 'handler.setDNA', 'swfLib.handler.getDNA']),
-            ('perfdrive', ['perfdrive.com', '_Selenium_IDE_Recorder', '.seleniumKey', re.escape('getAttribute("webdriver")')]),
             ('datadome', ['checkSelenium', 'checkNightmare', 'DataDomeAnalyzer']),
             ('Adscore', ['AdscoreInit', 'webdriver', 'window.adscore_jsv=']),
             ('hotwords', ['hotwords.core.BrowserDetect', '.__phantom']),
             ('uol', [re.escape('PhantomJS-based web perf metrics + monitoring tool'), 'botDetect()']),
             ('metrics', ['document.__webdriver_script_fn', 'WebKitMediaKeyMessageEvent', 'WebGLRenderingContext', 'MozSettingsEvent']),
             ('am15', ['am15.net', 'window._phantom', 'amuid']),
-            ('whatisit?', [re.escape('version:t(/silk\/(\d+(\.\d+)?)/i)}:/phantom/i.test(e)?n={name:"PhantomJS",phantom:o,version:t(/phantomjs\/(\d+')]),
             ('APU', ['_phantom', 'callPhantom', 'zwgsdloasdf', 'apu', 'window.zfgloadedpopup']),
             ('Platform.js', ['Electron', 'PhantomJS', 'cleanupOS', 'Platform.js']),
             ('GoogleAnalytics', [re.escape('www.gstatic.com/attribution/collection/attributiontools'), '.callPhantom', 'window._phantom', 'gtmscript']),
-            ('Vendor', [re.escape('chromium|flock|rockmelt|midori|epiphany|silk|skyfire|ovibrowser|bolt|iron|vivaldi|iridium|phantomjs|bowser'), 'headlesschrome', re.escape('navigator.language||navigator.userLanguage||navigator.browserLanguage')])
+            ('Vendor', [re.escape('chromium|flock|rockmelt|midori|epiphany|silk|skyfire|ovibrowser|bolt|iron|vivaldi|iridium|phantomjs|bowser'), 'headlesschrome', re.escape('navigator.language||navigator.userLanguage||navigator.browserLanguage')]),
+            ('GoogleDoubleClickForPublishers', ['dfpKeyValues', 'isPubDfp', 'webdriver', 'navigator.userAgent', '__phantomas', 'callPhantom', ]),
+            ('UnknownBotDetection', ['detectPhantomJs', 'detectSelenium', 'navigator.userAgent', 'callPhantom', 'bots']),
+            ('UnknownBotDetection2', ['isPhantomJS', 'isHeadlessChrome', 'navigator.userAgent', 'callPhantom']),
+            ('UnknownBotDetection3', ['hasWebdriverAttr', 'webdriver', 'hasPhantom', 'window.callPhantom', 'window._phantom', 'hasDomAutomation', 'window.domAutomation']),
+
         ]
 

@@ -6,6 +6,8 @@ class Script:
         self.identifier = id
         self.detectionPatterns = {}
         self.companyPatterns = []
+        self.headless = False
+        self.headfull = False
         self.URL = ''
         self.score = 0
         self.detectionPatternHash = 0
@@ -23,34 +25,19 @@ class Script:
 
         if topic in self.detectionPatterns:
             detectionPattern = self.detectionPatterns[topic];
-            detectionPattern.score = detectionPattern.score + score;
             detectionPattern.patterns.append(searchPattern)
             self.detectionPatterns[topic] = detectionPattern
         else:
             self.detectionPatterns[topic] = DetectionPattern.DetectionPattern(score, searchPattern)
 
-    def validateKeyPresence(self, detectionKeys):
-        present = False
-        for detectionKey in detectionKeys:
-            if detectionKey in self.detectionPatterns.keys():
-                return True
-
-
     def calculateScore(self):
-        userAgentKey = self.validateKeyPresence(['General_UserAgent', 'General_UserAgentElectron']) #OR construction
-
         for key, detectionPattern in self.detectionPatterns.iteritems():
-            validated = True
-            if key in ScoreCalculator.preConditions:
-                validated = self.validateKeyPresence(ScoreCalculator.preConditions[key])
+            detectionPattern.totalScore = ScoreCalculator.getScore(key, self.detectionPatterns, detectionPattern)
+            self.score = self.score + detectionPattern.totalScore
+            if not (self.headfull and self.headless):
+                ScoreCalculator.determineTypeOfDetection(key, self)
 
-            if validated:
-                amountOfPatterns = len(self.detectionPatterns[key].patterns)
-
-                score = ScoreCalculator.getScore(key, amountOfPatterns, userAgentKey, detectionPattern)
-                self.score = self.score + score
-
-            self.detectionPatternHash = self.detectionPatternHash + detectionPattern.hash
+        self.detectionPatternHash = self.detectionPatternHash + detectionPattern.hash
 
     def __hash__(self):
             if not self.hash:

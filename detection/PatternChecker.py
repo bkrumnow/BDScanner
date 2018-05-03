@@ -3,11 +3,12 @@ import re
 def checkPattern(data, patternObject, origin):
     ignoreCase = True
     disjunction = False
+    stringPattern = ''
 
     if (type(patternObject) is tuple):
+
         option = patternObject[1]
         patternObject = patternObject[0]
-
         if option == 'C': #Case Sensitive
             ignoreCase = False
         elif option == 'OR':
@@ -15,28 +16,41 @@ def checkPattern(data, patternObject, origin):
 
     if type(patternObject) is str:
         patterns = [patternObject]
+        stringPattern = patternObject
     else:
         patterns = patternObject
+        stringPattern = str(patternObject)
 
-    return search(data, patterns, origin, ignoreCase, disjunction)
+    return (search(data, patterns, origin, ignoreCase, disjunction), stringPattern)
 
 
 def search(data, patterns, origin, ignoreCase =True, disjunction=False):
-    try:
+#    try:
         retValue = 0
 
         for value in patterns:
-            compiledPattern = re.compile(value)
+            result = None
+            skip = False
 
-            if ignoreCase:
-                result = re.search(compiledPattern.pattern, data, re.IGNORECASE)
-            else:
-                result = re.search(compiledPattern.pattern, data)
+            if type(value) is list:  # ([['1'],['2'], ['useragent', 'navigator']], 'OR')
+                if len(value) > 1:
+                    result = search(data, value, origin)
+                    skip = True
+                else:
+                    value = value[0]
 
-#            print "Checking %s %s %s" % (value, result, ignoreCase)
-        #
-        #            if 'electron' in value:
-        #                print ('comparing %s %s %s' % (value, disjunction, result))
+            if not skip:
+                compiledPattern = re.compile(value)
+
+                if ignoreCase:
+                    result = re.search(compiledPattern.pattern, data, re.IGNORECASE)
+                else:
+                    result = re.search(compiledPattern.pattern, data)
+
+    #            print "Checking %s %s %s" % (value, result, ignoreCase)
+            #
+    #            if 'electron' in value:
+    #                print ('comparing %s %s %s' % (value, disjunction, result))
 
             if result:
                 retValue = 1
@@ -50,6 +64,6 @@ def search(data, patterns, origin, ignoreCase =True, disjunction=False):
         #        if 'electron' in value:
         #            print 'retvalue %s' % retValue
         return retValue
-    except:
-        print("Unknown data format %s %s" % (origin, patterns)) #, sys.exc_info()[0]))
-        return -1
+#    except:
+#        print("Unknown data format %s %s" % (origin, patterns)) #, sys.exc_info()[0]))
+#        return -1

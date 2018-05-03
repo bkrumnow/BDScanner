@@ -19,9 +19,9 @@ def analyseFile(src):
 #analyseFile('file:detection/examples/inlineScript9.js')
 
 
-for subdir, dirs, files in os.walk('detection/examples'):
+for subdir, dirs, files in os.walk('detection/examples/test'):
     for file in files:
-#        if file == 'asynec.js':
+#        if file.startswith('vendor'):
             filepath = 'file:' + subdir + os.sep + file
             analyseFile(filepath)
 

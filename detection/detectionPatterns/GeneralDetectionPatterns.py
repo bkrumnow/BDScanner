@@ -8,9 +8,8 @@ class GeneralDetectionPatterns:
     userAgent = (12.0, "UserAgent", [
         "PhantomJS(?![a-zA-z-])",
         "HeadlessChrome",
-        "domAutomation",
-        "slimer", "Sequentum"]) #not documented
-    userAgentElectron = (12.0,  "UserAgentElectron", ["'electron'", '"electron"', "\.electron"])
+        "[\'|\"]slimer[\'|\"]", "Sequentum"]) #not documented
+    userAgentElectron = (12.0,  "UserAgentElectron", [(["'electron'", '"electron"', "\.electron"], "OR")])
     userAgentWOW = (8.0, "UserAgentWOW", [["WOW64", "WOW32"]])
     colorDepth = (0.1, "ColorDepth", ["colorDepth == 32", "screen.colorDepth", "window.screen.colorDepth"])
     hardWareConcurrency = (0.1, "HardwareConcurrency", ["navigator.hardwareConcurrency", "hardwareConcurrency == -1"])
@@ -27,14 +26,14 @@ class GeneralDetectionPatterns:
     "plugins.length == 0", "plugins.length === 0", "plugins.length == 'undefined'", "plugins.length === 'undefined'","x-pnacl", "Shockwave Flash", "ShockwaveFlash.ShockwaveFlash"])
     stackTrace = (0.2, "StackTrace", [".stack"])
     webSecurity = (0.1, "WebSecurity", [])
-    popupSuppression = (1, "PopupSuppression", [["Date.now", "alert"]])
+    popupSuppression = (0.5, "PopupSuppression", [["Date.now", "alert"]])
     mimeTypes = (1.4, "MimeTypes", ["mimeTypes"])
     languages = (1.6, "Languages", ["!navigator.languages", "navigator.languages.length", "navigator.languages === 'undefined'"])
     images = (0.1, "Images", ["Brain Paul", "Mesa OffScreen", "image.width === 0", "image.width == 0", "image.height === 0","image.height == 0"])
     misc = (0.1, "Misc", ["Function.prototype.bind", "Function.prototype.toString", "window.Buffer", "window.emit", "window.spawn",
     "outerWidth === 0", "outerWidth == 0", "outerHeight === 0","outerHeight == 0", "Modernizr['hairline']"])
     distilMisc = (12, "DistilMisc", [re.escape('distil.areyouahuman')])
-    blackList = (2.0, "BlackList", ['Mozilla/4.0 (Windows NT 6.2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.70 Safari/537.17']) #VAMSOFT
+    blackList = (12.0, "BlackList", ['Mozilla/4.0 (Windows NT 6.2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.70 Safari/537.17']) #VAMSOFT
 
     self.patterns.extend((userAgent,
     userAgentElectron,

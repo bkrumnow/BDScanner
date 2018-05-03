@@ -1,6 +1,8 @@
 import json
 import os, sys
 import BotDetectionPattern
+from selenium.common.exceptions import StaleElementReferenceException
+
 from detectionPatterns import DocumentKeysDetectionPatterns, GeneralDetectionPatterns, NavigatorDetectionPatterns, WindowKeysDetectionPatterns
 from detection import PatternChecker, Script, ScoreCalculator
 from detection import FileManager
@@ -43,16 +45,19 @@ class Scanner:
                     FileManager.downloadFile(scriptSrc, self)
                     self.visitUrls.append(scriptSrc)
                 else:
-                    outerHTML = element.get_attribute('outerHTML')
-                    fileName = 'inlineScript' + str(counter) + '.js'
-                    self.analyse(outerHTML, fileName, fileName)
-                    counter = counter +1
+                    try:
+                        outerHTML = element.get_attribute('outerHTML')
+                        fileName = 'inlineScript' + str(counter) + '.js'
+                        self.analyse(outerHTML, fileName, fileName)
+                        counter = counter +1
+                    except StaleElementReferenceException:
+                        print 'element became invalid'
 
-            honeypotScanner = HoneypotScanner.HoneypotScanner()
+#            honeypotScanner = HoneypotScanner.HoneypotScanner()
             self.db.scripts = self.detectionScripts
 
-            self.db.honeypotElements = honeypotScanner.scan(driver, self.pageScripts);
-            del honeypotScanner
+#            self.db.honeypotElements = honeypotScanner.scan(driver, self.pageScripts);
+#            del honeypotScanner
             del self.detectionScripts
 
     def analyse(self, data, identifier, path):
@@ -65,13 +70,12 @@ class Scanner:
 
         if currentScript:
             currentScript.calculateScore()
-
             if currentScript.score >= 12:
                 currentScript.URL = path
 
                 #now that we have a pattern detected .. is it from a company?
                 for companyPattern in self.botDetectionPattern.CompanyPattern:
-                    companyResult = PatternChecker.checkPattern(res, companyPattern[1], path)
+                    companyResult = PatternChecker.checkPattern(res, companyPattern[1], path)[0]
 
                     if companyResult:
                         currentScript.addCompanyPattern(companyPattern)
@@ -91,7 +95,9 @@ class Scanner:
             for detectionPattern in detectionClass.patterns:
                 for pattern in detectionPattern[2]: #todo can this be more efficient?
                     #pattern can be a list , tuple or str
-                    result = PatternChecker.checkPattern(res, pattern, path)
+                    returnValue = PatternChecker.checkPattern(res, pattern, path)
+                    result = returnValue[0]
+
                     if result == -1: #File contents is corrupt skip this file
                         corruptFile = True
                         return
@@ -100,6 +106,5 @@ class Scanner:
                         if currentScript == None:
                             currentScript = Script.Script(identifier, res)
 
-                        currentScript.addDetectionPattern(detectionClass.name + '_' + detectionPattern[1], pattern, detectionPattern[0])
-
+                        currentScript.addDetectionPattern(detectionClass.name + '_' + detectionPattern[1], returnValue[1], detectionPattern[0])
         return currentScript
