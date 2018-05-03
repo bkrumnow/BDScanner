@@ -34,10 +34,10 @@ class DB:
 #        except:
 #            print("Error inserting honeypot element record %s %s %s" % (visit_id, elementId, name))
 
-    def updateSiteVisit(self, sock, score, headless, headfull, visitId):
+    def updateSiteVisit(self, sock, score, visitId):
         try:
-            query = ("UPDATE site_visits SET score=?, headless=?, headfull=? WHERE visit_id=?",
-            (score, headless, headfull, visitId))
+            query = ("UPDATE site_visits SET score=? WHERE visit_id=?",
+            (score, visitId))
             sock.send(query)
         except:
             print("Error updating site_visit record %s %s %s" % (score, visitId, sys.exc_info()[0]))
@@ -46,8 +46,7 @@ class DB:
     def persistResults(self, sock, visit_id, manager_params):
         print('PERSIST SCRIPTS %s' % len(self.scripts))
         highestScore =0
-        headless = False
-        headfull = False
+
         #print('self %s' % self)
         for script in self.scripts:
             scriptHash = hash(script)
@@ -63,10 +62,6 @@ class DB:
             else:
                 if script.score > highestScore:
                     highestScore = script.score
-                if script.headless:
-                    headless = True
-                if script.headfull:
-                    headfull = True
 
                 self.writeFile(script.identifier, script.data, str(visit_id) + '/')
                 company = ','.join(script.companyPatterns)
@@ -79,7 +74,7 @@ class DB:
         for honeypotElement in self.honeypotElements:
             self.insertHoneypotElement(sock, visit_id, honeypotElement[0], honeypotElement[1], ','.join(honeypotElement[2]), ','.join(honeypotElement[3]), 12)
 
-        self.updateSiteVisit(sock, highestScore, headless, headfull, visit_id)
+        self.updateSiteVisit(sock, highestScore, visit_id)
 
     def writeFile(self, name, data, prefix):
         path = '/home/osboxes/OpenWPM/detection/files/' +prefix

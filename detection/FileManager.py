@@ -21,6 +21,10 @@ def downloadFile(src, scanner):
                    'Accept-Encoding': 'none',
                    'Accept-Language': 'en-US,en;q=0.8',
                    'Connection': 'keep-alive'}
+
+            if src.startswith('//'):
+                src = 'http:' + src
+
             req = urllib2.Request(src, headers=hdr)
 
             response = urllib2.urlopen(req)
@@ -32,6 +36,9 @@ def downloadFile(src, scanner):
                 data = data + chunk;
 
             contentEncoding = response.info().getheader('Content-Encoding')
+        except urllib2.URLError, e:
+            print ("Could not open: %s %s" % (src,e))
+            return
         except:
             print("Could not open: %s %s" % (src,sys.exc_info()[0]))
             return

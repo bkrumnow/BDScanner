@@ -93,8 +93,6 @@ CREATE TABLE IF NOT EXISTS CrawlHistory (
 CREATE TABLE IF NOT EXISTS Scripts (
     id TEXT PRIMARY KEY,
     visit_id INTEGER NOT NULL,
-    headless BOOLEAN NOT NULL DEFAULT 0,
-    headfull BOOLEAN NOT NULL DEFAULT 0,
     name TEXT,
     URL TEXT,
     level INTEGER,
