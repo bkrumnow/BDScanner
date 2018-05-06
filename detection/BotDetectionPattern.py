@@ -34,7 +34,7 @@ class BotDetectionPattern:
             ('Bowser', ['/phantom/i.test\(', 'SlimerJS', 'Bowser']),
             ('whatisit?', [re.escape('version:t(/silk\/(\d+(\.\d+)?)/i)}:/phantom/i.test(e)?n={name:"PhantomJS",phantom:o,version:t(/phantomjs\/(\d+')]),
             ('liveintent', ['name: "phantomjs",', '"./internal/default_filter"', '"./processors/stack": 10', 'o = r.appId || "mint-production-appId"']),
-            ('webfont_googleAPI', ['a.a.indexOf\("PhantomJS"\)', 'e = "PhantomJS"', 'a.a.indexOf\("PlayStation"\)', 'a.a.indexOf\("AdobeAIR"\)', 'WebFont']),
+            ('webfont_googleAPI', ['a.a.indexOf\("PhantomJS"\)', 'a.a.indexOf\("PlayStation"\)', 'a.a.indexOf\("AdobeAIR"\)', 'WebFont']),
             ('fox_browser', ['function getWindowsVersion\(s\)','/phantom/i.test\(ua\)', '/slimerjs/i.test\(ua\)', 'function detect\(ua\)']),
             ('akamaicdc', ['in document || navigator.webdriver', '\$cdc_asdjflasutopfhvcZLmcfl_', '"callPhantom" in e || /PhantomJS/i.test']),
             ('unknown_obf', [re.escape('var _ = ["opera", "Candara", "", "btoa", "HTMLMenuItemElement", "Vani", "timing", "Malgun Gothic", "navigator", "Calibri", "Opera", "screenX", "Shonar Bangla", "bt", "charCodeAt", "save", "[object SafariRemoteNotification]", "charAt", "1.0", "<div>", "textBaseline", "XMLHttpRequest", "7", "MS PGothic", "Noteworthy", "5.0", "getElementsByClassName", "src", "port", "compute", "Apple SD Gothic Neo", "hostname", "screenY", "Lucida Sans", "product", "AVENIR", "Synchro LET", "getImageData", "Vijaya", "Yu Gothic UI", "outerWidth", "1.4", "Skia", "ieps", "indexedDB", "AcroPDF.PDF.1", "ShockwaveFlash.ShockwaveFlash.7", ".", "number", "toHexStr", "bazadebezolkohpepadr", "Chrome IOS", "/akam/10/pixel_", "object", "exitEarly", "Big Caslon", "18pt Tahoma", "insertBefore", "location", "boolean", "chrome", "}", "Gill Sans", "documentElement", "encodeURIComponent", "screen", "description", "ap", "Safari", "profile", "oscpu", "childNodes", "drawImage", "open", "</div>", "documentMode", "name", "Microsoft.XMLHTTP", "text", "IE", "Monaco", "=", "fonts", "detachEvent", "Mona Lisa Solid ITC TT", "driver", "doNotTrack", "sr", "sessionStorage", "Abadi MT Condensed Light", "2.0", "pageXOffset", "ROTL", "1.9", "now", "ceil", "globalStorage", "urhehlevkedkilrobacf",')]),
@@ -52,7 +52,6 @@ class BotDetectionPattern:
             ('JW Player', ['JW Player','navigator.userAgent', 'navigator.plugins.length']),
             ('SnapABug', ['SnapABug', 'SnapEngage']),
             ('SnapABug2?', ['Please leave us a message. 24/7 support is available for Enterprise and Premium', 'window.ActiveXObject', 'navigator.language']),
-            ('optimizely', ['optimizely', re.escape('|ovibrowser|bolt|iron|vivaldi|iridium|phantomjs')]),
             ('fingerprinterjs', ['webglKey', 'hasLiedResolutionKey', 'hasLiedBrowserKey', 'hasLiedOsKey']),
             ('bat.bing.com', ['bat.bing.com', 'addFraudSignals']),
             ('PubAds', ['googletag.impl.pubads', 'window.navigator.plugins', 'ShockwaveFlash.ShockwaveFlash']),
@@ -69,11 +68,17 @@ class BotDetectionPattern:
             ('APU', ['_phantom', 'callPhantom', 'zwgsdloasdf', 'apu', 'window.zfgloadedpopup']),
             ('Platform.js', ['Electron', 'PhantomJS', 'cleanupOS', 'Platform.js']),
             ('GoogleAnalytics', [re.escape('www.gstatic.com/attribution/collection/attributiontools'), '.callPhantom', 'window._phantom', 'gtmscript']),
-            ('Vendor', [re.escape('chromium|flock|rockmelt|midori|epiphany|silk|skyfire|ovibrowser|bolt|iron|vivaldi|iridium|phantomjs|bowser'), 'headlesschrome', re.escape('navigator.language||navigator.userLanguage||navigator.browserLanguage')]),
             ('GoogleDoubleClickForPublishers', ['dfpKeyValues', 'isPubDfp', 'webdriver', 'navigator.userAgent', '__phantomas', 'callPhantom', ]),
             ('UnknownBotDetection', ['detectPhantomJs', 'detectSelenium', 'navigator.userAgent', 'callPhantom', 'bots']),
             ('UnknownBotDetection2', ['isPhantomJS', 'isHeadlessChrome', 'navigator.userAgent', 'callPhantom']),
             ('UnknownBotDetection3', ['hasWebdriverAttr', 'webdriver', 'hasPhantom', 'window.callPhantom', 'window._phantom', 'hasDomAutomation', 'window.domAutomation']),
+            ('Wistia', ['Wistia', 'phantomjs']),
+            ('Avada', ['avada_lightbox', 'phantomjs', 'wrap_gravity_selects']),
+            ('optimizely', ['optimizely', re.escape('|ovibrowser|bolt|iron|vivaldi|iridium|phantomjs')]),
+            ('Vendor', [re.escape('chromium|flock|rockmelt|midori|epiphany|silk|skyfire|ovibrowser|bolt|iron|vivaldi|iridium|phantomjs|bowser'), 'headlesschrome', re.escape('navigator.language||navigator.userLanguage||navigator.browserLanguage')]),
+            ('CommonUAPattern', [re.escape('chromium|flock|rockmelt|midori|epiphany|silk|skyfire|ovibrowser|bolt|iron|vivaldi|iridium|phantomjs')]),
+            ('SquareSpace', ['squarespace', 'PhantomJS']),
+            ('WistiaHeadlessTampered', ['xhrHasBeenTamperedWith', 'isHeadless', 'phantomjs'])
 
         ]
 

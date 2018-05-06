@@ -10,18 +10,18 @@ class DB:
         self.scripts = []
         self.honeypotElements = []
 
-    def insertScript(self, sock, id, visit_id, headless, headfull, identifier, URL, score, company, duplicate, hash):
+    def insertScript(self, sock, id, visit_id, headless, headfull, identifier, URL, scriptLength, score, context, duplicate, hash):
         try:
-            query = ("INSERT INTO Scripts (id, visit_id, headless, headfull, name, URL, level, score, company, duplicate, hash) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
-            (id, visit_id, headless, headfull, identifier, URL, 0, score, company, duplicate, hash))
+            query = ("INSERT INTO Scripts (id, visit_id, headless, headfull, name, URL, script_length, score, context, duplicate, hash) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+            (id, visit_id, headless, headfull, identifier, URL, scriptLength, score, context, duplicate, hash))
             sock.send(query)
         except:
             print("Error inserting script record %s %s" % (identifier, id))
 
-    def insertDetection(self, sock, scriptId, topic, pattern, company, score):
+    def insertDetection(self, sock, scriptId, topic, pattern, context, score):
         try:
-            query = ("INSERT INTO DetectionPatterns (script_id, topic, pattern, company, score) VALUES (?,?,?,?,?)",
-            (scriptId, topic, pattern, company, score))
+            query = ("INSERT INTO DetectionPatterns (script_id, topic, pattern, context, score) VALUES (?,?,?,?,?)",
+            (scriptId, topic, pattern, context, score))
             sock.send(query)
         except:
             print("Error inserting detection record %s %s %s" % (scriptId, topic, pattern))
@@ -53,7 +53,7 @@ class DB:
             existsInCache = self.checkCache(sock, scriptHash, manager_params)
 
             duplicate = ''
-            company = ''
+            context = ','.join(script.companyPatterns)
 
             scriptId = str(visit_id) + '_' + script.identifier + '_' + str(random.randint(1,101)*5)
             if existsInCache:
@@ -64,15 +64,14 @@ class DB:
                     highestScore = script.score
 
                 self.writeFile(script.identifier, script.data, str(visit_id) + '/')
-                company = ','.join(script.companyPatterns)
                 for key, detectionPattern in script.detectionPatterns.iteritems():
-                    self.insertDetection(sock, scriptId, key, ','.join(detectionPattern.patterns), company, detectionPattern.totalScore)
+                    self.insertDetection(sock, scriptId, key, ','.join(detectionPattern.patterns), context, detectionPattern.totalScore)
 
-            self.insertScript(sock, scriptId, visit_id, script.headless, script.headfull, script.identifier, script.URL, script.score, company, duplicate, scriptHash)
+            self.insertScript(sock, scriptId, visit_id, script.headless, script.headfull, script.identifier, script.URL, script.scriptLength, script.score, context, duplicate, scriptHash)
 
-        print('PERSIST HONEYPOTS %s' % len(self.honeypotElements))
-        for honeypotElement in self.honeypotElements:
-            self.insertHoneypotElement(sock, visit_id, honeypotElement[0], honeypotElement[1], ','.join(honeypotElement[2]), ','.join(honeypotElement[3]), 12)
+#        print('PERSIST HONEYPOTS %s' % len(self.honeypotElements))
+#        for honeypotElement in self.honeypotElements:
+#            self.insertHoneypotElement(sock, visit_id, honeypotElement[0], honeypotElement[1], ','.join(honeypotElement[2]), ','.join(honeypotElement[3]), 12)
 
         self.updateSiteVisit(sock, highestScore, visit_id)
 
@@ -100,5 +99,5 @@ class DB:
     def printScripts(self):
         for script in self.scripts:
             print ("Company | BotMode %s %s %s %s" % (script.companyPatterns, script.headfull, script.headless, hash(script)))
-            for key, detectionPattern in script.detectionPatterns.iteritems():
-                print("Pattern %s %s %s %s" % (key, ','.join(detectionPattern.patterns), detectionPattern.score, detectionPattern.totalScore))
+#            for key, detectionPattern in script.detectionPatterns.iteritems():
+#                print("Pattern %s %s %s %s" % (key, ','.join(detectionPattern.patterns), detectionPattern.score, detectionPattern.totalScore))

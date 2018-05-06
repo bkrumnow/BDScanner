@@ -15,6 +15,7 @@ class Script:
         self.fromCache = False
         self.hash = None
         self.data = data
+        self.scriptLength = len(data)
 
     def addCompanyPattern(self, companyPattern):
         if companyPattern not in self.companyPatterns:
@@ -30,9 +31,9 @@ class Script:
         else:
             self.detectionPatterns[topic] = DetectionPattern.DetectionPattern(score, searchPattern)
 
-    def calculateScore(self):
+    def calculateScore(self, UAPropertyTargeted):
         for key, detectionPattern in self.detectionPatterns.iteritems():
-            detectionPattern.totalScore = ScoreCalculator.getScore(key, self.detectionPatterns, detectionPattern)
+            detectionPattern.totalScore = ScoreCalculator.getScore(key, self.detectionPatterns, detectionPattern, UAPropertyTargeted)
             self.score = self.score + detectionPattern.totalScore
             if not (self.headfull and self.headless):
                 ScoreCalculator.determineTypeOfDetection(key, self)
@@ -41,5 +42,5 @@ class Script:
 
     def __hash__(self):
             if not self.hash:
-                self.hash = hash((self.score, len(self.data), self.detectionPatternHash, self.companyPatternHash))
+                self.hash = hash((self.score, self.scriptLength, self.detectionPatternHash, self.companyPatternHash))
             return self.hash

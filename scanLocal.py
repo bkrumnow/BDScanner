@@ -19,13 +19,13 @@ def analyseFile(src):
 #analyseFile('file:detection/examples/inlineScript9.js')
 
 
-for subdir, dirs, files in os.walk('detection/examples/test'):
+for subdir, dirs, files in os.walk('detection/examples'):
     for file in files:
-#        if file.startswith('vendor'):
+        if file.startswith('inlineScript2'):
             filepath = 'file:' + subdir + os.sep + file
             analyseFile(filepath)
 
-#
+#s
 #file = open(os.path.join('detection/tests/honeypots','index.html'))
 #data = file.read()
 #

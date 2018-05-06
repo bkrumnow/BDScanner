@@ -107,7 +107,7 @@ def preProcessScript(data):
 #            print("Could not beautify %s" % (identifier))
 #            res = data
 
-    #Remove comment
+    #Remove comments
     try:
         res = re.sub("(?:\/\*(?:[\s\S]*?)\*\/)|(?:^\s*\/\/(?:.*)$)","" ,data, flags=re.MULTILINE)
     except:

@@ -1,7 +1,7 @@
 {
   "excludeFiles": [
-    "jquery.*.js",
-    "bootstrap.*.js",
-    "underscore.*.js"
+    "^jquery(\b.min|).js",
+    "^bootstrap(\b.min|).js",
+    "^underscore(\b.min|).js"
   ]
 }

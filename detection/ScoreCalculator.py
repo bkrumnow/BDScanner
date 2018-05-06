@@ -43,8 +43,9 @@ categories['4'] = ['General_ColorDepth',
 'General_Languages',
 'General_Images',
 'General_Misc',
+'General_BotPattern',
 'NavigatorAttr_Misc.',
-'NavigatorAttr_UserAgent'
+'NavigatorAttr_UserAgent',
 ]
 
 #Bot detection file literals
@@ -60,20 +61,19 @@ categories['headfullAndHeadless'] = ['DocumentKeys_SelChromeChromium',
 'WindowKeys_ChromiumWebbot',
 'WindowKeys_Nightmare']
 
-def getScore(key, detectionPatterns, detectionPattern):
+# When an UA string has found it is only valid when on site level a UA attribute exists
+
+def getScore(key, detectionPatterns, detectionPattern, UAPropertyTargeted):
     score = 0
     amountOfPatterns = len(detectionPatterns[key].patterns)
     if key in categories['1']:
-
         score = detectionPattern.score * amountOfPatterns
-
     elif key in categories['2']:
-        if validateKeyPresence(detectionPatterns, ['NavigatorAttr_UserAgent']): #user agent property
+        if UAPropertyTargeted: #user agent property on site level
             score =  detectionPattern.score * amountOfPatterns
     elif key in categories['3']:
         if validateKeyPresence(detectionPatterns, categories['2']): #user agent value
             score = detectionPattern.score * amountOfPatterns
-
     elif key in categories['4'] or key in categories['5']:
         score =  detectionPattern.score * amountOfPatterns
 

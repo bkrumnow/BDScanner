@@ -34,6 +34,7 @@ class GeneralDetectionPatterns:
     "outerWidth === 0", "outerWidth == 0", "outerHeight === 0","outerHeight == 0", "Modernizr['hairline']"])
     distilMisc = (12, "DistilMisc", [re.escape('distil.areyouahuman')])
     blackList = (12.0, "BlackList", ['Mozilla/4.0 (Windows NT 6.2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.70 Safari/537.17']) #VAMSOFT
+    botPattern = (24.0, "BotPattern", [["BotPattern", "PhantomJS"]])
 
     self.patterns.extend((userAgent,
     userAgentElectron,
@@ -53,4 +54,5 @@ class GeneralDetectionPatterns:
     images,
     misc,
     distilMisc,
-    blackList))
+    blackList,
+    botPattern))

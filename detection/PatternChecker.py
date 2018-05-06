@@ -47,10 +47,8 @@ def search(data, patterns, origin, ignoreCase =True, disjunction=False):
                 else:
                     result = re.search(compiledPattern.pattern, data)
 
-    #            print "Checking %s %s %s" % (value, result, ignoreCase)
-            #
-    #            if 'electron' in value:
-    #                print ('comparing %s %s %s' % (value, disjunction, result))
+#            if 'BotPattern' in patterns:
+#                print "Checking %s %s %s %s" % (value, result, ignoreCase, disjunction)
 
             if result:
                 retValue = 1
@@ -61,8 +59,8 @@ def search(data, patterns, origin, ignoreCase =True, disjunction=False):
                 if not disjunction:
                     break;
 
-        #        if 'electron' in value:
-        #            print 'retvalue %s' % retValue
+#        if 'BotPattern' in patterns:
+#            print 'retvalue %s' % retValue
         return retValue
 #    except:
 #        print("Unknown data format %s %s" % (origin, patterns)) #, sys.exc_info()[0]))
