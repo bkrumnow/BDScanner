@@ -1,8 +1,18 @@
+###############################################################################################################
+## PatternChecker.py
+## Analysis script content by making use of regular expressions
+##
+## License 2018 Open Source License
+## Written By: Gabry Vlot (https://github.com/GabryVlot)
+## Project: Detecting Web bot Detecting | BotDetectionScanner (https://github.com/GabryVlot/BotDetectionScanner)
+###############################################################################################################
+
 import re
 
+#pre-processes patternObject (detectionPatterns that it can be used to analyse the contents of the data param
 def checkPattern(data, patternObject, origin):
     ignoreCase = True
-    disjunction = False
+    OR = False #so it is an AND condition
     stringPattern = ''
 
     if (type(patternObject) is tuple):
@@ -12,7 +22,7 @@ def checkPattern(data, patternObject, origin):
         if option == 'C': #Case Sensitive
             ignoreCase = False
         elif option == 'OR':
-            disjunction = True
+            OR = True
 
     if type(patternObject) is str:
         patterns = [patternObject]
@@ -21,11 +31,13 @@ def checkPattern(data, patternObject, origin):
         patterns = patternObject
         stringPattern = str(patternObject)
 
-    return (search(data, patterns, origin, ignoreCase, disjunction), stringPattern)
+    return (analyse(data, patterns, origin, ignoreCase, OR), stringPattern)
 
-
-def search(data, patterns, origin, ignoreCase =True, disjunction=False):
-#    try:
+# analyses the data by making use of the patterns provided
+# if it maches a pattern 1 will be returned if this is not the case 0 will be returned
+# If an exception will raise -1 will be returned
+def analyse(data, patterns, origin, ignoreCase =True, OR=False):
+    try:
         retValue = 0
 
         for value in patterns:
@@ -34,11 +46,13 @@ def search(data, patterns, origin, ignoreCase =True, disjunction=False):
 
             if type(value) is list:  # ([['1'],['2'], ['useragent', 'navigator']], 'OR')
                 if len(value) > 1:
-                    result = search(data, value, origin)
+                    #recursive : check all values in the list
+                    result = analyse(data, value, origin)
                     skip = True
                 else:
                     value = value[0]
 
+            #perform regex search with option : case sensitive : true / false
             if not skip:
                 compiledPattern = re.compile(value)
 
@@ -48,20 +62,19 @@ def search(data, patterns, origin, ignoreCase =True, disjunction=False):
                     result = re.search(compiledPattern.pattern, data)
 
 #            if 'BotPattern' in patterns:
-#                print "Checking %s %s %s %s" % (value, result, ignoreCase, disjunction)
+#                print "Checking %s %s %s %s" % (value, result, ignoreCase, OR)
 
+            # analyse result in combination with options
             if result:
                 retValue = 1
-                if disjunction:
+                if OR:
                     break;
             else:
                 retValue = 0
-                if not disjunction:
+                if not OR:
                     break;
 
-#        if 'BotPattern' in patterns:
-#            print 'retvalue %s' % retValue
         return retValue
-#    except:
-#        print("Unknown data format %s %s" % (origin, patterns)) #, sys.exc_info()[0]))
-#        return -1
+    except:
+        print("Unknown data format %s %s" % (origin, patterns)) #, sys.exc_info()[0]))
+        return -1

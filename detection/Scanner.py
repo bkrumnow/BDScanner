@@ -1,71 +1,63 @@
-import json
-import os, sys
+###############################################################################################################
+## scanner.py
+## Extracts inline and external script code from page content and analyses the data for bot detection inclusions
+##
+## License 2018 Open Source License
+## Written By: Gabry Vlot (https://github.com/GabryVlot)
+## Project: Detecting Web bot Detecting | BotDetectionScanner (https://github.com/GabryVlot/BotDetectionScanner)
+###############################################################################################################
+
 import BotDetectionPattern
 from selenium.common.exceptions import StaleElementReferenceException
-
 from detectionPatterns import DocumentKeysDetectionPatterns, GeneralDetectionPatterns, NavigatorDetectionPatterns, WindowKeysDetectionPatterns
-from detection import PatternChecker, Script, ScoreCalculator
+from detection import PatternChecker, Script
 from detection import FileManager
-from detection.honeypots import HoneypotScanner
 
 class Scanner:
-    def __init__(self, db, driver, visit_id):
-        self.db = db
-        self.detectionScripts = []
-        self.pageScripts = []
-        self.visitId = visit_id
+    def __init__(self, driver, visit_id):
+        self.scripts = []
         self.scorePatterns = [];
         self.scorePatterns.extend((GeneralDetectionPatterns.GeneralDetectionPatterns(), DocumentKeysDetectionPatterns.DocumentKeysDetectionPatterns(),
         NavigatorDetectionPatterns.NavigatorDetectionPatterns(),WindowKeysDetectionPatterns.WindowKeysDetectionPatterns()))
         self.botDetectionPattern = BotDetectionPattern.BotDetectionPattern()
-        self.visitUrls = []
+        self.URLHistory = []
         self.UAPropertyTargeted = False
 
-        #Scan Main page Source (innerscripts are already seperated no use )
-        #pageSource = driver.page_source
-        #self.analyse(pageSource, 'index.html', 'index.html')
+        self.extractScriptInclusions(driver)
 
+    #extracts inline and external script inclusions
+    def extractScriptInclusions(self, driver):
         counter = 1
         if driver:
             for element in driver.find_elements_by_tag_name('script'):
-                #Scan internal and external script contents
+                #Extract internal and external scripts from pages
                 try:
                     scriptSrc = element.get_attribute('src')
                 except:
                     scriptSrc = None
 
-    #            if counter > 4:
-    #                self.db.scripts = self.scripts
-    #                return;
-
                 if scriptSrc:
-    #                counter = counter +1
-                    if scriptSrc in self.visitUrls:
+                    if scriptSrc in self.URLHistory:
                         continue
 
-                    FileManager.downloadFile(scriptSrc, self)
-                    self.visitUrls.append(scriptSrc)
+                    result = FileManager.downloadFile(scriptSrc)
+                    if result:
+                        self.analyseCode(result[0], result[1], result[2])
+                    self.URLHistory.append(scriptSrc)
                 else:
                     try:
                         outerHTML = element.get_attribute('outerHTML')
                         fileName = 'inlineScript' + str(counter) + '.js'
-                        self.analyse(outerHTML, fileName, fileName)
+                        self.analyseCode(outerHTML, fileName, fileName)
                         counter = counter +1
                     except StaleElementReferenceException:
                         print 'element became invalid'
+                    except:
+                        print 'element cannot be targeted'
 
-#            honeypotScanner = HoneypotScanner.HoneypotScanner()
-            self.db.scripts = self.detectionScripts
-
-#            self.db.honeypotElements = honeypotScanner.scan(driver, self.pageScripts);
-#            del honeypotScanner
-            del self.detectionScripts
-
-    def analyse(self, data, identifier, path):
-        processedScript = FileManager.preProcessScript(data)
-        res = processedScript[0]
-#        self.pageScripts.append(res)
-
+    #preprocesses script (de-obfuscating and remove comments) and script persistence
+    def analyseCode(self, data, identifier, path):
+        res = FileManager.preProcessScript(data)
         currentScript = None
         currentScript = self.analysePatterns(currentScript, res, identifier, path)
 
@@ -81,11 +73,12 @@ class Scanner:
                     if companyResult:
                         currentScript.addCompanyPattern(companyPattern)
 
-                self.detectionScripts.append(currentScript)
-                print("\n@append: %s %s %s" % (len(self.detectionScripts), identifier, currentScript.score))
+                self.scripts.append(currentScript)
+                print("\n@append: %s %s %s" % (len(self.scripts), identifier, currentScript.score))
             else:
                 del currentScript
 
+    #Compares script with detection patterns
     def analysePatterns(self, currentScript, res, identifier, path):
         corruptFile = False
 

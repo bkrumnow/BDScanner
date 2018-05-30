@@ -52,4 +52,4 @@ def checkPropertyValue(properties, property, valueToCompare, regEx=False):
     return propertyValue == valueToCompare
 
 def checkPropertyValueByRegEx(propertyValue, pattern):
-    return PatternChecker.search(propertyValue, [pattern], 'ExternalStylePattern', False, False)
+    return PatternChecker.analyse(propertyValue, [pattern], 'ExternalStylePattern', False, False)

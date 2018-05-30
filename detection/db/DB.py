@@ -1,14 +1,12 @@
-import os
 import random
-import sqlite3
-from detection import DetectionPattern, Globals
+from detection import FileManager
 from automation.utilities import db_utils
 
 class DB:
 
-    def __init__(self):
-        self.scripts = []
-        self.honeypotElements = []
+    def __init__(self, dataPath, scripts):
+        self.scripts = scripts
+        self.dataPath = dataPath
 
     def insertScript(self, sock, id, visit_id, headless, headfull, identifier, URL, scriptLength, score, context, duplicate, hash):
         try:
@@ -63,7 +61,7 @@ class DB:
                 if script.score > highestScore:
                     highestScore = script.score
 
-                self.writeFile(script.identifier, script.data, str(visit_id) + '/')
+                FileManager.persistFile(script.identifier, script.data, self.dataPath + '/files/' + str(visit_id) + '/')
                 for key, detectionPattern in script.detectionPatterns.iteritems():
                     self.insertDetection(sock, scriptId, key, ','.join(detectionPattern.patterns), context, detectionPattern.totalScore)
 
@@ -74,20 +72,6 @@ class DB:
 #            self.insertHoneypotElement(sock, visit_id, honeypotElement[0], honeypotElement[1], ','.join(honeypotElement[2]), ','.join(honeypotElement[3]), 12)
 
         self.updateSiteVisit(sock, highestScore, visit_id)
-
-    def writeFile(self, name, data, prefix):
-        path = '/home/osboxes/OpenWPM/detection/files/' +prefix
-        try:
-            os.makedirs(path)
-        except:
-            pass
-
-        try:
-            with open(path + name, 'w') as file:
-                file.write(data.encode('utf-8'))
-        except:
-            print("Could not write file %s" % name)
-
 
     def checkCache(self, sock, scriptHash, manager_params):
         rows = db_utils.query_db(manager_params['database_name'], "SELECT id FROM Scripts WHERE hash = " + str(scriptHash) + ";")
