@@ -7,23 +7,29 @@
 ## Project: Detecting Web bot Detecting | BotDetectionScanner (https://github.com/GabryVlot/BotDetectionScanner)
 ###############################################################################################################
 
-import BotDetectionPattern
+import FamiliarPatterns
 from selenium.common.exceptions import StaleElementReferenceException
-from detectionPatterns import DocumentKeysDetectionPatterns, GeneralDetectionPatterns, NavigatorDetectionPatterns, WindowKeysDetectionPatterns
+from detectionPatterns import BotDetectionLiterals, BotDetectionProperties, BotDetectionValues, BrowserCharacteristics, KnownDetectionPatterns
 from detection import PatternChecker, Script
 from detection import FileManager
 
 class Scanner:
     def __init__(self, driver, visit_id):
         self.scripts = []
-        self.scorePatterns = [];
-        self.scorePatterns.extend((GeneralDetectionPatterns.GeneralDetectionPatterns(), DocumentKeysDetectionPatterns.DocumentKeysDetectionPatterns(),
-        NavigatorDetectionPatterns.NavigatorDetectionPatterns(),WindowKeysDetectionPatterns.WindowKeysDetectionPatterns()))
-        self.botDetectionPattern = BotDetectionPattern.BotDetectionPattern()
+        self.detectionPatterns = [];
+        self.familiarPatterns = FamiliarPatterns.FamiliarPatterns()
         self.URLHistory = []
-        self.UAPropertyTargeted = False
 
+        self.initDetectionPatterns()
         self.extractScriptInclusions(driver)
+
+    #register detection patterns
+    def initDetectionPatterns(self):
+        self.detectionPatterns.extend((KnownDetectionPatterns.KnownDetectionPatterns(),
+        BotDetectionLiterals.BotDetectionLiterals(),
+        BotDetectionProperties.BotDetectionProperties(),
+        BotDetectionValues.BotDetectionValues(),
+        BrowserCharacteristics.BrowserCharacteristics()))
 
     #extracts inline and external script inclusions
     def extractScriptInclusions(self, driver):
@@ -62,16 +68,16 @@ class Scanner:
         currentScript = self.analysePatterns(currentScript, res, identifier, path)
 
         if currentScript:
-            currentScript.calculateScore(self.UAPropertyTargeted)
+            currentScript.calculateScore()
             if currentScript.score >= 12:
                 currentScript.URL = path
 
-                #now that we have a pattern detected .. is it from a company?
-                for companyPattern in self.botDetectionPattern.CompanyPattern:
-                    companyResult = PatternChecker.checkPattern(res, companyPattern[1], path)[0]
+#                now that we have a pattern detected .. is it a familiar one?
+                for familiarPattern in self.familiarPatterns.familiarPatterns:
+                    result = PatternChecker.checkPattern(res, familiarPattern[1], path)[0]
 
-                    if companyResult:
-                        currentScript.addCompanyPattern(companyPattern)
+                    if result:
+                        currentScript.addCompanyPattern(familiarPattern)
 
                 self.scripts.append(currentScript)
                 print("\n@append: %s %s %s" % (len(self.scripts), identifier, currentScript.score))
@@ -80,29 +86,36 @@ class Scanner:
 
     #Compares script with detection patterns
     def analysePatterns(self, currentScript, res, identifier, path):
-        corruptFile = False
+        stop = False
 
-        for detectionClass in self.scorePatterns:
-            if corruptFile:
+        for detectionPattern in self.detectionPatterns:
+            if stop:
                 return
 
-            for detectionPattern in detectionClass.patterns:
-                for pattern in detectionPattern[2]:
+            for pattern in detectionPattern.patterns:
+                for regEx in pattern.patterns:
                     #pattern can be a list , tuple or str
-                    returnValue = PatternChecker.checkPattern(res, pattern, path)
+                    returnValue = PatternChecker.checkPattern(res, regEx, path)
                     result = returnValue[0]
 
                     if result == -1: #File contents is corrupt skip this file
-                        corruptFile = True
+                        stop = True
                         return
 
                     if (result):
                         if currentScript == None:
                             currentScript = Script.Script(identifier, res)
 
-                        detectionTopic = detectionClass.name + '_' + detectionPattern[1]
-                        if detectionTopic == 'NavigatorAttr_UserAgent':
-                            self.UAPropertyTargeted = True
+                        detectionTopic = detectionPattern.name + '_' + pattern.name
 
-                        currentScript.addDetectionPattern(detectionTopic, returnValue[1], detectionPattern[0])
+                        if pattern.determinative:
+                            topic = detectionTopic
+                        else:
+                            topic = returnValue[1]
+
+                        currentScript.addDetectionPattern(detectionPattern.name, detectionTopic, topic, pattern.value, pattern.prerequisites)
+
+                        if pattern.determinative:
+                            stop = True
+                            return currentScript
         return currentScript

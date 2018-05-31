@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS site_visits (
     crawl_id INTEGER NOT NULL,
     site_url VARCHAR(500) NOT NULL,
     score DECIMAL,
+    scriptId TEXT,
     FOREIGN KEY(crawl_id) REFERENCES crawl(id));
 
 /* Firefox Storage Vector Dumps */
@@ -91,8 +92,7 @@ CREATE TABLE IF NOT EXISTS CrawlHistory (
 CREATE TABLE IF NOT EXISTS Scripts (
     id TEXT PRIMARY KEY,
     visit_id INTEGER NOT NULL,
-    headless BOOLEAN NOT NULL DEFAULT 0,
-    headfull BOOLEAN NOT NULL DEFAULT 0,
+    categories TEXT,
     name TEXT,
     URL TEXT,
     script_length DECIMAL,

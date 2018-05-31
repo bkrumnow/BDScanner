@@ -7,21 +7,26 @@ from detection import PatternChecker
 from detection.honeypots.patterns import InlineStylePatterns
 
 start = datetime.datetime.now()
-db = DB.DB()
+
 
 def analyseFile(src):
         print ('\n######################################## %s' % src)
-        scanner = Scanner.Scanner(db, None, 3)
-        FileManager.downloadFile(src, scanner)
-        db.scripts = scanner.detectionScripts
+        scanner = Scanner.Scanner(None, 3)
+        result = FileManager.downloadFile(src)
+
+        if result == None:
+            return
+
+        scanner.analyseCode(result[0], result[1], result[2])
+        db = DB.DB('~/OpenWPM/data', scanner.scripts)
         db.printScripts()
 
 #analyseFile('file:detection/examples/inlineScript9.js')
 
 
-for subdir, dirs, files in os.walk('detection/examples'):
+for subdir, dirs, files in os.walk('detection/examples/distil'):
     for file in files:
-        if file.startswith('inlineScript2'):
+#        if file.startswith('pubads_impl'):
             filepath = 'file:' + subdir + os.sep + file
             analyseFile(filepath)
 

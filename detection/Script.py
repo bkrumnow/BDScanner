@@ -1,4 +1,4 @@
-import DetectionPattern, ScoreCalculator
+import RegisteredDetectionTopic, ScoreCalculator
 
 class Script:
 
@@ -16,27 +16,28 @@ class Script:
         self.hash = None
         self.data = data
         self.scriptLength = len(data)
+        self.categories = []
 
     def addCompanyPattern(self, companyPattern):
         if companyPattern not in self.companyPatterns:
             self.companyPatterns.append(companyPattern[0])
             self.companyPatternHash = self.companyPatternHash + hash(companyPattern[0]);
 
-    def addDetectionPattern(self, topic, searchPattern, score):
+    def addDetectionPattern(self, category, topic, searchPattern, score, prerequisites):
+        if category not in self.categories:
+            self.categories.append(category)
 
         if topic in self.detectionPatterns:
             detectionPattern = self.detectionPatterns[topic];
             detectionPattern.patterns.append(searchPattern)
             self.detectionPatterns[topic] = detectionPattern
         else:
-            self.detectionPatterns[topic] = DetectionPattern.DetectionPattern(score, searchPattern)
+            self.detectionPatterns[topic] = RegisteredDetectionTopic.RegisteredDetectionTopic(score, searchPattern, prerequisites)
 
-    def calculateScore(self, UAPropertyTargeted):
+    def calculateScore(self):
         for key, detectionPattern in self.detectionPatterns.iteritems():
-            detectionPattern.totalScore = ScoreCalculator.getScore(key, self.detectionPatterns, detectionPattern, UAPropertyTargeted)
+            detectionPattern.totalScore = ScoreCalculator.getScore(key, self.detectionPatterns, detectionPattern)
             self.score = self.score + detectionPattern.totalScore
-            if not (self.headfull and self.headless):
-                ScoreCalculator.determineTypeOfDetection(key, self)
 
         self.detectionPatternHash = self.detectionPatternHash + detectionPattern.hash
 

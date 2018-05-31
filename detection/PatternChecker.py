@@ -19,6 +19,7 @@ def checkPattern(data, patternObject, origin):
 
         option = patternObject[1]
         patternObject = patternObject[0]
+
         if option == 'C': #Case Sensitive
             ignoreCase = False
         elif option == 'OR':
@@ -39,7 +40,6 @@ def checkPattern(data, patternObject, origin):
 def analyse(data, patterns, origin, ignoreCase =True, OR=False):
     try:
         retValue = 0
-
         for value in patterns:
             result = None
             skip = False
@@ -52,6 +52,7 @@ def analyse(data, patterns, origin, ignoreCase =True, OR=False):
                 else:
                     value = value[0]
 
+
             #perform regex search with option : case sensitive : true / false
             if not skip:
                 compiledPattern = re.compile(value)
@@ -60,9 +61,6 @@ def analyse(data, patterns, origin, ignoreCase =True, OR=False):
                     result = re.search(compiledPattern.pattern, data, re.IGNORECASE)
                 else:
                     result = re.search(compiledPattern.pattern, data)
-
-#            if 'BotPattern' in patterns:
-#                print "Checking %s %s %s %s" % (value, result, ignoreCase, OR)
 
             # analyse result in combination with options
             if result:

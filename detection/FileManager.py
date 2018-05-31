@@ -128,13 +128,11 @@ def persistFile(name, data, path):
         print("Could not write file %s" % name)
 
 def decompressData(data, contentEncoding, fileName):
-    print '@@COMpress',fileName
     try:
         if contentEncoding.lower() == 'gzip':
             compressedstream = StringIO.StringIO(data)
             unzipper = gzip.GzipFile(fileobj=compressedstream)
             data = unzipper.read()
-            print 'victory'
         else:
             print "Not supported encoding %s"  % contentEncoding
     except:

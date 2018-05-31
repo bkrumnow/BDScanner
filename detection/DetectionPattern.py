@@ -1,6 +1,7 @@
 class DetectionPattern:
-    def __init__(self, score, pattern):
-        self.score = score;
-        self.totalScore = 0
-        self.patterns = [pattern]
-        self.hash = hash((self.score, pattern))
+    def __init__(self, value, name, patterns, prerequisites=None, determinative=False):
+        self.value = value;
+        self.name = name
+        self.patterns = patterns
+        self.prerequisites = prerequisites
+        self.determinative = determinative

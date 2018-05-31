@@ -8,10 +8,10 @@ class DB:
         self.scripts = scripts
         self.dataPath = dataPath
 
-    def insertScript(self, sock, id, visit_id, headless, headfull, identifier, URL, scriptLength, score, context, duplicate, hash):
+    def insertScript(self, sock, id, visit_id, categories, identifier, URL, scriptLength, score, context, duplicate, hash):
         try:
-            query = ("INSERT INTO Scripts (id, visit_id, headless, headfull, name, URL, script_length, score, context, duplicate, hash) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
-            (id, visit_id, headless, headfull, identifier, URL, scriptLength, score, context, duplicate, hash))
+            query = ("INSERT INTO Scripts (id, visit_id, categories, name, URL, script_length, score, context, duplicate, hash) VALUES (?,?,?,?,?,?,?,?,?,?)",
+            (id, visit_id, categories, identifier, URL, scriptLength, score, context, duplicate, hash))
             sock.send(query)
         except:
             print("Error inserting script record %s %s" % (identifier, id))
@@ -32,10 +32,10 @@ class DB:
 #        except:
 #            print("Error inserting honeypot element record %s %s %s" % (visit_id, elementId, name))
 
-    def updateSiteVisit(self, sock, score, visitId):
+    def updateSiteVisit(self, sock, score, visitId, scriptId):
         try:
-            query = ("UPDATE site_visits SET score=? WHERE visit_id=?",
-            (score, visitId))
+            query = ("UPDATE site_visits SET score=?, scriptId=? WHERE visit_id=?",
+            (score, scriptId, visitId))
             sock.send(query)
         except:
             print("Error updating site_visit record %s %s %s" % (score, visitId, sys.exc_info()[0]))
@@ -44,6 +44,7 @@ class DB:
     def persistResults(self, sock, visit_id, manager_params):
         print('PERSIST SCRIPTS %s' % len(self.scripts))
         highestScore =0
+        highestScoreScriptId=''
 
         #print('self %s' % self)
         for script in self.scripts:
@@ -54,24 +55,25 @@ class DB:
             context = ','.join(script.companyPatterns)
 
             scriptId = str(visit_id) + '_' + script.identifier + '_' + str(random.randint(1,101)*5)
+            if script.score > highestScore:
+                highestScore = script.score
+                highestScoreScriptId = scriptId
+
             if existsInCache:
                 duplicate = existsInCache
                 scriptHash = -1
             else:
-                if script.score > highestScore:
-                    highestScore = script.score
-
                 FileManager.persistFile(script.identifier, script.data, self.dataPath + '/files/' + str(visit_id) + '/')
                 for key, detectionPattern in script.detectionPatterns.iteritems():
                     self.insertDetection(sock, scriptId, key, ','.join(detectionPattern.patterns), context, detectionPattern.totalScore)
 
-            self.insertScript(sock, scriptId, visit_id, script.headless, script.headfull, script.identifier, script.URL, script.scriptLength, script.score, context, duplicate, scriptHash)
+            self.insertScript(sock, scriptId, visit_id, ','.join(script.categories), script.identifier, script.URL, script.scriptLength, script.score, context, duplicate, scriptHash)
 
 #        print('PERSIST HONEYPOTS %s' % len(self.honeypotElements))
 #        for honeypotElement in self.honeypotElements:
 #            self.insertHoneypotElement(sock, visit_id, honeypotElement[0], honeypotElement[1], ','.join(honeypotElement[2]), ','.join(honeypotElement[3]), 12)
 
-        self.updateSiteVisit(sock, highestScore, visit_id)
+        self.updateSiteVisit(sock, highestScore, visit_id, highestScoreScriptId)
 
     def checkCache(self, sock, scriptHash, manager_params):
         rows = db_utils.query_db(manager_params['database_name'], "SELECT id FROM Scripts WHERE hash = " + str(scriptHash) + ";")
@@ -83,5 +85,5 @@ class DB:
     def printScripts(self):
         for script in self.scripts:
             print ("Company | BotMode %s %s %s %s" % (script.companyPatterns, script.headfull, script.headless, hash(script)))
-#            for key, detectionPattern in script.detectionPatterns.iteritems():
-#                print("Pattern %s %s %s %s" % (key, ','.join(detectionPattern.patterns), detectionPattern.score, detectionPattern.totalScore))
+            for key, detectionPattern in script.detectionPatterns.iteritems():
+                print("Pattern %s %s %s %s" % (key, ','.join(detectionPattern.patterns), detectionPattern.score, detectionPattern.totalScore))

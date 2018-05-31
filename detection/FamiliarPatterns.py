@@ -1,37 +1,9 @@
 import re
 
-class BotDetectionPattern:
+class FamiliarPatterns:
 
   def __init__(self):
-
-
-        #HL+HF
-#        Akamai?? (Obfuscated)
-#          APU
-#   ParameterX
-#  Adscore
-#akamaicdc
-#Distil_CDN
-
-        #HL (+misc)
-#        Bowser
-#        Google_ima3
-
-        #Misc
-#        fingerprinterjs
-
-        #no hits
-        #asyncdistil
-        #ShieldSquare
-        #liveintent
-        #unknown_obf
-        #CloudFlare
-
-        #not specific enough
-        #optimizely
-
-
-        self.CompanyPattern = [
+        self.familiarPatterns = [
             ('Distil', ['Internet Explorer", "Firefox", "Chrome", "Chromium", "Safari", "MacIntel", "Win32", "Win64", "Windows", "WinNT", "OSX", "Linux", "eval", "O", "Snow Leopard", "Lion/Mountain Lion", "Yosemite", "Mavericks", "d", "XMLHttpRequest", "undefined", "Msxml2.XMLHTTP.6.0", "Msxml2.XMLHTTP.3.0", "Microsoft.XMLHTTP", "length", "substring", "slice", "n", "substr", "", "navigator", "toLowerCase", "a", "h", "replace", "t", "\$2\$1", "platform", "script", "object", "screen", "fonts", "cpu", "addEventListener", "__", "_", "uate", "__web", "__s", "__fx", "_unwrapped", "_script_", "tion", "_fn", "_S", "_IDE", "_Recorder", "_p", "_s", "P", "S", "e", "document", "match", "cache_", "300", "external", "Sequentum", "indexOf", "400", "s", "getAttribute", "documentElement", "500", "web", "600", "700", "POST", "open", "=", "send", "hostname", "location", "___dTL", "getElementById", "nodeName", "INPUT", "value", "audio", "progress", "video", "window", "media", "readystate", "loading", "load", "-", "attachEvent", "onload"']),
             ('Distil_CDN', ['|| window._phantom || window.__phantomas || window.callPhantom || 0 == navigator.onLine &&', 'n-distil.areyouahuman.com']),
             ('Distil_FP', [re.escape('/dist/preview_data.js?token=__TOKEN__&preview_layer_ids'), '"phantomjs", "moatbot", "facebookexternalhit"']),
@@ -43,7 +15,6 @@ class BotDetectionPattern:
             ('ShieldSquare', ['typeof a.__webdriver_script_fn ', '","j34":"', '"undefined" !== typeof a._Selenium_IDE_Recorder']),
             ('perfdrive', ['perfdrive.com', '_Selenium_IDE_Recorder', '.seleniumKey', re.escape('getAttribute("webdriver")')]),
             ('Bowser', ['/phantom/i.test\(', 'SlimerJS', 'Bowser']),
-            ('whatisit?', [re.escape('version:t(/silk\/(\d+(\.\d+)?)/i)}:/phantom/i.test(e)?n={name:"PhantomJS",phantom:o,version:t(/phantomjs\/(\d+')]),
             ('liveintent', ['name: "phantomjs",', '"./internal/default_filter"', '"./processors/stack": 10', 'o = r.appId || "mint-production-appId"']),
             ('webfont_googleAPI', ['a.a.indexOf\("PhantomJS"\)', 'a.a.indexOf\("PlayStation"\)', 'a.a.indexOf\("AdobeAIR"\)', 'WebFont']),
             ('fox_browser', ['function getWindowsVersion\(s\)','/phantom/i.test\(ua\)', '/slimerjs/i.test\(ua\)', 'function detect\(ua\)']),
@@ -54,11 +25,9 @@ class BotDetectionPattern:
             ('Segmentify_BrowserFP', [re.escape('var r, i = n(/(ipod|iphone|ipad)/i).toLowerCase(),'), re.escape('version: n(/slimerjs\/(\d+(\.\d+)?)/i)')]),
             ('AkamaiBlockBotsUA', [re.escape('/Mozilla\/5\.0\s\(Windows\sNT\s6\.1;\sWOW64;\sTrident\/7\.0;\sSLCC2;\s\.NET\sCLR\s2\.0\.50727;\s\.NET\sCLR\s3\.5\.30729;\s\.NET\sCLR\s3\.0\.30729;\s\.NET4\.0C;\s\.NET4\.0E;\srv:11\.0\)\slike\sGecko/i) || navigator.userAgent.match(/Mozilla\/5\.0\s\(Windows\sNT\s6\.1;\sWOW64;\srv:45\.0\)\sGecko\/20100101\sFirefox\/45\.0/i) || navigator.userAgent.match(/PTST/i)')]),
             ('AkamaiBlockBotsUA2', [re.escape('\sWOW64;'), 'Block bot agents', 'AKM-41']),
-            ('Akamai??', ['webdriver','driver', '5932ec3b29ebe803fd4c2ea4c6466594a8d26e98']),
             ('akamai?', [re.escape("script[type='text/rocketscript']"),'clnmdecom', '"_selenium","_webdriver","__nightmare","callSelenium"']),
             ('modernizr', ['Modernizr._config.classPrefix', 'Modernizr.addTest', re.escape('Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Min')]),
-            ('modernizr(2)', ['Modernizr', re.escape('attachEvent("onbeforeprint"')]),
-            ('gigyaFP', ['gigya','navigator.mimeTypes']),
+            ('modernizr(2)', ['Modernizr', re.escape('attachEvent("onbeforeprint"'), 'window.Modernizr']),
             ('Tealium_utag', ['tealium universal tag', 'navigator.plugins.length', 'screen.colorDepth']),
             ('JW Player', ['JW Player','navigator.userAgent', 'navigator.plugins.length']),
             ('SnapABug', ['SnapABug', 'SnapEngage']),
@@ -83,13 +52,14 @@ class BotDetectionPattern:
             ('UnknownBotDetection', ['detectPhantomJs', 'detectSelenium', 'navigator.userAgent', 'callPhantom', 'bots']),
             ('UnknownBotDetection2', ['isPhantomJS', 'isHeadlessChrome', 'navigator.userAgent', 'callPhantom']),
             ('UnknownBotDetection3', ['hasWebdriverAttr', 'webdriver', 'hasPhantom', 'window.callPhantom', 'window._phantom', 'hasDomAutomation', 'window.domAutomation']),
+            ('UnknownBotDetection4', [re.escape('version:t(/silk\/(\d+(\.\d+)?)/i)}:/phantom/i.test(e)?n={name:"PhantomJS",phantom:o,version:t(/phantomjs\/(\d+')]),
+            ('UnknownBotDetection5', ['webdriver','driver', '5932ec3b29ebe803fd4c2ea4c6466594a8d26e98']),
             ('Wistia', ['Wistia', 'phantomjs']),
             ('Avada', ['avada_lightbox', 'phantomjs', 'wrap_gravity_selects']),
-            ('optimizely', ['optimizely', re.escape('|ovibrowser|bolt|iron|vivaldi|iridium|phantomjs')]),
             ('Vendor', [re.escape('chromium|flock|rockmelt|midori|epiphany|silk|skyfire|ovibrowser|bolt|iron|vivaldi|iridium|phantomjs|bowser'), 'headlesschrome', re.escape('navigator.language||navigator.userLanguage||navigator.browserLanguage')]),
             ('CommonUAPattern', [re.escape('chromium|flock|rockmelt|midori|epiphany|silk|skyfire|ovibrowser|bolt|iron|vivaldi|iridium|phantomjs')]),
             ('SquareSpace', ['squarespace', 'PhantomJS']),
-            ('WistiaHeadlessTampered', ['xhrHasBeenTamperedWith', 'isHeadless', 'phantomjs'])
-
+            ('WistiaHeadlessTampered', ['xhrHasBeenTamperedWith', 'isHeadless', 'phantomjs']),
+            ('VAMSOFT', [re.escape('Mozilla/4.0 (Windows NT 6.2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.70 Safari/537.17')])
         ]
 

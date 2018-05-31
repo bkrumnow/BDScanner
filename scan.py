@@ -25,7 +25,7 @@ manager_params['log_directory'] = '~/OpenWPM/data'
 manager = TaskManager.TaskManager(manager_params, browser_params)
 
 #fileReader = csv.reader(open('detection/alexa/top-1m.csv'), delimiter=',')
-fileReader = csv.reader(open('detection/tests/decompress.csv'), delimiter=',')
+fileReader = csv.reader(open('detection/validation/test.csv'), delimiter=',')
 #        fileReader = csv.reader(open(filepath), delimiter=',')
 
 urls = []
