@@ -93,6 +93,6 @@ class DB:
 
     def printScripts(self):
         for script in self.scripts:
-            print ("Company | BotMode %s %s %s" % (script.repeatingPatterns, ','.join(script.categories), hash(script)))
+            print ("Company | Categories %s %s %s" % (script.repeatingPatterns, ','.join(script.categories), hash(script)))
             for key, detectionPattern in script.detectionPatterns.iteritems():
                 print("Pattern %s %s %s %s" % (key, ','.join(detectionPattern.patterns), detectionPattern.score, detectionPattern.totalScore))
