@@ -1,3 +1,12 @@
+###############################################################################################################
+## DB.py
+## Responsible for persisting scripts and detection patterns
+##
+## License 2018 Open Source License
+## Written By: Gabry Vlot (https://github.com/GabryVlot)
+## Project: Detecting Web bot Detecting | BotDetectionScanner (https://github.com/GabryVlot/BotDetectionScanner)
+###############################################################################################################
+
 import random
 from detection import FileManager
 from automation.utilities import db_utils
@@ -52,7 +61,7 @@ class DB:
             existsInCache = self.checkCache(sock, scriptHash, manager_params)
 
             duplicate = ''
-            context = ','.join(script.companyPatterns)
+            context = ','.join(script.repeatingPatterns)
 
             scriptId = str(visit_id) + '_' + script.identifier + '_' + str(random.randint(1,101)*5)
             if script.score > highestScore:
@@ -84,6 +93,6 @@ class DB:
 
     def printScripts(self):
         for script in self.scripts:
-            print ("Company | BotMode %s %s %s %s" % (script.companyPatterns, script.headfull, script.headless, hash(script)))
+            print ("Company | BotMode %s %s %s" % (script.repeatingPatterns, ','.join(script.categories), hash(script)))
             for key, detectionPattern in script.detectionPatterns.iteritems():
                 print("Pattern %s %s %s %s" % (key, ','.join(detectionPattern.patterns), detectionPattern.score, detectionPattern.totalScore))

@@ -1,15 +1,20 @@
+###############################################################################################################
+## RepeatingPatterns.py
+## Contains repeating detection patterns across different sites
+##
+## License 2018 Open Source License
+## Written By: Gabry Vlot (https://github.com/GabryVlot)
+## Project: Detecting Web bot Detecting | BotDetectionScanner (https://github.com/GabryVlot/BotDetectionScanner)
+###############################################################################################################
+
 import re
 
-class FamiliarPatterns:
+class RepeatingPatterns:
 
   def __init__(self):
-        self.familiarPatterns = [
+        self.patterns = [
             ('Distil', ['Internet Explorer", "Firefox", "Chrome", "Chromium", "Safari", "MacIntel", "Win32", "Win64", "Windows", "WinNT", "OSX", "Linux", "eval", "O", "Snow Leopard", "Lion/Mountain Lion", "Yosemite", "Mavericks", "d", "XMLHttpRequest", "undefined", "Msxml2.XMLHTTP.6.0", "Msxml2.XMLHTTP.3.0", "Microsoft.XMLHTTP", "length", "substring", "slice", "n", "substr", "", "navigator", "toLowerCase", "a", "h", "replace", "t", "\$2\$1", "platform", "script", "object", "screen", "fonts", "cpu", "addEventListener", "__", "_", "uate", "__web", "__s", "__fx", "_unwrapped", "_script_", "tion", "_fn", "_S", "_IDE", "_Recorder", "_p", "_s", "P", "S", "e", "document", "match", "cache_", "300", "external", "Sequentum", "indexOf", "400", "s", "getAttribute", "documentElement", "500", "web", "600", "700", "POST", "open", "=", "send", "hostname", "location", "___dTL", "getElementById", "nodeName", "INPUT", "value", "audio", "progress", "video", "window", "media", "readystate", "loading", "load", "-", "attachEvent", "onload"']),
-            ('Distil_CDN', ['|| window._phantom || window.__phantomas || window.callPhantom || 0 == navigator.onLine &&', 'n-distil.areyouahuman.com']),
             ('Distil_FP', [re.escape('/dist/preview_data.js?token=__TOKEN__&preview_layer_ids'), '"phantomjs", "moatbot", "facebookexternalhit"']),
-            ('Distil_OBF', ['\x49\x6E\x74\x65\x72\x6E\x65\x74\x20\x45\x78\x70\x6C\x6F\x72\x65\x72","\x46\x69\x72\x65\x66\x6F\x78']),
-            ('Distil_Sync', ['"\x41\x64\x6f\x62\x65\x41\x41\x4d\x44\x65\x74\x65\x63\x74","\x53\x68\x61\x72\x65\x50\x6f\x69\x6e\x74\x20\x42\x72\x6f\x77\x73\x65\x72\x20\x50\x6c\x75\x67\x2d\x69\x6e","\x63\x6b\x69\x65","\x52\x65\x61\x6c\x50\x6c\x61\x79\x65\x72\x20\x56\x65\x72\x73\x69\x6f\x6e\x20\x50\x6c\x75\x67\x69\x6e"']),
-            ('ParameterX', ['perimeterx', 'window._Selenium_IDE_Recorder', 'PX239', 'callPhantom']),
             ('AsyncDistil', ['\$cdc_asdjflasutopfhvcZLmcfl_", "0", "{"sensor_data":"", "touchmove", "doadma_en", "readyState", ', '_ac = \[', '"Chrome Remote Desktop Viewer", "fonts", "callPhantom", "RTCPeerConnection", "attachEvent", "timezoneOffsetKey", "lang"']),
             ('Google_ima3', ['ima.bridge.getVideoMetadata', 'webdriver-evaluate', 'webdriver-evaluate-response']),
             ('ShieldSquare', ['typeof a.__webdriver_script_fn ', '","j34":"', '"undefined" !== typeof a._Selenium_IDE_Recorder']),

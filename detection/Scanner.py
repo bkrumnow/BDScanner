@@ -7,9 +7,8 @@
 ## Project: Detecting Web bot Detecting | BotDetectionScanner (https://github.com/GabryVlot/BotDetectionScanner)
 ###############################################################################################################
 
-import FamiliarPatterns
 from selenium.common.exceptions import StaleElementReferenceException
-from detectionPatterns import BotDetectionLiterals, BotDetectionProperties, BotDetectionValues, BrowserCharacteristics, KnownDetectionPatterns
+from detectionPatterns import BotDetectionLiterals, BotDetectionProperties, BotDetectionValues, BrowserCharacteristics, KnownDetectionPatterns, RepeatingPatterns
 from detection import PatternChecker, Script
 from detection import FileManager
 
@@ -17,7 +16,7 @@ class Scanner:
     def __init__(self, driver, visit_id):
         self.scripts = []
         self.detectionPatterns = [];
-        self.familiarPatterns = FamiliarPatterns.FamiliarPatterns()
+        self.repeatingPatterns = RepeatingPatterns.RepeatingPatterns()
         self.URLHistory = []
 
         self.initDetectionPatterns()
@@ -68,16 +67,17 @@ class Scanner:
         currentScript = self.analysePatterns(currentScript, res, identifier, path)
 
         if currentScript:
-            currentScript.calculateScore()
+            currentScript.calculateDetectionValue()
             if currentScript.score >= 12:
                 currentScript.URL = path
 
-#                now that we have a pattern detected .. is it a familiar one?
-                for familiarPattern in self.familiarPatterns.familiarPatterns:
-                    result = PatternChecker.checkPattern(res, familiarPattern[1], path)[0]
+#                now that we have a pattern detected .. is it a familiar one (only for non-knowndetection patterns)?
+                if currentScript.checkForRepeatingPatterns:
+                    for pattern in self.repeatingPatterns.patterns:
+                        result = PatternChecker.checkPattern(res, pattern[1], path)[0]
 
-                    if result:
-                        currentScript.addCompanyPattern(familiarPattern)
+                        if result:
+                            currentScript.addRepeatingPattern(pattern)
 
                 self.scripts.append(currentScript)
                 print("\n@append: %s %s %s" % (len(self.scripts), identifier, currentScript.score))
@@ -106,16 +106,20 @@ class Scanner:
                         if currentScript == None:
                             currentScript = Script.Script(identifier, res)
 
-                        detectionTopic = detectionPattern.name + '_' + pattern.name
-
-                        if pattern.determinative:
-                            topic = detectionTopic
-                        else:
-                            topic = returnValue[1]
-
-                        currentScript.addDetectionPattern(detectionPattern.name, detectionTopic, topic, pattern.value, pattern.prerequisites)
+                        self.addScriptToCollection(currentScript, detectionPattern, pattern, returnValue)
 
                         if pattern.determinative:
                             stop = True
                             return currentScript
         return currentScript
+
+    #add script to the in memory collection
+    def addScriptToCollection(self, currentScript, detectionPattern, pattern, returnValue):
+        detectionTopic = detectionPattern.name + '_' + pattern.name
+
+        if pattern.determinative:
+            topic = detectionTopic
+        else:
+            topic = returnValue[1]
+
+        currentScript.addDetectionPattern(detectionPattern.name, detectionTopic, topic, pattern.value, pattern.prerequisites)

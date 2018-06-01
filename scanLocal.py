@@ -24,7 +24,7 @@ def analyseFile(src):
 #analyseFile('file:detection/examples/inlineScript9.js')
 
 
-for subdir, dirs, files in os.walk('detection/examples/distil'):
+for subdir, dirs, files in os.walk('detection/examples/test'):
     for file in files:
 #        if file.startswith('pubads_impl'):
             filepath = 'file:' + subdir + os.sep + file

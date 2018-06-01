@@ -1,3 +1,12 @@
+###############################################################################################################
+## BotDetectionLiterals.py
+## Contains detection patterns based on literals that has been found on sites while developing the scanner
+##
+## License 2018 Open Source License
+## Written By: Gabry Vlot (https://github.com/GabryVlot)
+## Project: Detecting Web bot Detecting | BotDetectionScanner (https://github.com/GabryVlot/BotDetectionScanner)
+###############################################################################################################
+
 from .. import DetectionPatternFactory
 import re
 

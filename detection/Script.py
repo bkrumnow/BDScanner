@@ -1,29 +1,42 @@
-import RegisteredDetectionTopic, ScoreCalculator
+###############################################################################################################
+## Script.py
+## Represents a web page script
+##
+## License 2018 Open Source License
+## Written By: Gabry Vlot (https://github.com/GabryVlot)
+## Project: Detecting Web bot Detecting | BotDetectionScanner (https://github.com/GabryVlot/BotDetectionScanner)
+###############################################################################################################
+
+import RegisteredDetectionTopic, BotDetectionValueManager
 
 class Script:
 
     def __init__(self, id, data):
         self.identifier = id
         self.detectionPatterns = {}
-        self.companyPatterns = []
-        self.headless = False
-        self.headfull = False
+        self.repeatingPatterns = []
         self.URL = ''
         self.score = 0
         self.detectionPatternHash = 0
-        self.companyPatternHash = 0
-        self.fromCache = False
+        self.repeatingPatternHash = 0
         self.hash = None
         self.data = data
         self.scriptLength = len(data)
         self.categories = []
+        self.checkForRepeatingPatterns = True
 
-    def addCompanyPattern(self, companyPattern):
-        if companyPattern not in self.companyPatterns:
-            self.companyPatterns.append(companyPattern[0])
-            self.companyPatternHash = self.companyPatternHash + hash(companyPattern[0]);
+    #A repeating pattern provides the context about it origins
+    def addRepeatingPattern(self, pattern):
+        if pattern not in self.repeatingPatterns:
+            self.repeatingPatterns.append(pattern[0])
+            self.repeatingPatternHash = self.repeatingPatternHash + hash(pattern[0]);
 
+    #Add a pattern that match with the script content
+    #A category will reveal the detection category : literal, bot detetion property  / value etc
     def addDetectionPattern(self, category, topic, searchPattern, score, prerequisites):
+        if category == 'KnownDetectionPatterns':
+            self.checkForRepeatingPatterns = False
+
         if category not in self.categories:
             self.categories.append(category)
 
@@ -34,14 +47,16 @@ class Script:
         else:
             self.detectionPatterns[topic] = RegisteredDetectionTopic.RegisteredDetectionTopic(score, searchPattern, prerequisites)
 
-    def calculateScore(self):
+    #After looping through the detection pattern the detection score based upon detection pattern will be calulated
+    def calculateDetectionValue(self):
         for key, detectionPattern in self.detectionPatterns.iteritems():
-            detectionPattern.totalScore = ScoreCalculator.getScore(key, self.detectionPatterns, detectionPattern)
+            detectionPattern.totalScore = BotDetectionValueManager.getDetectionValue(key, self.detectionPatterns, detectionPattern)
             self.score = self.score + detectionPattern.totalScore
 
         self.detectionPatternHash = self.detectionPatternHash + detectionPattern.hash
 
+    #Override build in function __hash__
     def __hash__(self):
             if not self.hash:
-                self.hash = hash((self.score, self.scriptLength, self.detectionPatternHash, self.companyPatternHash))
+                self.hash = hash((self.score, self.scriptLength, self.detectionPatternHash, self.repeatingPatternHash))
             return self.hash
