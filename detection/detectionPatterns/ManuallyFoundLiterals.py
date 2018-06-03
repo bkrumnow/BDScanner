@@ -1,5 +1,5 @@
 ###############################################################################################################
-## RepeatingPatterns.py
+## ManuallyFoundLiterals.py
 ## Contains repeating detection patterns across different sites
 ##
 ## License 2018 Open Source License
@@ -9,17 +9,17 @@
 
 import re
 
-class RepeatingPatterns:
+class ManuallyFoundLiterals:
 
   def __init__(self):
         self.patterns = [
             ('Distil', ['Internet Explorer", "Firefox", "Chrome", "Chromium", "Safari", "MacIntel", "Win32", "Win64", "Windows", "WinNT", "OSX", "Linux", "eval", "O", "Snow Leopard", "Lion/Mountain Lion", "Yosemite", "Mavericks", "d", "XMLHttpRequest", "undefined", "Msxml2.XMLHTTP.6.0", "Msxml2.XMLHTTP.3.0", "Microsoft.XMLHTTP", "length", "substring", "slice", "n", "substr", "", "navigator", "toLowerCase", "a", "h", "replace", "t", "\$2\$1", "platform", "script", "object", "screen", "fonts", "cpu", "addEventListener", "__", "_", "uate", "__web", "__s", "__fx", "_unwrapped", "_script_", "tion", "_fn", "_S", "_IDE", "_Recorder", "_p", "_s", "P", "S", "e", "document", "match", "cache_", "300", "external", "Sequentum", "indexOf", "400", "s", "getAttribute", "documentElement", "500", "web", "600", "700", "POST", "open", "=", "send", "hostname", "location", "___dTL", "getElementById", "nodeName", "INPUT", "value", "audio", "progress", "video", "window", "media", "readystate", "loading", "load", "-", "attachEvent", "onload"']),
             ('Distil_FP', [re.escape('/dist/preview_data.js?token=__TOKEN__&preview_layer_ids'), '"phantomjs", "moatbot", "facebookexternalhit"']),
             ('AsyncDistil', ['\$cdc_asdjflasutopfhvcZLmcfl_", "0", "{"sensor_data":"", "touchmove", "doadma_en", "readyState", ', '_ac = \[', '"Chrome Remote Desktop Viewer", "fonts", "callPhantom", "RTCPeerConnection", "attachEvent", "timezoneOffsetKey", "lang"']),
+            ('Distil_AreYouHuman', [re.escape('distil.areyouahuman')]),
             ('Google_ima3', ['ima.bridge.getVideoMetadata', 'webdriver-evaluate', 'webdriver-evaluate-response']),
-            ('ShieldSquare', ['typeof a.__webdriver_script_fn ', '","j34":"', '"undefined" !== typeof a._Selenium_IDE_Recorder']),
-            ('perfdrive', ['perfdrive.com', '_Selenium_IDE_Recorder', '.seleniumKey', re.escape('getAttribute("webdriver")')]),
-            ('Bowser', ['/phantom/i.test\(', 'SlimerJS', 'Bowser']),
+            ('ShieldSquare', [re.escape('typeof a.__webdriver_script_fn '), re.escape('","j34":"'), re.escape('"undefined" !== typeof a._Selenium_IDE_Recorder')]),
+            ('OneSignal', ['OneSignal', '/phantom/i.test\(', 'SlimerJS', 'Bowser', 'squarespace', 'PhantomJS']),
             ('liveintent', ['name: "phantomjs",', '"./internal/default_filter"', '"./processors/stack": 10', 'o = r.appId || "mint-production-appId"']),
             ('webfont_googleAPI', ['a.a.indexOf\("PhantomJS"\)', 'a.a.indexOf\("PlayStation"\)', 'a.a.indexOf\("AdobeAIR"\)', 'WebFont']),
             ('fox_browser', ['function getWindowsVersion\(s\)','/phantom/i.test\(ua\)', '/slimerjs/i.test\(ua\)', 'function detect\(ua\)']),
@@ -44,8 +44,6 @@ class RepeatingPatterns:
             ('WebEngage', ['webengage/ua', re.escape('Google Page Speed Insights", "Site24x7", "PhantomJS"')]),
             ('PixiMedia', ['case"flv":case"f4v":case"mp4":case"ogg":case"ogv":case"webm":case"video":case"dailymotion":return"video"']),
             ('dna', ['HttpConnection.xhrRequest', '__webdriver_evaluate"in document', 'handler.setDNA', 'swfLib.handler.getDNA']),
-            ('datadome', ['checkSelenium', 'checkNightmare', 'DataDomeAnalyzer']),
-            ('Adscore', ['AdscoreInit', 'webdriver', 'window.adscore_jsv=']),
             ('hotwords', ['hotwords.core.BrowserDetect', '.__phantom']),
             ('uol', [re.escape('PhantomJS-based web perf metrics + monitoring tool'), 'botDetect()']),
             ('metrics', ['document.__webdriver_script_fn', 'WebKitMediaKeyMessageEvent', 'WebGLRenderingContext', 'MozSettingsEvent']),
@@ -63,8 +61,7 @@ class RepeatingPatterns:
             ('Avada', ['avada_lightbox', 'phantomjs', 'wrap_gravity_selects']),
             ('Vendor', [re.escape('chromium|flock|rockmelt|midori|epiphany|silk|skyfire|ovibrowser|bolt|iron|vivaldi|iridium|phantomjs|bowser'), 'headlesschrome', re.escape('navigator.language||navigator.userLanguage||navigator.browserLanguage')]),
             ('CommonUAPattern', [re.escape('chromium|flock|rockmelt|midori|epiphany|silk|skyfire|ovibrowser|bolt|iron|vivaldi|iridium|phantomjs')]),
-            ('SquareSpace', ['squarespace', 'PhantomJS']),
             ('WistiaHeadlessTampered', ['xhrHasBeenTamperedWith', 'isHeadless', 'phantomjs']),
-            ('VAMSOFT', [re.escape('Mozilla/4.0 (Windows NT 6.2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.70 Safari/537.17')])
+            ('VAMSOFT', [re.escape('Mozilla/4.0 (Windows NT 6.2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.70 Safari/537.17')]),
+            ('MultipleBotPatterns', ['BotPattern', 'PhantomJS', 'DuckDuckBot'])
         ]
-

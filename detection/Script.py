@@ -34,7 +34,7 @@ class Script:
     #Add a pattern that match with the script content
     #A category will reveal the detection category : literal, bot detetion property  / value etc
     def addDetectionPattern(self, category, topic, searchPattern, score, prerequisites):
-        if category == 'KnownDetectionPatterns':
+        if category == 'DetectorPatterns':
             self.checkForRepeatingPatterns = False
 
         if category not in self.categories:

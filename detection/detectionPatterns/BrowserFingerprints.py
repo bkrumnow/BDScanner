@@ -1,5 +1,5 @@
 ###############################################################################################################
-## BrowserCharacteristics.py
+## BrowserFingerprints.py
 ## Contains detection patterns based on web bot specific browser properties (Characteristics)
 ##
 ## License 2018 Open Source License
@@ -10,11 +10,11 @@
 from .. import DetectionPatternFactory
 import re
 
-class BrowserCharacteristics:
+class BrowserFingerprints:
 
     def __init__(self):
         self.patterns = []
-        self.name = "BrowserCharacteristics"
+        self.name = "BrowserFingerprints"
 
         colorDepth = DetectionPatternFactory.createDetectionPattern(0.1, "ColorDepth", ["colorDepth == 32", "screen.colorDepth", "window.screen.colorDepth"])
         hardWareConcurrency = DetectionPatternFactory.createDetectionPattern(0.1, "HardwareConcurrency", ["navigator.hardwareConcurrency", "hardwareConcurrency == -1"])
@@ -27,7 +27,7 @@ class BrowserCharacteristics:
         fonts = DetectionPatternFactory.createDetectionPattern(0.1, "Fonts", ["style.fontFamily", "style.fontSize", ".offsetHeight", ".offsetWidth"])
         flashSupport = DetectionPatternFactory.createDetectionPattern(1.0, "FlashSupport", ["___fp_swf_loaded", "swfobject.embedSWF", "allowScriptAccess"]) #not documented
         plugins = DetectionPatternFactory.createDetectionPattern(1.5, "Plugins", ["plugins.length",
-        "window.ActiveXObject", ([["plugins.length == 0"],["plugins.length === 0"], ["plugins == undefined"], ["plugins === undefined"]], 'OR'), "x-pnacl", "Shockwave Flash", "ShockwaveFlash.ShockwaveFlash"], ['BrowserCharacteristics_navigator'])
+        "window.ActiveXObject", ([["plugins.length == 0"],["plugins.length === 0"], ["plugins == undefined"], ["plugins === undefined"]], 'OR'), "x-pnacl", "Shockwave Flash", "ShockwaveFlash.ShockwaveFlash"], ['BrowserFingerprints_navigator'])
         stackTrace = DetectionPatternFactory.createDetectionPattern(0.2, "StackTrace", [".stack"])
         webSecurity = DetectionPatternFactory.createDetectionPattern(0.1, "WebSecurity", [])
         popupSuppression = DetectionPatternFactory.createDetectionPattern(0.5, "PopupSuppression", [["Date.now", "alert"]])

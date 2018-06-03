@@ -8,7 +8,7 @@
 ###############################################################################################################
 
 from selenium.common.exceptions import StaleElementReferenceException
-from detectionPatterns import BotDetectionLiterals, BotDetectionProperties, BotDetectionValues, BrowserCharacteristics, KnownDetectionPatterns, RepeatingPatterns
+from detectionPatterns import DetectorPatterns, BotFingerprintingSurface, BrowserFingerprints, ManuallyFoundLiterals
 from detection import PatternChecker, Script
 from detection import FileManager
 
@@ -16,7 +16,7 @@ class Scanner:
     def __init__(self, driver, visit_id):
         self.scripts = []
         self.detectionPatterns = [];
-        self.repeatingPatterns = RepeatingPatterns.RepeatingPatterns()
+        self.manuallyFoundLiterals = ManuallyFoundLiterals.ManuallyFoundLiterals()
         self.URLHistory = []
 
         self.initDetectionPatterns()
@@ -24,11 +24,9 @@ class Scanner:
 
     #register detection patterns
     def initDetectionPatterns(self):
-        self.detectionPatterns.extend((KnownDetectionPatterns.KnownDetectionPatterns(),
-        BotDetectionLiterals.BotDetectionLiterals(),
-        BotDetectionProperties.BotDetectionProperties(),
-        BotDetectionValues.BotDetectionValues(),
-        BrowserCharacteristics.BrowserCharacteristics()))
+        self.detectionPatterns.extend((DetectorPatterns.DetectorPatterns(),
+        BotFingerprintingSurface.BotFingerprintingSurface(),
+        BrowserFingerprints.BrowserFingerprints()))
 
     #extracts inline and external script inclusions
     def extractScriptInclusions(self, driver):
@@ -73,7 +71,7 @@ class Scanner:
 
 #                now that we have a pattern detected .. is it a familiar one (only for non-knowndetection patterns)?
                 if currentScript.checkForRepeatingPatterns:
-                    for pattern in self.repeatingPatterns.patterns:
+                    for pattern in self.manuallyFoundLiterals.patterns:
                         result = PatternChecker.checkPattern(res, pattern[1], path)[0]
 
                         if result:

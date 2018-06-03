@@ -8,7 +8,7 @@
 ###############################################################################################################
 
 #Detemines detection value PER script based upon pattern category
-#In case of the pattern BotDetectionProperties and BotDetectionValues there are prerequisites in place towars Browser properties
+#In case of the pattern BotDetectionProperties and BotDetectionValues there are prerequisites in place towards Browser properties
 #If the prerequisites are not met the score will be dividd by two, reason:
 #In some case the webbot detection value/property resides in a separated file. This means it is not fair to discard the whole score
 #This implementation contributes to the fact that
@@ -18,23 +18,17 @@ def getDetectionValue(key, detectionPatterns, detectionTopic):
     score = 0
     amountOfPatterns = len(detectionPatterns[key].patterns)
 
-    if 'KnownDetectionPatterns' in key:
+    if 'DetectorPatterns' in key:
         score = detectionTopic.score * amountOfPatterns
-    elif 'BotDetectionProperties' in key:
-        score = detectionTopic.score * amountOfPatterns
-        if not validateKeyPresence(detectionPatterns, detectionTopic.prerequisites):
-            score = score / 2
-    elif 'BotDetectionValues' in key:
+    elif 'BotFingerprintingSurface' in key:
         score = detectionTopic.score * amountOfPatterns
         if not validateKeyPresence(detectionPatterns, detectionTopic.prerequisites):
             score = score / 2
-    elif 'BrowserCharacteristics' in key:
+    elif 'BrowserFingerprints' in key:
         score =  detectionTopic.score * amountOfPatterns
-    elif 'BotDetectionLiterals' in key:
-        score = (detectionTopic.score * amountOfPatterns) / 2
     return score
 
-# validatates the keys of the prerequisites with detected pattern keys
+# validates the keys of the prerequisites with detected pattern keys
 def validateKeyPresence(detectionPatterns, detectionKeys):
     if detectionKeys == None:
         return True

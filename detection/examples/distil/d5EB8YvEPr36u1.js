@@ -2894,7 +2894,7 @@ var AyahPublisherOptions = {
                     } catch (t) {
                         n = t
                     }
-                    return Number(d(n.stack, "phantomjs://") > -1 || window._phahjkntom || window.__phantomas || window.callPhantom || 0 == navigator.onLine && "" == navigator.plugins)
+                    return Number(d(n.stack, "phantomjs://") > -1 || window._phantom || window.__phantomas || window.callPhantom || 0 == navigator.onLine && "" == navigator.plugins)
                 },
                 r = function() {
                     return n(window.Buffer)
