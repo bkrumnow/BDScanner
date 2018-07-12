@@ -4,7 +4,7 @@ import csv
 import os
 
 # Number of parallel browsers
-NUM_BROWSERS = 1
+NUM_BROWSERS = 8
 
 # Loads the manager preference
 manager_params, browser_params = TaskManager.load_default_params(NUM_BROWSERS)
@@ -24,23 +24,17 @@ manager_params['log_directory'] = '~/OpenWPM/data'
 # Instantiates the measurement platform
 manager = TaskManager.TaskManager(manager_params, browser_params)
 
-#fileReader = csv.reader(open('detection/alexa/top-1m.csv'), delimiter=',')
-fileReader = csv.reader(open('detection/validation/test.csv'), delimiter=',')
+fileReader = csv.reader(open('detection/alexa/top-1m.csv'), delimiter=',')
+#fileReader = csv.reader(open('detection/validation/test.csv'), delimiter=',')
 #        fileReader = csv.reader(open(filepath), delimiter=',')
 
 urls = []
-
 for (index, url) in fileReader:
     urls.append(url);
 del fileReader
 
-#maxRecords = 5000
-#startRange = 180003
-#threshold = (maxRecords * 20) + startRange  # (100000) + startrange
-#print "Starting threshold:", threshold
-
 #for i in range(949244, len(urls),4):
-for i in range(0, len(urls),1):
+for i in range(823809, -1,-1):
     url = urls[i]
     print ("Command creation %s %s" % (i, url))
 
@@ -56,10 +50,5 @@ for i in range(0, len(urls),1):
     manager.execute_command_sequence(command_sequence, index=None)
     del command_sequence
 
-#    if i >= threshold:
-#        print "Threshold reached",i
-#        break;
-
-print "All browser commands instantiated"
 # Shuts down the browsers and waits for the data to finish logging
 manager.close()
