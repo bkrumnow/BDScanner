@@ -1,5 +1,4 @@
-Web bot Detection command
-=======
+#Introduction#
 
 The web bot detection command makes it possible to detect web bot detection code inclusions. For a given
 URL the command extracts the script inclusions (inline and external scirpt) from the home page and examines
@@ -15,14 +14,15 @@ The web bot detection command detect a bot detection inclusion based upon a heur
 4 Web bot detection literal (Common observed literals used to identify a web bot)
 
 
-Process
-------------
-Pending...
+# Quick Start # 
+First install OpenWPM as in the introdution
+Run the scanner extension by exectuing this command:
 
-Quick Start
------------
-Pending...
+	$ python scan.py
 
-Extending the command
--------------------------------
-Pending...
+
+#Testing#
+
+Run a single test by executing from the parent directory of the "detection" folder:
+
+    $ python -m detection.tests.file_manager_test

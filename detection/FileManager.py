@@ -79,8 +79,7 @@ def downloadFile(src):
 def preProcessScript(data):
     """ Preprocesses rawdata by removing comments and converting hexadecimal content
     """
-    #Remove comments
-    return  convert_hexadecimal(remove_comments(data))
+    return convert_hexadecimal(remove_comments(data))
 
 def remove_comments(data):
     """ Removes comments from JavaScript files
@@ -91,16 +90,14 @@ def remove_comments(data):
         print("Error while removing script comment: %s " % (sys.exc_info()[0]))
         return data
      
-
 def convert_hexadecimal(data):
     """ Converts hexadecimal literals in scripts to readable/comparable ASCII strings 
     """    
     try:
         regObj = re.compile(r'\\x(\w{2})')
-        res = regObj.sub(asciirepl, res)
+        return regObj.sub(asciirepl, data)
     except:
-        res = res
-    return res
+        return data
 
 # regex helper function to replace the hexadecimal characters with ascii characters
 def asciirepl(match):
