@@ -34,7 +34,7 @@ for (index, url) in fileReader:
 del fileReader
 
 #for i in range(949244, len(urls),4):
-for i in range(823809, -1,-1):
+for i in range(2, -1,-1):
     url = urls[i]
     print ("Command creation %s %s" % (i, url))
 

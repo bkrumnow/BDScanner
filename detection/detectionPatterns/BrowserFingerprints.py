@@ -18,7 +18,7 @@ class BrowserFingerprints:
 
         colorDepth = DetectionPatternFactory.createDetectionPattern(0.1, "ColorDepth", ["colorDepth == 32", "screen.colorDepth", "window.screen.colorDepth"])
         hardWareConcurrency = DetectionPatternFactory.createDetectionPattern(0.1, "HardwareConcurrency", ["navigator.hardwareConcurrency", "hardwareConcurrency == -1"])
-        canvas = DetectionPatternFactory.createDetectionPattern(1.2, "Canvas", ["createElement('canvas')", "canvas.getContext", "canvas.toDataURL", re.escape('"canvas").getContext("2d")')])
+        #canvas = DetectionPatternFactory.createDetectionPattern(1.2, "Canvas", ["createElement('canvas')", "canvas.getContext", "canvas.toDataURL", re.escape('"canvas").getContext("2d")')])
         webgl = DetectionPatternFactory.createDetectionPattern(1.2, "WebGL", ["getContext\('webgl'\)", "getContext\('experimental-webgl'\)",
         "getSupportedExtensions", "createBuffer", "bindBuffer", "createProgram", "createShader",
         "getExtension('WEBGL_debug_renderer_info')", re.escape('("experimental-webgl") : "WebGLRenderingContext"')])
@@ -29,7 +29,7 @@ class BrowserFingerprints:
         plugins = DetectionPatternFactory.createDetectionPattern(1.5, "Plugins", ["plugins.length",
         "window.ActiveXObject", ([["plugins.length == 0"],["plugins.length === 0"], ["plugins == undefined"], ["plugins === undefined"]], 'OR'), "x-pnacl", "Shockwave Flash", "ShockwaveFlash.ShockwaveFlash"], ['BrowserFingerprints_navigator'])
         stackTrace = DetectionPatternFactory.createDetectionPattern(0.2, "StackTrace", [".stack"])
-        webSecurity = DetectionPatternFactory.createDetectionPattern(0.1, "WebSecurity", [])
+        #webSecurity = DetectionPatternFactory.createDetectionPattern(0.1, "WebSecurity", [])
         popupSuppression = DetectionPatternFactory.createDetectionPattern(0.5, "PopupSuppression", [["Date.now", "alert"]])
         mimeTypes = DetectionPatternFactory.createDetectionPattern(1.0, "MimeTypes", ["mimeTypes.length"])
         languages = DetectionPatternFactory.createDetectionPattern(1.5, "Languages", ["!navigator.languages", "navigator.languages.length", "navigator.languages === 'undefined'"])
