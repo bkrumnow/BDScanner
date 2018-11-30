@@ -69,7 +69,7 @@ def downloadFile(src):
         # decode contents
         content = decodeData(data)
 
-
+        # Exclude common scripts, that are knwon frameworks and should not do bot detection. Currently: JQuery, bootstrap and underscore
         if not PatternChecker.analyse(fileName, config['excludeFiles'], 'FileManagerExludeFiles', True, True):
            return (content, fileName, src)
 
