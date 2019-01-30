@@ -69,32 +69,27 @@ def downloadFile(src):
         # decode contents
         content = decodeData(data)
 
-        # Exclude common scripts, that are known frameworks and should not do bot detection. Currently: JQuery, bootstrap and underscore
+        # Exclude common scripts, that are knwon frameworks and should not do bot detection. Currently: JQuery, bootstrap and underscore
         if not PatternChecker.analyse(fileName, config['excludeFiles'], 'FileManagerExludeFiles', True, True):
            return (content, fileName, src)
 
         return None
 
-
+#Preprocess rawdata : 1 remove comment 2 convert hexadecimal contents
 def preProcessScript(data):
-    """ Preprocesses rawdata by removing comments and converting hexadecimal content
-    """
-    #Remove comments
-    return  convert_hexadecimal(remove_comments(data))
+#        try:
+#            res = jsbeautifier.beautify(data)
+#        except:
+#            print("Could not beautify %s" % (identifier))
+#            res = data
 
-def remove_comments(data):
-    """ Removes comments from JavaScript files
-    """
+    #Remove comments
     try:
-        return re.sub("(?:\/\*(?:[\s\S]*?)\*\/)|(?:^\s*\/\/(?:.*)$)","" ,data, flags=re.MULTILINE)
+        res = re.sub("(?:\/\*(?:[\s\S]*?)\*\/)|(?:^\s*\/\/(?:.*)$)","" ,data, flags=re.MULTILINE)
     except:
         print("Error while removing script comment: %s " % (sys.exc_info()[0]))
-        return data
-     
+        res = data
 
-def convert_hexadecimal(data):
-    """ Converts hexadecimal literals in scripts to readable/comparable ASCII strings 
-    """    
     try:
         regObj = re.compile(r'\\x(\w{2})')
         res = regObj.sub(asciirepl, res)
