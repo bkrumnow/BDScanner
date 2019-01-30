@@ -40,21 +40,22 @@ def checkPattern(data, patternObject, origin):
 def analyse(data, patterns, origin, ignoreCase =True, OR=False):
     try:
         retValue = 0
-        for pattern in patterns:
+        for value in patterns:
             result = None
             skip = False
 
-            if type(pattern) is list:  # ([['1'],['2'], ['useragent', 'navigator']], 'OR')
-                if len(pattern) > 1:
-                    #recursive : check all patterns in the list
-                    result = analyse(data, pattern, origin)
+            if type(value) is list:  # ([['1'],['2'], ['useragent', 'navigator']], 'OR')
+                if len(value) > 1:
+                    #recursive : check all values in the list
+                    result = analyse(data, value, origin)
                     skip = True
                 else:
-                    pattern = pattern[0]
+                    value = value[0]
+
 
             #perform regex search with option : case sensitive : true / false
             if not skip:
-                compiledPattern = re.compile(pattern)
+                compiledPattern = re.compile(value)
 
                 if ignoreCase:
                     result = re.search(compiledPattern.pattern, data, re.IGNORECASE)
