@@ -15,14 +15,15 @@ The web bot detection command detect a bot detection inclusion based upon a heur
 4 Web bot detection literal (Common observed literals used to identify a web bot)
 
 
-Process
-------------
-Pending...
+# Quick Start # 
+First install OpenWPM as in the introdution
+Run the scanner extension by exectuing this command:
 
-Quick Start
------------
-Pending...
+	$ python scan.py
 
-Extending the command
--------------------------------
-Pending...
+
+#Testing#
+
+Run a single test by executing from the parent directory of the "detection" folder:
+
+    $ python -m unittest detection.tests.file_manager_test
