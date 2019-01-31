@@ -4,9 +4,10 @@
 """
 
 import unittest
+import os.path as path
 from .. import FileManager as FileManager
 
-PATH = "./resources"
+PATH = path.dirname(path.realpath(__file__))+"/resources"
 COMMENTED_FILE = "commented.js"
 
 class FileManagerTest(unittest.TestCase):
@@ -15,11 +16,11 @@ class FileManagerTest(unittest.TestCase):
 
     #def tearDown(self):
         
-    def test_pre_process(self):
+    def test_preProcessScript(self):
         """ testing the preprocessing function for removed comments and deobfuscation
         """
-        with open(path(PATH, COMMENTED_FILE), "r") as f:
+        with open(path.join(PATH, COMMENTED_FILE), "r") as f:
             script = f.read()
-            FileManager.pre_process(f)
+            FileManager.preProcessScript(f)
             
             

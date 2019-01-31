@@ -118,7 +118,7 @@ def convert_hexadecimal(data):
         res = regObj.sub(asciirepl, res)
     except:
         res = res
-return res
+    return res
 
 # regex helper function to replace the hexadecimal characters with ascii characters
 def asciirepl(match):
