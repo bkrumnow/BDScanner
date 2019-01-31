@@ -69,14 +69,17 @@ def downloadFile(src):
         # decode contents
         content = decodeData(data)
 
-        # Exclude common scripts, that are knwon frameworks and should not do bot detection. Currently: JQuery, bootstrap and underscore
+        # Exclude common scripts, that are known frameworks and should not do bot detection. Currently: JQuery, bootstrap and underscore
         if not PatternChecker.analyse(fileName, config['excludeFiles'], 'FileManagerExludeFiles', True, True):
            return (content, fileName, src)
 
         return None
 
-#Preprocess rawdata : 1 remove comment 2 convert hexadecimal contents
+
 def preProcessScript(data):
+    """ Preprocess rawdata : 1 remove comment 2 convert hexadecimal contents
+        :param data: JavaScript file? 
+    """
 #        try:
 #            res = jsbeautifier.beautify(data)
 #        except:
@@ -114,8 +117,13 @@ def asciirepl(match):
 
     return value
 
-# write the data to a file on the file system by the given path
+
 def persistFile(name, data, path):
+    """ Write the data to a file on the file system by the given path
+    :param name:
+    :param data:
+    :param opath:
+    """
     try:
         os.makedirs(path)
     except:
@@ -128,6 +136,11 @@ def persistFile(name, data, path):
         print("Could not write file %s" % name)
 
 def decompressData(data, contentEncoding, fileName):
+    """ Decompresses optional file encoding gzip
+    :param data:
+    :param contentEncoding:
+    :param fileName:
+    """
     try:
         if contentEncoding.lower() == 'gzip':
             compressedstream = StringIO.StringIO(data)
@@ -151,8 +164,10 @@ def decodeData(data):
 
     return content
 
-#extract filename from src attribute
 def extractFileName(src):
+    """ Extract filename from src attribute
+    :param src:
+    """
     if src.endswith('/'):
         src = src[:-1]
 
