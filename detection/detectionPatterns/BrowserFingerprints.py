@@ -44,21 +44,24 @@ class BrowserFingerprints:
         document = DetectionPatternFactory.createDetectionPattern(0.1, 'document', [r'\bdocument\b'])
 
         self.patterns.extend((
-        colorDepth,
-        hardWareConcurrency,
-        canvas,webgl,
-        liedLanguages,
-        touchSupport,
-        fonts,
-        flashSupport,plugins,
-    #    stackTrace,
-#        webSecurity,
-        popupSuppression,
-        mimeTypes,
-        languages,
-        images,
-        misc,
-        userAgent,
-        window,
-        navigator,
-        document))
+        colorDepth
+        , hardWareConcurrency
+#	, canvas
+	, webgl
+        , liedLanguages
+        , touchSupport
+        , fonts
+        , flashSupport
+	, plugins
+#	, stackTrace
+#       , webSecurity
+        , popupSuppression
+        , mimeTypes
+        , languages
+        , images
+        , misc
+        , userAgent
+        , window
+        , navigator
+        , document
+))
