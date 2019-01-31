@@ -99,6 +99,26 @@ def preProcessScript(data):
     except:
         res = res
     return res
+    
+def remove_comments(data):
+    """ Removes comments from JavaScript files
+    """
+    try:
+        return re.sub("(?:\/\*(?:[\s\S]*?)\*\/)|(?:^\s*\/\/(?:.*)$)","" ,data, flags=re.MULTILINE)
+    except:
+        print("Error while removing script comment: %s " % (sys.exc_info()[0]))
+        return data
+     
+
+def convert_hexadecimal(data):
+    """ Converts hexadecimal literals in scripts to readable/comparable ASCII strings 
+    """    
+    try:
+        regObj = re.compile(r'\\x(\w{2})')
+        res = regObj.sub(asciirepl, res)
+    except:
+        res = res
+return res
 
 # regex helper function to replace the hexadecimal characters with ascii characters
 def asciirepl(match):
@@ -122,7 +142,7 @@ def persistFile(name, data, path):
     """ Write the data to a file on the file system by the given path
     :param name:
     :param data:
-    :param opath:
+    :param path:
     """
     try:
         os.makedirs(path)
