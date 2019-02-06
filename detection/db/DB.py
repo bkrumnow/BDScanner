@@ -41,10 +41,10 @@ class DB:
 #        except:
 #            print("Error inserting honeypot element record %s %s %s" % (visit_id, elementId, name))
 
-    def updateSiteVisit(self, sock, score, visitId, scriptId):
+    def updateSiteVisit(self, sock, score, visitId, scriptId, cat_a, cat_b, cat_c, dist_a, dist_b, dist_c):
         try:
-            query = ("UPDATE site_visits SET score=?, scriptId=? WHERE visit_id=?",
-            (score, scriptId, visitId))
+            query = ("UPDATE site_visits SET score=?, scriptId=?, cat_a=?, cat_b=?, cat_c=?, dist_a=?, dist_b=?, dist_c=? WHERE visit_id=?",
+            (score, scriptId, cat_a, cat_b, cat_c, dist_a, dist_b, dist_c, visitId))
             sock.send(query)
         except:
             print("Error updating site_visit record %s %s %s" % (score, visitId, sys.exc_info()[0]))
@@ -54,6 +54,7 @@ class DB:
         print('PERSIST SCRIPTS %s' % len(self.scripts))
         highestScore =0
         highestScoreScriptId=''
+        cat_a = cat_b = cat_c = dist_a = dist_b = dist_c = 0
 
         #print('self %s' % self)
         for script in self.scripts:
@@ -82,7 +83,7 @@ class DB:
 #        for honeypotElement in self.honeypotElements:
 #            self.insertHoneypotElement(sock, visit_id, honeypotElement[0], honeypotElement[1], ','.join(honeypotElement[2]), ','.join(honeypotElement[3]), 12)
 
-        self.updateSiteVisit(sock, highestScore, visit_id, highestScoreScriptId)
+        self.updateSiteVisit(sock, highestScore, visit_id, highestScoreScriptId, cat_a, cat_b, cat_c, dist_a, dist_b, dist_c)
 
     def checkCache(self, sock, scriptHash, manager_params):
         rows = db_utils.query_db(manager_params['database_name'], "SELECT id FROM Scripts WHERE hash = " + str(scriptHash) + ";")

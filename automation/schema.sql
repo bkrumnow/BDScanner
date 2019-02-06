@@ -37,6 +37,12 @@ CREATE TABLE IF NOT EXISTS site_visits (
     site_url VARCHAR(500) NOT NULL,
     score DECIMAL,
     scriptId TEXT,
+    cat_a INTEGER,
+    cat_b INTEGER,
+    cat_c INTEGER,
+    dist_a INTEGER,
+    dist_b INTEGER,
+    dist_c INTEGER,
     FOREIGN KEY(crawl_id) REFERENCES crawl(id));
 
 /* Firefox Storage Vector Dumps */
