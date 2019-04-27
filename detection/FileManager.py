@@ -115,10 +115,10 @@ def convert_hexadecimal(data):
     """    
     try:
         regObj = re.compile(r'\\x(\w{2})')
-        res = regObj.sub(asciirepl, res)
+        data = regObj.sub(asciirepl, data)
     except:
-        res = res
-    return res
+        data = data
+    return data
 
 # regex helper function to replace the hexadecimal characters with ascii characters
 def asciirepl(match):
