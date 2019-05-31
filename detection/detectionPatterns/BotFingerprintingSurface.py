@@ -46,7 +46,11 @@ class BotFingerprintingSurface:
         
         openWPM = DetectionPatternFactory.createDetectionPattern(600.0, "openWPM", ["instrumentObject"
                                                                                     , "jsInstruments"
-                                                                                    , "instrumentFingerprintingApis"])
+                                                                                    , "instrumentFingerprintingApis"
+                                                                                    , "instrumentobject"
+                                                                                    , "jsinstruments"
+                                                                                    , "instrumentfingerprintingapis"
+                                                                                    ])
 
         openWPM_headless = DetectionPatternFactory.createDetectionPattern(1000.0, "openWPM_headless", ["Inc.~llvmpipe"
                                                                                                     , "VMware"])
