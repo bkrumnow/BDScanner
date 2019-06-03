@@ -25,4 +25,4 @@ class DetectorPatterns:
         adScore = DetectionPatternFactory.createDetectionPattern(score, 'AdScore', [['AdscoreInit', 'webdriver', re.escape('window.adscore_jsv=')]], None, True)
         perfDrive = DetectionPatternFactory.createDetectionPattern(score, 'Perfdrive', [['perfdrive.com', '_Selenium_IDE_Recorder', '.seleniumKey', re.escape('getAttribute("webdriver")')]], None, True)
 
-        #self.patterns.extend((distilDetection1, distilDetection2, distil_CDN1, distil_CDN2, perimeterX, datadome, adScore, perfDrive))
+        self.patterns.extend((distilDetection1, distilDetection2, distil_CDN1, distil_CDN2, perimeterX, datadome, adScore, perfDrive))

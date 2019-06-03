@@ -43,7 +43,7 @@ class BotFingerprintingSurface:
         userAgentElectron = DetectionPatternFactory.createDetectionPattern(12.0,  "UserAgentElectron", [(["'electron'", '"electron"', "\.electron(?![a-zA-z-])"], "OR")], ['BrowserFingerprints_UserAgent'])
         userAgentWOW = DetectionPatternFactory.createDetectionPattern(8.0, "UserAgentWOW", [["WOW64", "WOW32"]], ['BrowserFingerprints_UserAgent'])
         blackList = DetectionPatternFactory.createDetectionPattern(12.0, "BlackList", [re.escape('Mozilla/4.0 (Windows NT 6.2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.70 Safari/537.17')], ['BrowserFingerprints_UserAgent']) #VAMSOFT
-        
+
         openWPM = DetectionPatternFactory.createDetectionPattern(600.0, "openWPM", ["instrumentObject"
                                                                                     , "jsInstruments"
                                                                                     , "instrumentFingerprintingApis"
@@ -52,9 +52,10 @@ class BotFingerprintingSurface:
                                                                                     , "instrumentfingerprintingapis"
                                                                                     ])
 
-        openWPM_headless = DetectionPatternFactory.createDetectionPattern(1000.0, "openWPM_headless", ["Inc.~llvmpipe"
+	# currently not in use
+	openWPM_headless = DetectionPatternFactory.createDetectionPattern(1000.0, "openWPM_headless", ["Inc.~llvmpipe"
                                                                                                     , "VMware"])
 
         self.patterns.extend((document_seleniumChrome, document_seleniumIE, document_misc, navigator_selenium, window_phantomWebbot,
         window_chromiumBasedAutomationDriver, window_nightmare, window_seleniumIE,
-        userAgent, userAgentElectron, userAgentWOW, blackList, openWPM, openWPM_headless))
+        userAgent, userAgentElectron, userAgentWOW, blackList, openWPM))

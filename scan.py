@@ -24,6 +24,7 @@ manager_params['log_directory'] = '~/OpenWPM/data'
 # Instantiates the measurement platform
 manager = TaskManager.TaskManager(manager_params, browser_params)
 
+#fileReader = csv.reader(open('detection/tests/all_sites2.csv'), delimiter=',')
 fileReader = csv.reader(open('detection/alexa/top-1m.csv'), delimiter=',')
 #fileReader = csv.reader(open('detection/validation/test.csv'), delimiter=',')
 #        fileReader = csv.reader(open(filepath), delimiter=',')
@@ -34,7 +35,7 @@ for (index, url) in fileReader:
 del fileReader
 
 #for i in range(949244, len(urls),4):
-for i in range(823809, -1,-1):
+for i in range(1, 10000,1):
     url = urls[i]
     print ("Command creation %s %s" % (i, url))
 
