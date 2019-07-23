@@ -66,21 +66,21 @@ class Scanner:
 
         if currentScript:
             currentScript.calculateDetectionValue()
-            if currentScript.score >= 12:
-                currentScript.URL = path
+            #if currentScript.score >= 12:
+            currentScript.URL = path
 
 #                now that we have a pattern detected .. is it a familiar one (only for non-knowndetection patterns)?
-                if currentScript.checkForRepeatingPatterns:
-                    for pattern in self.manuallyFoundLiterals.patterns:
-                        result = PatternChecker.checkPattern(res, pattern[1], path)[0]
+            if currentScript.checkForRepeatingPatterns:
+                for pattern in self.manuallyFoundLiterals.patterns:
+                    result = PatternChecker.checkPattern(res, pattern[1], path)[0]
 
-                        if result:
-                            currentScript.addRepeatingPattern(pattern)
+                    if result:
+                        currentScript.addRepeatingPattern(pattern)
 
-                self.scripts.append(currentScript)
-                print("\n@append: %s %s %s" % (len(self.scripts), identifier, currentScript.score))
-            else:
-                del currentScript
+            self.scripts.append(currentScript)
+            print("\n@append: %s %s %s" % (len(self.scripts), identifier, currentScript.score))
+#            else:
+#               del currentScript
 
     #Compares script with detection patterns
     def analysePatterns(self, currentScript, res, identifier, path):

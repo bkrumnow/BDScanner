@@ -18,14 +18,15 @@ for i in range(NUM_BROWSERS):
     browser_params[i]['headless'] = True
 
 # Update TaskManager configuration (use this for crawl-wide settings)
-manager_params['data_directory'] = '~/OpenWPM/data'
-manager_params['log_directory'] = '~/OpenWPM/data'
+manager_params['data_directory'] = './Results/'
+manager_params['log_directory'] = './Results/'
 
 # Instantiates the measurement platform
 manager = TaskManager.TaskManager(manager_params, browser_params)
 
 #fileReader = csv.reader(open('detection/alexa/top-1m.csv'), delimiter=',')
-fileReader = csv.reader(open('detection/validation/test.csv'), delimiter=',')
+#fileReader = csv.reader(open('detection/validation/test.csv'), delimiter=',')
+fileReader = csv.reader(open('detection/validation/test_set.csv'), delimiter=',')
 #        fileReader = csv.reader(open(filepath), delimiter=',')
 
 urls = []
