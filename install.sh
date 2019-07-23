@@ -37,28 +37,9 @@ fi
 if [ "$flash" = true ]; then
     sudo sh -c 'echo "deb http://archive.canonical.com/ubuntu/ trusty partner" >> /etc/apt/sources.list.d/canonical_partner.list'
 fi
+sudo apt-get update
 
-#sudo apt-get update
-zypper ref
-
-#sudo apt-get install -y firefox htop git python-dev libxml2-dev libxslt-dev libffi-dev libssl-dev build-essential xvfb libboost-python-dev libleveldb-dev libjpeg-dev
-
-# Firefox installation
-#wget http://download.opensuse.org/repositories/home:/psmt/SLE_12_SP3/x86_64/MozillaFirefox-52.9.0-4.1.x86_64.rpm 
-#rpm -i MozillaFirefox-52.9.0-4.1.x86_64.rpm
-#rm MozillaFirefox-52.9.0-4.1.x86_64.rpm 
-
-#wget http://download.opensuse.org/repositories/home:/mcalmer:/tito/SLE_12_SP3/noarch/python-virtualenv-15.1.0-3.1.noarch.rpm
-#rpm -i ../tools/python-virtualenv-15.1.0-3.1.noarch.rpm
-
-zypper ar http://download.opensuse.org/repositories/devel:libraries:c_c++/SLE_12_SP3/devel:libraries:c_c++.repo
-zypper refresh
-# build-essential is ubuntu only tool :(
-# libjpeg-del --> Found libjpeg62-devel only :(
-# xvfb was alrea installed
-
-zypper in leveldb-devel python-devel libxml2-devel htop libxslt-devel libffi-devel libjpeg62-devel
-libboost_python-py3-1_67_0-devel libleveldb1
+sudo apt-get install -y firefox htop git python-dev libxml2-dev libxslt-dev libffi-dev libssl-dev build-essential xvfb libboost-python-dev libleveldb-dev libjpeg-dev
 
 # For some versions of ubuntu, the package libleveldb1v5 isn't available. Use libleveldb1 instead.
 sudo apt-get install -y libleveldb1v5 || sudo apt-get install -y libleveldb1
@@ -82,9 +63,6 @@ fi
 # Older ESRs are not supported by geckodriver.
 FIREFOX_VERSION=52.4.1esr
 
-#wget https://ftp.mozilla.org/pub/firefox/releases/52.4.1esr/linux-x86_64/en-US/firefox-52.4.1esr.tar.bz2
-#tar jxf firefox-52.4.1esr.tar.bz2 
-#mv firefox ../BotDetectionScanner/firefox-bin
 wget https://ftp.mozilla.org/pub/firefox/releases/${FIREFOX_VERSION}/linux-$(uname -m)/en-US/firefox-${FIREFOX_VERSION}.tar.bz2
 tar jxf firefox-${FIREFOX_VERSION}.tar.bz2
 rm -rf firefox-bin
@@ -104,8 +82,6 @@ case $(uname -m) in
         exit 1
         ;;
 esac
-#GECKODRIVER_ARCH=linux64
-#https://github.com/mozilla/geckodriver/releases/download/v0.15.0/geckodriver-v0.15.0-linux64.tar.gz
 wget https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-${GECKODRIVER_ARCH}.tar.gz
 tar zxf geckodriver-v${GECKODRIVER_VERSION}-${GECKODRIVER_ARCH}.tar.gz
 rm geckodriver-v${GECKODRIVER_VERSION}-${GECKODRIVER_ARCH}.tar.gz
