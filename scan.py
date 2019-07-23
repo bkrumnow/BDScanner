@@ -26,7 +26,7 @@ manager = TaskManager.TaskManager(manager_params, browser_params)
 
 #fileReader = csv.reader(open('detection/alexa/top-1m.csv'), delimiter=',')
 #fileReader = csv.reader(open('detection/validation/test.csv'), delimiter=',')
-fileReader = csv.reader(open('detection/validation/test_set.csv'), delimiter=',')
+fileReader = csv.reader(open('detection/alexa/test_set.csv'), delimiter=',')
 #        fileReader = csv.reader(open(filepath), delimiter=',')
 
 urls = []

@@ -79,8 +79,8 @@ class Scanner:
 
             self.scripts.append(currentScript)
             print("\n@append: %s %s %s" % (len(self.scripts), identifier, currentScript.score))
-#            else:
-#               del currentScript
+            #else:
+                #del currentScript
 
     #Compares script with detection patterns
     def analysePatterns(self, currentScript, res, identifier, path):
