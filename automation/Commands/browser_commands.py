@@ -1,36 +1,35 @@
 from __future__ import absolute_import
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import MoveTargetOutOfBoundsException
-from selenium.common.exceptions import TimeoutException
-from selenium.common.exceptions import WebDriverException
-from selenium.webdriver.common.action_chains import ActionChains
-from hashlib import md5
-from glob import glob
-from PIL import Image
-import traceback
-import random
-import json
-import time
-import sys
-import gzip
-import os
 
+import gzip
+import json
+import os
+import random
+import sys
+import time
+import traceback
+from glob import glob
+from hashlib import md5
+
+from PIL import Image
+from selenium.common.exceptions import (MoveTargetOutOfBoundsException,
+                                        TimeoutException, WebDriverException)
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from six.moves import range
+
+from ..MPLogger import loggingclient
+from ..SocketInterface import clientsocket
+from .utils.lso import get_flash_cookies
+from .utils.webdriver_extensions import (execute_in_all_frames,
+                                         execute_script_with_retry,
+                                         get_intra_links, is_displayed,
+                                         scroll_down, wait_until_loaded)
+                                         
 # WebBot Detection section
 from detection import Scanner
 from detection.db import DB
 
-from ..SocketInterface import clientsocket
-from ..MPLogger import loggingclient
-from .utils.lso import get_flash_cookies
-from .utils.firefox_profile import get_cookies
-from .utils.webdriver_extensions import (scroll_down,
-                                         wait_until_loaded,
-                                         get_intra_links,
-                                         execute_in_all_frames,
-                                         execute_script_with_retry)
-from six.moves import range
-import six
 
 # Constants for bot mitigation
 NUM_MOUSE_MOVES = 10  # Times to randomly move the mouse
@@ -49,8 +48,8 @@ def bot_mitigation(webdriver):
     while num_moves < NUM_MOUSE_MOVES + 1 and num_fails < NUM_MOUSE_MOVES:
         try:
             if num_moves == 0:  # move to the center of the screen
-                x = int(round(window_size['height']/2))
-                y = int(round(window_size['width']/2))
+                x = int(round(window_size['height'] / 2))
+                y = int(round(window_size['width'] / 2))
             else:  # move a random amount in some direction
                 move_max = random.randint(0, 500)
                 x = random.randint(-move_max, move_max)
@@ -147,32 +146,6 @@ def get_website(url, sleep, visit_id, webdriver,
         bot_mitigation(webdriver)
 
 
-def extract_links(webdriver, browser_params, manager_params):
-    link_elements = webdriver.find_elements_by_tag_name('a')
-    link_urls = set(element.get_attribute("href") for element in link_elements)
-
-    sock = clientsocket()
-    sock.connect(*manager_params['aggregator_address'])
-    create_table_query = ("""
-    CREATE TABLE IF NOT EXISTS links_found (
-      found_on TEXT,
-      location TEXT
-    )
-    """, ())
-    sock.send(create_table_query)
-
-    if len(link_urls) > 0:
-        current_url = webdriver.current_url
-        insert_query_string = """
-        INSERT INTO links_found (found_on, location)
-        VALUES (?, ?)
-        """
-        for link in link_urls:
-            sock.send((insert_query_string, (current_url, link)))
-
-    sock.close()
-
-
 def browse_website(url, num_links, sleep, visit_id, webdriver,
                    browser_params, manager_params, extension_socket):
     """Calls get_website before visiting <num_links> present on the page.
@@ -188,12 +161,12 @@ def browse_website(url, num_links, sleep, visit_id, webdriver,
     logger = loggingclient(*manager_params['logger_address'])
 
     # Then visit a few subpages
-    for i in range(num_links):
+    for _ in range(num_links):
         links = [x for x in get_intra_links(webdriver, url)
-                 if x.is_displayed() is True]
+                 if is_displayed(x) is True]
         if not links:
             break
-        r = int(random.random()*len(links))
+        r = int(random.random() * len(links))
         logger.info("BROWSER %i: visiting internal link %s" % (
             browser_params['crawl_id'], links[r].get_attribute("href")))
 
@@ -225,44 +198,10 @@ def dump_flash_cookies(start_time, visit_id, webdriver, browser_params,
     # Flash cookies
     flash_cookies = get_flash_cookies(start_time)
     for cookie in flash_cookies:
-        query = ("INSERT INTO flash_cookies (crawl_id, visit_id, domain, "
-                 "filename, local_path, key, content) VALUES (?,?,?,?,?,?,?)",
-                 (browser_params['crawl_id'], visit_id, cookie.domain,
-                  cookie.filename, cookie.local_path, cookie.key,
-                  cookie.content))
-        sock.send(query)
-
-    # Close connection to db
-    sock.close()
-
-
-def dump_profile_cookies(start_time, visit_id, webdriver,
-                         browser_params, manager_params):
-    """ Save changes to Firefox's cookies.sqlite to database
-
-    We determine which cookies to save by the `start_time` timestamp.
-    This timestamp should be taken prior to calling the `get` for
-    which creates these changes.
-
-    Note that the extension's cookieInstrument is preferred to this approach,
-    as this is likely to miss changes still present in the sqlite `wal` files.
-    This will likely be removed in a future version.
-    """
-    # Set up a connection to DataAggregator
-    tab_restart_browser(webdriver)  # kills window to avoid stray requests
-    sock = clientsocket()
-    sock.connect(*manager_params['aggregator_address'])
-
-    # Cookies
-    rows = get_cookies(browser_params['profile_path'], start_time)
-    if rows is not None:
-        for row in rows:
-            query = ("INSERT INTO profile_cookies (crawl_id, visit_id, "
-                     "baseDomain, name, value, host, path, expiry, accessed, "
-                     "creationTime, isSecure, isHttpOnly) VALUES "
-                     "(?,?,?,?,?,?,?,?,?,?,?,?)", (browser_params['crawl_id'],
-                                                   visit_id) + row)
-            sock.send(query)
+        data = cookie._asdict()
+        data["crawl_id"] = browser_params["crawl_id"]
+        data["visit_id"] = visit_id
+        sock.send(("flash_cookies", data))
 
     # Close connection to db
     sock.close()
@@ -319,7 +258,7 @@ def _stitch_screenshot_parts(visit_id, crawl_id, logger, manager_params):
     output = Image.new('RGB', (max_width, total_height))
 
     # Compute dimensions for output image
-    for i in range(max(images.keys())+1):
+    for i in range(max(images.keys()) + 1):
         img = images[i]
         output.paste(im=img['object'], box=(0, img['scroll']))
         img['object'].close()
@@ -358,8 +297,8 @@ def screenshot_full_page(visit_id, crawl_id, driver, manager_params,
             driver, 'return window.scrollY;')
         prev_scrollY = -1
         driver.save_screenshot(outname % (part, curr_scrollY))
-        while ((curr_scrollY + inner_height) < max_height
-               and curr_scrollY != prev_scrollY):
+        while (curr_scrollY + inner_height) < max_height and \
+                curr_scrollY != prev_scrollY:
 
             # Scroll down to bottom of previous viewport
             try:
@@ -447,6 +386,7 @@ def recursive_dump_page_source(visit_id, driver, manager_params, suffix=''):
             page_source = dict()
         page_source['doc_url'] = doc_url
         source = driver.page_source
+        import six
         if type(source) != six.text_type:
             source = six.text_type(source, 'utf-8')
         page_source['source'] = source

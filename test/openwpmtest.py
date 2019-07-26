@@ -1,11 +1,12 @@
 from __future__ import absolute_import
 
 import os
-from os.path import join, isfile
+from os.path import isfile, join
+
 import pytest
 
-from . import utilities
 from ..automation import TaskManager
+from . import utilities
 
 
 class OpenWPMTest(object):
@@ -39,7 +40,8 @@ class OpenWPMTest(object):
             load_default_params(num_browsers)
         manager_params['data_directory'] = data_dir
         manager_params['log_directory'] = data_dir
-        browser_params[0]['headless'] = True
+        for i in range(num_browsers):
+            browser_params[i]['headless'] = True
         manager_params['db'] = join(manager_params['data_directory'],
                                     manager_params['database_name'])
         return manager_params, browser_params
@@ -62,6 +64,8 @@ class OpenWPMTest(object):
         pkg_name_mapping = {"pyopenssl": "OpenSSL",
                             "beautifulsoup4": "bs4",
                             "python-dateutil": "dateutil",
+                            "sentry-sdk": "sentry_sdk",
+                            "flake8-isort": "flake8_isort",
                             "mini-amf": "miniamf",
                             "pillow": "PIL"
                             }

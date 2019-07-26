@@ -1,5 +1,13 @@
+# Docker volume
+docker-volume/
+
+# pytest
+.pytest_cache/
+
 # firefox directories
 firefox-bin/
+Firefox*.app/
+Nightly*.app/
 
 # VIM tmp files
 *~
@@ -12,6 +20,9 @@ C:\\nppdf32Log\\debuglog.txt
 .idea/*
 *.idea
 */idea
+
+# Local Python virtual environments
+venv/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -66,3 +77,12 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+
+# npm packages
+node_modules
+
+# built extension artifacts
+automation/Extension/firefox/dist
+automation/Extension/firefox/openwpm.xpi
+automation/Extension/firefox/src/content.js
+automation/Extension/firefox/src/feature.js

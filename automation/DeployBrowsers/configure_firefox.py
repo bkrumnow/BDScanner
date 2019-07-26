@@ -1,7 +1,6 @@
 """ Set prefs and load extensions in Firefox """
 
-from __future__ import absolute_import
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import os
 import shutil
@@ -208,3 +207,7 @@ def optimize_prefs(fo):
     # Disable Shield
     fo.set_preference("app.shield.optoutstudies.enabled", False)
     fo.set_preference("extensions.shield-recipe-client.enabled", False)
+
+    # Enable legacy extensions and disable extension signing
+    fo.set_preference("extensions.legacy.enabled", True)
+    fo.set_preference("xpinstall.signatures.required", False)

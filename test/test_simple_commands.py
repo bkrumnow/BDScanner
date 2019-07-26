@@ -1,16 +1,17 @@
 from __future__ import absolute_import
-from PIL import Image
-from six.moves.urllib.parse import urlparse
+
 import glob
 import gzip
 import json
 import os
 import re
 
-from . import utilities
-from ..automation import CommandSequence
-from ..automation import TaskManager
+from PIL import Image
+from six.moves.urllib.parse import urlparse
+
+from ..automation import CommandSequence, TaskManager
 from ..automation.utilities import db_utils
+from . import utilities
 from .openwpmtest import OpenWPMTest
 
 url_a = utilities.BASE_TEST_URL + '/simple_a.html'
@@ -389,11 +390,11 @@ class TestSimpleCommands(OpenWPMTest):
             # Verify source
             path = urlparse(frame['doc_url']).path
             expected_source = ''
-            with open('.'+path, 'r') as f:
-                expected_source = re.sub('\s', '', f.read().lower())
+            with open('.' + path, 'r') as f:
+                expected_source = re.sub(r'\s', '', f.read().lower())
                 if expected_source.startswith('<!doctypehtml>'):
                     expected_source = expected_source[14:]
-            observed_source = re.sub('\s', '', frame['source'].lower())
+            observed_source = re.sub(r'\s', '', frame['source'].lower())
             if observed_source.startswith('<!doctypehtml>'):
                 observed_source = observed_source[14:]
             assert observed_source == expected_source
