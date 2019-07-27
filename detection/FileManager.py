@@ -26,22 +26,22 @@ with open(os.path.join('detection/configuration','config.json')) as json_data_fi
 # downloads the file and if necessary de-compresses the content of the HTTP request and parses content format
 def downloadFile(src):
         data = ''
+        # TODO: Needs to be switched with a recent user agent each start
+        hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
+               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+               'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+               'Accept-Encoding': 'none',
+               'Accept-Language': 'en-US,en;q=0.8',
+               'Connection': 'keep-alive'}
+               
         try:
-            # TODO: Needs to be switched with a recent user agent each start
-            hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
-                   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                   'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
-                   'Accept-Encoding': 'none',
-                   'Accept-Language': 'en-US,en;q=0.8',
-                   'Connection': 'keep-alive'}
-
             # A src attribute may not contain a http(s) prefix
             if src.startswith('//'):
                 src = 'http:' + src
 
-            req = urllib.Request(src, headers=hdr)
+            req = urllib.request.Request(src, headers=hdr)
 
-            response = urllib.urlopen(req)
+            response = urllib.request.urlopen(req)
             CHUNK = 16 * 1024
             while True:
                 chunk = response.read(CHUNK)
@@ -51,7 +51,7 @@ def downloadFile(src):
 
             contentEncoding = response.info().getheader('Content-Encoding')
         except urllib.error.URLError as e:
-            print("Could not open: %s %s" % (src,e))
+            print("URLError - Could not open: %s %s" % (src,e))
             return
         except:
             print("Could not open: %s %s" % (src,sys.exc_info()[0]))
