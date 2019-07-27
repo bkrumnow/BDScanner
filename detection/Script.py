@@ -7,7 +7,8 @@
 ## Project: Detecting Web bot Detecting | BotDetectionScanner (https://github.com/GabryVlot/BotDetectionScanner)
 ###############################################################################################################
 
-import RegisteredDetectionTopic, BotDetectionValueManager
+from . import RegisteredDetectionTopic
+from . import BotDetectionValueManager
 
 class Script:
 

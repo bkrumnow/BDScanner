@@ -347,7 +347,7 @@ def detect_webbot_detection(visit_id, driver, manager_params, suffix=''):
     try:
         tab_restart_browser(driver)  # kills window to avoid stray requests
     except:
-        print 'error while restarting browser'
+        print('error while restarting browser')
 
     sock = clientsocket()
     sock.connect(*manager_params['aggregator_address'])

@@ -7,8 +7,8 @@
 ## Project: Detecting Web bot Detecting | BotDetectionScanner (https://github.com/GabryVlot/BotDetectionScanner)
 ###############################################################################################################
 
-import urllib2
-import StringIO
+import urllib
+from io import StringIO
 import gzip
 import sys
 import json
@@ -27,6 +27,7 @@ with open(os.path.join('detection/configuration','config.json')) as json_data_fi
 def downloadFile(src):
         data = ''
         try:
+            # TODO: Needs to be switched with a recent user agent each start
             hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                    'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
@@ -38,9 +39,9 @@ def downloadFile(src):
             if src.startswith('//'):
                 src = 'http:' + src
 
-            req = urllib2.Request(src, headers=hdr)
+            req = urllib.Request(src, headers=hdr)
 
-            response = urllib2.urlopen(req)
+            response = urllib.urlopen(req)
             CHUNK = 16 * 1024
             while True:
                 chunk = response.read(CHUNK)
@@ -49,8 +50,8 @@ def downloadFile(src):
                 data = data + chunk;
 
             contentEncoding = response.info().getheader('Content-Encoding')
-        except urllib2.URLError, e:
-            print ("Could not open: %s %s" % (src,e))
+        except urllib.error.URLError as e:
+            print("Could not open: %s %s" % (src,e))
             return
         except:
             print("Could not open: %s %s" % (src,sys.exc_info()[0]))
@@ -133,7 +134,7 @@ def asciirepl(match):
             except:
                 value = '\\x' + s
     except:
-        print "[De-Obf]Error obtaining match group"
+        print("[De-Obf]Error obtaining match group")
 
     return value
 
@@ -167,7 +168,7 @@ def decompressData(data, contentEncoding, fileName):
             unzipper = gzip.GzipFile(fileobj=compressedstream)
             data = unzipper.read()
         else:
-            print "Not supported encoding %s"  % contentEncoding
+            print("Not supported encoding {}".format(contentEncoding))
     except:
         print("Not able to de-compress content %s" % (fileName))
 

@@ -8,7 +8,10 @@
 ###############################################################################################################
 
 from selenium.common.exceptions import StaleElementReferenceException
-from detectionPatterns import DetectorPatterns, BotFingerprintingSurface, BrowserFingerprints, ManuallyFoundLiterals
+from detection.detectionPatterns import DetectorPatterns
+from detection.detectionPatterns import BotFingerprintingSurface
+from detection.detectionPatterns import BrowserFingerprints
+from detection.detectionPatterns import ManuallyFoundLiterals
 from detection import PatternChecker, Script
 from detection import FileManager
 
@@ -54,9 +57,9 @@ class Scanner:
                         self.analyseCode(outerHTML, fileName, fileName)
                         counter = counter +1
                     except StaleElementReferenceException:
-                        print 'element became invalid'
+                        print('element became invalid')
                     except:
-                        print 'element cannot be targeted'
+                        print('element cannot be targeted')
 
     #preprocesses script (de-obfuscating and remove comments) and script persistence
     def analyseCode(self, data, identifier, path):

@@ -7,7 +7,7 @@
 ## Project: Detecting Web bot Detecting | BotDetectionScanner (https://github.com/GabryVlot/BotDetectionScanner)
 ###############################################################################################################
 
-import DetectionPattern
+from . import DetectionPattern
 
 # The separation of the construction of the DetectionPattern serves for now only the purpose
 # for the separation of concerns for future development

@@ -61,43 +61,6 @@ CREATE TABLE IF NOT EXISTS crawl_history (
     dtg DATETIME DEFAULT (CURRENT_TIMESTAMP),
     FOREIGN KEY(crawl_id) REFERENCES crawl(id));
 
-<<<<<<< HEAD
-/* Bot detection tables */
-CREATE TABLE IF NOT EXISTS Scripts (
-    id TEXT PRIMARY KEY,
-    visit_id INTEGER NOT NULL,
-    categories TEXT,
-    name TEXT,
-    URL TEXT,
-    script_length DECIMAL,
-    score DECIMAL,
-    duplicate TEXT,
-    context TEXT,
-    hash INTEGER NOT NULL,
-    FOREIGN KEY(visit_id) REFERENCES site_visits(id));
-
-CREATE TABLE IF NOT EXISTS DetectionPatterns (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    script_id TEXT NOT NULL,
-    topic TEXT,
-    pattern TEXT,
-    context TEXT,
-    score DECIMAL,
-    FOREIGN KEY(script_id) REFERENCES Scripts(id));
-
-CREATE TABLE IF NOT EXISTS HoneypotElements (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    visit_id INTEGER NOT NULL,
-    element_id TEXT,
-    name TEXT,
-    categories TEXT,
-    patterns TEXT,
-    score DECIMAL,
-    FOREIGN KEY(visit_id) REFERENCES site_visits(id));
-
-
-CREATE INDEX IF NOT EXISTS hash_index ON Scripts (hash)
-=======
 /*
 # http_requests
  */
@@ -266,4 +229,40 @@ CREATE TABLE IF NOT EXISTS navigations(
   committed_event_ordinal INTEGER,
   committed_time_stamp DATETIME
 );
->>>>>>> a337b52eb172ceed9e2ab092a4ba0e1f7421ad29
+
+
+/* Bot detection tables */
+CREATE TABLE IF NOT EXISTS Scripts (
+    id TEXT PRIMARY KEY,
+    visit_id INTEGER NOT NULL,
+    categories TEXT,
+    name TEXT,
+    URL TEXT,
+    script_length DECIMAL,
+    score DECIMAL,
+    duplicate TEXT,
+    context TEXT,
+    hash INTEGER NOT NULL,
+    FOREIGN KEY(visit_id) REFERENCES site_visits(id));
+
+CREATE TABLE IF NOT EXISTS DetectionPatterns (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    script_id TEXT NOT NULL,
+    topic TEXT,
+    pattern TEXT,
+    context TEXT,
+    score DECIMAL,
+    FOREIGN KEY(script_id) REFERENCES Scripts(id));
+
+/*CREATE TABLE IF NOT EXISTS HoneypotElements (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    visit_id INTEGER NOT NULL,
+    element_id TEXT,
+    name TEXT,
+    categories TEXT,
+    patterns TEXT,
+    score DECIMAL,
+    FOREIGN KEY(visit_id) REFERENCES site_visits(id));
+
+*/
+CREATE INDEX IF NOT EXISTS hash_index ON Scripts (hash)
