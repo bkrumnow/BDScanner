@@ -74,7 +74,7 @@ class DB:
                 scriptHash = -1
             else:
                 FileManager.persistFile(script.identifier, script.data, self.dataPath + '/files/' + str(visit_id) + '/')
-                for key, detectionPattern in script.detectionPatterns.iteritems():
+                for key, detectionPattern in script.detectionPatterns.items():
                     self.insertDetection(sock, scriptId, key, ','.join(detectionPattern.patterns), context, detectionPattern.totalScore)
 
             self.insertScript(sock, scriptId, visit_id, ','.join(script.categories), script.identifier, script.URL, script.scriptLength, script.score, context, duplicate, scriptHash)

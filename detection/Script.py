@@ -50,7 +50,7 @@ class Script:
 
     #After looping through the detection pattern the detection score based upon detection pattern will be calulated
     def calculateDetectionValue(self):
-        for key, detectionPattern in self.detectionPatterns.iteritems():
+        for key, detectionPattern in self.detectionPatterns.items():
             detectionPattern.totalScore = BotDetectionValueManager.getDetectionValue(key, self.detectionPatterns, detectionPattern)
             self.score = self.score + detectionPattern.totalScore
 

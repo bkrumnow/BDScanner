@@ -7,6 +7,7 @@
 ## Project: Detecting Web bot Detecting | BotDetectionScanner (https://github.com/GabryVlot/BotDetectionScanner)
 ###############################################################################################################
 
+import requests
 import urllib
 from io import StringIO
 import gzip
@@ -15,33 +16,32 @@ import json
 import os
 import random
 #import jsbeautifier
-import re, binascii
+import re
+import binascii
 from detection import PatternChecker
 
 # load config file
 config = {}
 with open(os.path.join('detection/configuration','config.json')) as json_data_file:
     config = json.load(json_data_file)
-
-# downloads the file and if necessary de-compresses the content of the HTTP request and parses content format
+"""
 def downloadFile(src):
         data = ''
-        # TODO: Needs to be switched with a recent user agent each start
-        hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
-               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-               'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
-               'Accept-Encoding': 'none',
-               'Accept-Language': 'en-US,en;q=0.8',
-               'Connection': 'keep-alive'}
-               
         try:
+            hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
+                   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                   'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+                   'Accept-Encoding': 'none',
+                   'Accept-Language': 'en-US,en;q=0.8',
+                   'Connection': 'keep-alive'}
+
             # A src attribute may not contain a http(s) prefix
             if src.startswith('//'):
                 src = 'http:' + src
 
-            req = urllib.request.Request(src, headers=hdr)
+            req = urllib.Request(src, headers=hdr)
 
-            response = urllib.request.urlopen(req)
+            response = urllib.urlopen(req)
             CHUNK = 16 * 1024
             while True:
                 chunk = response.read(CHUNK)
@@ -51,7 +51,7 @@ def downloadFile(src):
 
             contentEncoding = response.info().getheader('Content-Encoding')
         except urllib.error.URLError as e:
-            print("URLError - Could not open: %s %s" % (src,e))
+            print ("Could not open: %s %s" % (src,e))
             return
         except:
             print("Could not open: %s %s" % (src,sys.exc_info()[0]))
@@ -70,12 +70,57 @@ def downloadFile(src):
         # decode contents
         content = decodeData(data)
 
-        # Exclude common scripts, that are known frameworks and should not do bot detection. Currently: JQuery, bootstrap and underscore
+
         if not PatternChecker.analyse(fileName, config['excludeFiles'], 'FileManagerExludeFiles', True, True):
            return (content, fileName, src)
 
         return None
+"""        
+# downloads the file and if necessary de-compresses the content of the HTTP request and parses content format
 
+def downloadFile(url):
+        data = ''
+        # TODO: Needs to be switched with a recent user agent each start
+        http_header = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
+               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+               'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+               'Accept-Encoding': 'none',
+               'Accept-Language': 'en-US,en;q=0.8',
+               'Connection': 'keep-alive'}
+
+        # A src attribute may not contain a http(s) prefix
+        if url.startswith('//'):
+            url = 'http:' + url
+               
+        try:
+            r = requests.get(url, headers=http_header)
+        except requests.exceptions.RequestException as e:
+            print("Could not open: {} {}".format(url, e, sys.exc_info()[0]))
+            return
+
+        data = r.content
+        contentEncoding = r.encoding
+
+
+        if data == None:
+            print("No content found {}".format(url))
+            return data
+
+        fileName = extractFileName(url)
+
+        #de-compress http request content
+        #Not needed when using requests library
+        #if contentEncoding:
+        #    data = decompressData(data, contentEncoding, fileName)
+
+        # decode contents
+        content = decodeData(data)
+
+        # Exclude common scripts, that are known frameworks and should not do bot detection. Currently: JQuery, bootstrap and underscore
+        if not PatternChecker.analyse(fileName, config['excludeFiles'], 'FileManagerExludeFiles', True, True):
+           return (content, fileName, url)
+
+        return None
 
 def preProcessScript(data):
     """ Preprocess rawdata : 1 remove comment 2 convert hexadecimal contents
@@ -153,26 +198,12 @@ def persistFile(name, data, path):
     try:
         with open(path + name, 'w') as file:
             file.write(data.encode('utf-8'))
-    except:
-        print("Could not write file %s" % name)
-
-def decompressData(data, contentEncoding, fileName):
-    """ Decompresses optional file encoding gzip
-    :param data:
-    :param contentEncoding:
-    :param fileName:
-    """
-    try:
-        if contentEncoding.lower() == 'gzip':
-            compressedstream = StringIO.StringIO(data)
-            unzipper = gzip.GzipFile(fileobj=compressedstream)
-            data = unzipper.read()
-        else:
-            print("Not supported encoding {}".format(contentEncoding))
-    except:
-        print("Not able to de-compress content %s" % (fileName))
-
-    return data
+    except TypeError:
+        try:
+            with open(path + name, 'w') as file:
+                file.write(data)
+        except Exception as e:
+            print("Could not write file {}: {}".format(name, e))
 
 def decodeData(data):
     try:
@@ -191,17 +222,22 @@ def extractFileName(src):
     """
     if src.endswith('/'):
         src = src[:-1]
-
+    if src.endswith('.js'): # It cuts off first, to avoid strings such as file.j or file. 
+        src = src[:-3]
+        
     fileName = src.split('/')[-1];
+    
     if fileName:
+        fileName = fileName[:20] +'.js';
+        
         if not fileName.endswith('.js'):
-            fileName = fileName[:20] + '.js';
-        else:
-            fileName = fileName[:20]
+             fileName = fileName + '.js';
 
-        #Virtual box limitation, files containing a question mark cannot be copied to host machine
+        # Virtual box limitation, files containing a question mark cannot be copied to host machine
         fileName = fileName.replace('?', '-')
+        # Can be a problem with some systems
+        fileName = fileName.replace('&', '-')
     else:
         fileName = 'script_johndoe_' + str(random.randint(1,1003)*3);
-
+        
     return fileName

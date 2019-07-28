@@ -343,7 +343,6 @@ def dump_page_source(visit_id, driver, manager_params, suffix=''):
 def detect_webbot_detection(visit_id, driver, manager_params, suffix=''):
     scanner = Scanner.Scanner(driver, visit_id)
 
-#    try:
     try:
         tab_restart_browser(driver)  # kills window to avoid stray requests
     except:
@@ -358,8 +357,8 @@ def detect_webbot_detection(visit_id, driver, manager_params, suffix=''):
     # Close connection to db
     sock.close()
     del sock
-#    except:
-#        print('Error socket connection to DB')
+    # except:
+        # print('Error socket connection to DB')
 
     # Delete instantiated objects
     del db
