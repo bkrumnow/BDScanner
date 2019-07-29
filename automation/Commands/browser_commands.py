@@ -351,15 +351,12 @@ def detect_webbot_detection(visit_id, driver, manager_params, suffix=''):
     sock = clientsocket()
     sock.connect(*manager_params['aggregator_address'])
 
-    print(scanner.scripts)
     db = DB.DB(manager_params['data_directory'], scanner.scripts)
-    db.persistResults(sock, visit_id, manager_params)
+    db.persist_results(sock, visit_id, manager_params)
 
     # Close connection to db
     sock.close()
     del sock
-    # except:
-        # print('Error socket connection to DB')
 
     # Delete instantiated objects
     del db

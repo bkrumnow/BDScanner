@@ -254,6 +254,8 @@ CREATE TABLE IF NOT EXISTS DetectionPatterns (
     score DECIMAL,
     FOREIGN KEY(script_id) REFERENCES Scripts(id));
 
+CREATE INDEX IF NOT EXISTS hash_index ON Scripts (hash)
+
 /*CREATE TABLE IF NOT EXISTS HoneypotElements (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     visit_id INTEGER NOT NULL,
@@ -265,4 +267,4 @@ CREATE TABLE IF NOT EXISTS DetectionPatterns (
     FOREIGN KEY(visit_id) REFERENCES site_visits(id));
 
 */
-CREATE INDEX IF NOT EXISTS hash_index ON Scripts (hash)
+

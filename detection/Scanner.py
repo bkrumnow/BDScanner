@@ -70,7 +70,8 @@ class Scanner:
 
         if currentScript:
             currentScript.calculateDetectionValue()
-            if currentScript.score >= 12:
+            #if currentScript.score >= 12:
+            if currentScript.score >= 0:
                 currentScript.URL = path
 
 #                now that we have a pattern detected .. is it a familiar one (only for unknown detection patterns)?

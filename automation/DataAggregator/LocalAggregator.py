@@ -79,8 +79,8 @@ class LocalListener(BaseListener):
         values = list()
         first = True
         print("---------------------------------------------------------------------------------------")
-        print(table)
-        print(data)
+        print("table: {}".format(table))
+        print("data: {}".format(data))
         for field, value in data.items():
             statement += "" if first else ", "
             statement += field
