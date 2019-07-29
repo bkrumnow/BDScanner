@@ -24,60 +24,8 @@ from detection import PatternChecker
 config = {}
 with open(os.path.join('detection/configuration','config.json')) as json_data_file:
     config = json.load(json_data_file)
-"""
-def downloadFile(src):
-        data = ''
-        try:
-            hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
-                   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                   'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
-                   'Accept-Encoding': 'none',
-                   'Accept-Language': 'en-US,en;q=0.8',
-                   'Connection': 'keep-alive'}
 
-            # A src attribute may not contain a http(s) prefix
-            if src.startswith('//'):
-                src = 'http:' + src
-
-            req = urllib.Request(src, headers=hdr)
-
-            response = urllib.urlopen(req)
-            CHUNK = 16 * 1024
-            while True:
-                chunk = response.read(CHUNK)
-                if not chunk:
-                    break
-                data = data + chunk;
-
-            contentEncoding = response.info().getheader('Content-Encoding')
-        except urllib.error.URLError as e:
-            print ("Could not open: %s %s" % (src,e))
-            return
-        except:
-            print("Could not open: %s %s" % (src,sys.exc_info()[0]))
-            return
-
-        if data == None:
-            print("No content found %s" % (src))
-            return data
-
-        fileName = extractFileName(src)
-
-        #de-compress http request content
-        if contentEncoding:
-            data = decompressData(data, contentEncoding, fileName)
-
-        # decode contents
-        content = decodeData(data)
-
-
-        if not PatternChecker.analyse(fileName, config['excludeFiles'], 'FileManagerExludeFiles', True, True):
-           return (content, fileName, src)
-
-        return None
-"""        
 # downloads the file and if necessary de-compresses the content of the HTTP request and parses content format
-
 def downloadFile(url):
         data = ''
         # TODO: Needs to be switched with a recent user agent each start
@@ -106,14 +54,7 @@ def downloadFile(url):
             print("No content found {}".format(url))
             return data
 
-        fileName = extractFileName(url)
-
-        #de-compress http request content
-        #Not needed when using requests library
-        #if contentEncoding:
-        #    data = decompressData(data, contentEncoding, fileName)
-
-        # decode contents
+        fileName = _extractFileName(url)
         content = decodeData(data)
 
         # Exclude common scripts, that are known frameworks and should not do bot detection. Currently: JQuery, bootstrap and underscore
@@ -216,7 +157,7 @@ def decodeData(data):
 
     return content
 
-def extractFileName(src):
+def _extractFileName(src):
     """ Extract filename from src attribute
     :param src:
     """

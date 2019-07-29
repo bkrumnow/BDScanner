@@ -351,6 +351,7 @@ def detect_webbot_detection(visit_id, driver, manager_params, suffix=''):
     sock = clientsocket()
     sock.connect(*manager_params['aggregator_address'])
 
+    print(scanner.scripts)
     db = DB.DB(manager_params['data_directory'], scanner.scripts)
     db.persistResults(sock, visit_id, manager_params)
 
