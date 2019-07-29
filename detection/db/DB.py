@@ -32,7 +32,7 @@ class DB:
                 , "hash": hash}
             sock.send(("Scripts", params))
         except:
-            print("Error inserting script record %s %s" % (identifier, id))
+            print("Error inserting script record {} {}".format(identifier, id))
 
     def insert_detection(self, sock, script_id, topic, pattern, context, score):
         try:
@@ -45,7 +45,7 @@ class DB:
             }
             sock.send(("DetectionPatterns", params))
         except:
-            print("Error inserting detection record %s %s %s" % (scriptId, topic, pattern))
+            print("Error inserting detection record {} {} {}".format(scriptId, topic, pattern))
 
     def update_site_visits(self, sock, score, visitId, scriptId, cat_a, cat_b, cat_c, dist_a, dist_b, dist_c):
         try:
@@ -54,7 +54,7 @@ class DB:
             )
             sock.send(("create_table", query))
         except:
-            print("Error updating site_visit record %s %s %s" % (score, visitId, sys.exc_info()[0]))
+            print("Error updating site_visit record {} {} {}".format(score, visitId, sys.exc_info()[0]))
 
 
     def persist_results(self, sock, visit_id, manager_params):
