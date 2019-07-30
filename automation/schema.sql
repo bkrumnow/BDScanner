@@ -242,7 +242,7 @@ CREATE TABLE IF NOT EXISTS Scripts (
     score DECIMAL,
     duplicate TEXT,
     context TEXT,
-    hash INTEGER NOT NULL,
+    hash TEXT NOT NULL,
     FOREIGN KEY(visit_id) REFERENCES site_visits(id));
 
 CREATE TABLE IF NOT EXISTS DetectionPatterns (

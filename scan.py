@@ -38,7 +38,7 @@ for i in range(0, len(urls),1):
     #second parameter will clear the profile (reset)
     command_sequence = CommandSequence.CommandSequence('http://' + url, True)
     # Start by visiting the page
-    command_sequence.get(sleep=5, timeout=120)
+    command_sequence.get(sleep=3, timeout=120)
     #command_sequence.save_screenshot('EndPrint', 1000)
     command_sequence.detect_webbot_detection(timeout=360)
     # index='**' synchronizes visits between the three browsers

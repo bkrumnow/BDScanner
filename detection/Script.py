@@ -9,6 +9,7 @@
 
 from . import RegisteredDetectionTopic
 from . import BotDetectionValueManager
+import hashlib
 
 class Script:
 
@@ -56,8 +57,15 @@ class Script:
 
         self.detectionPatternHash = self.detectionPatternHash + detectionPattern.hash
 
+
+    def get_ssh224(self):
+        data = self.data.replace(" ", "")
+        data = data.replace("\n","")
+        my_hash = hashlib.sha224(data.encode('utf-8'))
+        return my_hash.hexdigest()
+
     #Override build in function __hash__
     def __hash__(self):
             if not self.hash:
-                self.hash = hash((self.score, self.scriptLength, self.detectionPatternHash, self.repeatingPatternHash))
+                self.hash = hash((self.score, self.scriptLength, self.detectionPatternHash))
             return self.hash

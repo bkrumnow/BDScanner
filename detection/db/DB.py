@@ -65,7 +65,7 @@ class DB:
 
         #print('self %s' % self)
         for script in self.scripts:
-            scriptHash = hash(script)
+            scriptHash = script.get_ssh224()
             existsInCache = self.checkCache(sock, scriptHash, manager_params)
 
             duplicate = ''
@@ -78,7 +78,7 @@ class DB:
 
             if existsInCache:
                 duplicate = existsInCache
-                scriptHash = -1
+                #scriptHash = -1
             else:
                 FileManager.persistFile(script.identifier, script.data, self.dataPath + '/files/' + str(visit_id) + '/')
                 for key, detectionPattern in script.detectionPatterns.items():
@@ -89,7 +89,8 @@ class DB:
         self.update_site_visits(sock, highestScore, visit_id, highestScoreScriptId, cat_a, cat_b, cat_c, dist_a, dist_b, dist_c)
 
     def checkCache(self, sock, scriptHash, manager_params):
-        rows = db_utils.query_db(manager_params['database_name'], "SELECT id FROM Scripts WHERE hash = " + str(scriptHash) + ";")
+        print('SELECT id FROM Scripts WHERE hash = "' + scriptHash + '";')
+        rows = db_utils.query_db(manager_params['database_name'], 'SELECT id FROM Scripts WHERE hash = "' + scriptHash + '";')
         if not rows:
             return None
         else:
