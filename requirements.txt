@@ -30,3 +30,4 @@ six
 tabulate
 tblib
 tld
+requests
