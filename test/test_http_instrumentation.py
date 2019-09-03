@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
 import base64
@@ -7,6 +9,7 @@ from hashlib import sha256
 from time import sleep
 
 import pytest
+import six
 from six.moves import range
 from six.moves.urllib.parse import urlparse
 
@@ -404,25 +407,11 @@ CALL_STACK_INJECT_IMAGE =\
 BASE_PATH = os.path.dirname(os.path.realpath(__file__))
 
 
-# HACK: sometimes the browser has time to load about:blank
-# before getting our load request, so the top level URL is
-# logged as about:blank.
-# In this case, manually replace that value with the test
-# page URL.
-# Issue #245 tracks the issue of incorrect top level urls.
-def fix_about_page_url(url):
-    if url == "about:blank":
-        return u'http://localtest.me:8000/test_pages/http_test_page.html'
-    else:
-        return url
-
-
 class TestHTTPInstrument(OpenWPMTest):
 
     def get_config(self, data_dir=""):
         manager_params, browser_params = self.get_test_config(data_dir)
         browser_params[0]['http_instrument'] = True
-        browser_params[0]['save_javascript'] = True
         return manager_params, browser_params
 
     def test_page_visit(self):
@@ -437,7 +426,7 @@ class TestHTTPInstrument(OpenWPMTest):
         for row in rows:
             observed_records.add((
                 row['url'].split('?')[0],
-                fix_about_page_url(row['top_level_url']),
+                row['top_level_url'],
                 row['triggering_origin'], row['loading_origin'],
                 row['loading_href'], row['is_XHR'],
                 row['is_frame_load'], row['is_full_page'],
@@ -506,7 +495,7 @@ class TestHTTPInstrument(OpenWPMTest):
                 continue
             observed_records.add((
                 row['url'].split('?')[0],
-                fix_about_page_url(row['top_level_url']),
+                row['top_level_url'],
                 row['triggering_origin'], row['loading_origin'],
                 row['loading_href'], row['is_XHR'],
                 row['is_frame_load'], row['is_full_page'],
@@ -582,11 +571,36 @@ class TestHTTPInstrument(OpenWPMTest):
     def test_javascript_saving(self, tmpdir):
         """ check that javascript content is saved and hashed correctly """
         test_url = utilities.BASE_TEST_URL + '/http_test_page.html'
-        self.visit(test_url, str(tmpdir), sleep_after=3)
+        manager_params, browser_params = self.get_test_config(str(tmpdir))
+        browser_params[0]['http_instrument'] = True
+        browser_params[0]['save_content'] = "script"
+        manager = TaskManager.TaskManager(manager_params, browser_params)
+        manager.get(url=test_url, sleep=1)
+        manager.close()
         expected_hashes = {
             '0110c0521088c74f179615cd7c404816816126fa657550032f75ede67a66c7cc',
             'b34744034cd61e139f85f6c4c92464927bed8343a7ac08acf9fb3c6796f80f08'}
-        for chash, content in db_utils.get_javascript_content(str(tmpdir)):
+        for chash, content in db_utils.get_content(str(tmpdir)):
+            chash = chash.decode('ascii').lower()
+            pyhash = sha256(content).hexdigest().lower()
+            assert pyhash == chash  # Verify expected key (sha256 of content)
+            assert chash in expected_hashes
+            expected_hashes.remove(chash)
+        assert len(expected_hashes) == 0  # All expected hashes have been seen
+
+    def test_document_saving(self, tmpdir):
+        """ check that document content is saved and hashed correctly """
+        test_url = utilities.BASE_TEST_URL + '/http_test_page.html'
+        expected_hashes = {
+            '2390eceab422db15bc45940b7e042e83e6cbd5f279f57e714bc4ad6cded7f966',
+            '25343f42d9ffa5c082745f775b172db87d6e14dfbc3160b48669e06d727bfc8d'}
+        manager_params, browser_params = self.get_test_config(str(tmpdir))
+        browser_params[0]['http_instrument'] = True
+        browser_params[0]['save_content'] = "main_frame,sub_frame"
+        manager = TaskManager.TaskManager(manager_params, browser_params)
+        manager.get(url=test_url, sleep=1)
+        manager.close()
+        for chash, content in db_utils.get_content(str(tmpdir)):
             chash = chash.decode('ascii').lower()
             pyhash = sha256(content).hexdigest().lower()
             assert pyhash == chash  # Verify expected key (sha256 of content)
@@ -599,7 +613,7 @@ class TestHTTPInstrument(OpenWPMTest):
         test_url = utilities.BASE_TEST_URL + '/http_test_page.html'
         manager_params, browser_params = self.get_test_config(str(tmpdir))
         browser_params[0]['http_instrument'] = True
-        browser_params[0]['save_all_content'] = True
+        browser_params[0]['save_content'] = True
         manager = TaskManager.TaskManager(manager_params, browser_params)
         manager.get(url=test_url, sleep=1)
         manager.close()
@@ -617,7 +631,7 @@ class TestHTTPInstrument(OpenWPMTest):
             disk_content[chash] = content
 
         ldb_content = dict()
-        for chash, content in db_utils.get_javascript_content(str(tmpdir)):
+        for chash, content in db_utils.get_content(str(tmpdir)):
             chash = chash.decode('ascii')
             ldb_content[chash] = content
 
@@ -631,14 +645,19 @@ class TestPOSTInstrument(OpenWPMTest):
     The encoding types tested are explained here:
     https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest#Using_nothing_but_XMLHttpRequest
     """
-    post_data = '{"email":["test@example.com"],"username":["name surname+"]}'
+    post_data = ('{"email":["test@example.com"],'
+                 '"username":["name surname+你好"],'
+                 '"test":["ПриватБанк – банк для тих, хто йде вперед"]}')
     post_data_json = json.loads(post_data)
     post_data_multiline = r'{"email":["test@example.com"],"username":'\
-        r'["name surname+"],'\
+        r'["name surname+你好"],'\
+        r'"test":["ПриватБанк – банк для тих, хто йде вперед"],'\
         r'"multiline_text":["line1\r\n\r\nline2 line2_word2"]}'
     post_data_multiline_json = json.loads(post_data_multiline)
     post_data_multiline_raw = 'email=test@example.com\r\n'\
-        'username=name surname+\r\nmultiline_text=line1\r\n\r\n'\
+        'username=name surname+你好\r\n'\
+        'test=ПриватБанк – банк для тих, хто йде вперед\r\n'\
+        'multiline_text=line1\r\n\r\n'\
         'line2 line2_word2\r\n'
 
     def get_config(self, data_dir=""):
@@ -670,7 +689,11 @@ class TestPOSTInstrument(OpenWPMTest):
         encoding_type = "text/plain"
         db = self.visit('/post_request.html?encoding_type=' + encoding_type)
         post_body = self.get_post_request_body_from_db(db, True)
-        assert post_body.decode('utf8') == self.post_data_multiline_raw
+        if not isinstance(self.post_data_multiline_raw, six.text_type):
+            expected = self.post_data_multiline_raw.decode('utf-8')
+        else:
+            expected = self.post_data_multiline_raw
+        assert post_body.decode('utf8') == expected
 
     def test_record_post_data_multipart_formdata(self):
         encoding_type = "multipart/form-data"
@@ -716,7 +739,6 @@ class TestPOSTInstrument(OpenWPMTest):
         db = self.visit("/post_request_ajax.html?format=" + post_format)
         post_body = self.get_post_request_body_from_db(db, True)
         # Binary strings get put into the database as-if they were latin-1.
-        import six
         assert six.binary_type(bytearray(range(100))) == post_body
 
     @pytest.mark.skip(reason="Firefox is currently not able to return the "

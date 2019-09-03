@@ -7,12 +7,6 @@ of websites. OpenWPM is built on top of Firefox, with automation provided
 by Selenium. It includes several hooks for data collection. Check out
 the instrumentation section below for more details.
 
-**Note**: The master branch OpenWPM is currently unstable while we push to
-complete the upgrade to WebExtensions. If you're running crawls we recommend
-using the `firefox-52-archive` branch, noting that it is running an outdated
-version of Firefox.
-
-
 Installation
 ------------
 
@@ -96,13 +90,16 @@ available [below](#output-format).
 * Response body content
     * Saves all files encountered during the crawl to a `LevelDB`
         database de-duplicated by the md5 hash of the content.
-    * Set `browser_params['save_all_content'] = True`
+    * Set `browser_params['save_content'] = True`
     * The `content_hash` column of the `http_responses` table contains the md5
         hash for each script, and can be used to do content lookups in the
         LevelDB content database.
     * NOTE: this instrumentation may lead to performance issues when a large
         number of browsers are in use.
-    * Set `browser_params['save_javascript'] = True` to save only Javascript
+    * Set `browser_params['save_content']` to a comma-separated list of 
+        [resource_types](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/webRequest/ResourceType)
+        to save only specific types of files, for instance 
+        `browser_params['save_content'] = "script"` to save only Javascript
         files. This will lessen the performance impact of this instrumentation
         when a large number of browsers are used in parallel.
 * Flash Cookies
@@ -190,10 +187,9 @@ inline by sending a `create_table` message to the data aggregator.
 #### Parquet on Amazon S3 **Experimental**
 As an option, OpenWPM can save data directly to an Amazon S3 bucket as a
 Parquet Dataset. This is currently experimental and hasn't been thoroughly
-tested. Response body content (both `save_javascript` and `save_all_content`),
-screenshots, and page source saving is not currently supported and will still
-be stored in local databases and directories. To enable S3 saving specify the
-following configuration parameters in `manager_params`:
+tested. Screenshots, and page source saving is not currently supported and 
+will still be stored in local databases and directories. To enable S3 
+saving specify the following configuration parameters in `manager_params`:
 * Output format: `manager_params['output_format'] = 's3'`
 * S3 bucket name: `manager_params['s3_bucket'] = 'openwpm-test-crawl'`
 * Directory within S3 bucket: `manager_params['s3_directory'] = '2018-09-09_test-crawl-new'`
@@ -267,7 +263,8 @@ left out of this section.
   * Flash is disabled by default. Set this to `False` to re-enable. Note that
     flash cookies are shared between browsers.
 * `headless`
-  * Launch the browser in a virtual frame buffer, no GUI will be visible.
+  * Launch the browser in headless mode (supported as of Firefox 56),
+    no GUI will be visible.
   * Use this when running browsers on a remote machine or to run crawls in the
       background on a local machine.
 * `browser`
@@ -446,17 +443,6 @@ Running the OpenWPM tests on Mac OSX:
 
 For more detailed setup instructions for Mac, see [Running OpenWPM natively on macOS](https://github.com/mozilla/OpenWPM/wiki/Running-OpenWPM-natively-on-macOS).
 
-There are known limitations on Mac:
-1. Flash cookies are not parsed correctly since we
-   [hardcode](https://github.com/citp/OpenWPM/blob/de84f0595dd512649e46c87b47d5ab18c8374d7e/automation/Commands/utils/lso.py#L34)
-   the Flash storage path to that used on Linux.
-2. Headless mode does not work since we currently use XVFB and the Firefox
-   GUI on Mac doesn't make use of X. If [XQuartz](https://www.xquartz.org/) is
-   installed, the X virtual frame buffer is created but
-   is not used by the Firefox GUI. Thus Firefox windows will always be visible
-   regardless of the `headless` configuration parameter set. If XQuartz is not
-   installed, attempts to use the `headless` configuration will lead to crashes.
-
 We do not run CI tests for Mac, so new issues may arise. We welcome PRs to fix
 these issues and add full support and CI testing for Mac.
 
@@ -529,11 +515,15 @@ Then you can run the demo script using:
 
 ```
     mkdir -p docker-volume && docker run -v $PWD/docker-volume:/root/Desktop \
-    -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix \
+    -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix --shm-size=2g \
     -it openwpm python /opt/OpenWPM/demo.py
 ```
 
 Instead of _python_, _python3_ can be used here as well.
+
+**Note:** the `--shm-size=2g` parameter is required, as it increases the
+amount of shared memory available to Firefox. Without this parameter you can
+expect Firefox to crash on 20-30% of sites.
 
 This command uses _bind-mounts_ to share scripts and output between the
 container and host, as explained below (note the paths in the command assume

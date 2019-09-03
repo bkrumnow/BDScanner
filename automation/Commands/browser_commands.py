@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 import gzip
 import json
+import logging
 import os
 import random
 import sys
@@ -18,23 +19,23 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from six.moves import range
 
-from ..MPLogger import loggingclient
 from ..SocketInterface import clientsocket
 from .utils.lso import get_flash_cookies
-from .utils.webdriver_extensions import (execute_in_all_frames,
-                                         execute_script_with_retry,
-                                         get_intra_links, is_displayed,
-                                         scroll_down, wait_until_loaded)
-                                         
+
 # WebBot Detection section
 from detection import Scanner
 from detection.db import DB
 
+from .utils.webdriver_utils import (execute_in_all_frames,
+                                    execute_script_with_retry, get_intra_links,
+                                    is_displayed, scroll_down,
+                                    wait_until_loaded)
 
 # Constants for bot mitigation
 NUM_MOUSE_MOVES = 10  # Times to randomly move the mouse
 RANDOM_SLEEP_LOW = 1  # low (in sec) for random sleep between page loads
 RANDOM_SLEEP_HIGH = 7  # high (in sec) for random sleep between page loads
+logger = logging.getLogger('openwpm')
 
 
 def bot_mitigation(webdriver):
@@ -137,7 +138,7 @@ def get_website(url, sleep, visit_id, webdriver,
         alert = webdriver.switch_to_alert()
         alert.dismiss()
         time.sleep(1)
-    except TimeoutException:
+    except (TimeoutException, WebDriverException):
         pass
 
     close_other_windows(webdriver)
@@ -156,9 +157,6 @@ def browse_website(url, num_links, sleep, visit_id, webdriver,
     # First get the site
     get_website(url, sleep, visit_id, webdriver,
                 browser_params, extension_socket)
-
-    # Connect to logger
-    logger = loggingclient(*manager_params['logger_address'])
 
     # Then visit a few subpages
     for _ in range(num_links):
@@ -219,7 +217,7 @@ def save_screenshot(visit_id, crawl_id, driver, manager_params, suffix=''):
     driver.save_screenshot(outname)
 
 
-def _stitch_screenshot_parts(visit_id, crawl_id, logger, manager_params):
+def _stitch_screenshot_parts(visit_id, crawl_id, manager_params):
     # Read image parts and compute dimensions of output image
     total_height = -1
     max_scroll = -1
@@ -276,7 +274,6 @@ def _stitch_screenshot_parts(visit_id, crawl_id, logger, manager_params):
 
 def screenshot_full_page(visit_id, crawl_id, driver, manager_params,
                          suffix=''):
-    logger = loggingclient(*manager_params['logger_address'])
 
     outdir = os.path.join(manager_params['screenshot_path'], 'parts')
     if not os.path.isdir(outdir):
@@ -324,7 +321,7 @@ def screenshot_full_page(visit_id, crawl_id, driver, manager_params,
             (crawl_id, ''.join(excp)))
         return
 
-    _stitch_screenshot_parts(visit_id, crawl_id, logger, manager_params)
+    _stitch_screenshot_parts(visit_id, crawl_id, manager_params)
 
 
 def dump_page_source(visit_id, driver, manager_params, suffix=''):

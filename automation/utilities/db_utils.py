@@ -24,7 +24,7 @@ def query_db(db, query, params=None, as_tuple=False):
     return rows
 
 
-def get_javascript_content(data_directory):
+def get_content(data_directory):
     """Yield key, value pairs from the deduplicated leveldb content database
 
     Parameters
@@ -55,6 +55,6 @@ def any_command_failed(db):
     """Returns True if any command in a given database failed"""
     rows = query_db(db, "SELECT * FROM crawl_history;")
     for row in rows:
-        if row['bool_success'] != 1:
+        if row['command_status'] != 'ok':
             return True
     return False

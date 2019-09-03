@@ -1,15 +1,18 @@
 from __future__ import absolute_import
 
 import errno
+import logging
 import os
 import shutil
 import signal
 import sys
+import threading
 import time
 import traceback
 
 import psutil
-from multiprocess import Process, Queue
+from multiprocess import Queue
+from selenium.common.exceptions import WebDriverException
 from six import reraise
 from six.moves import cPickle as pickle
 from six.moves.queue import Empty as EmptyQueue
@@ -18,8 +21,8 @@ from tblib import pickling_support
 from .Commands import command_executor
 from .DeployBrowsers import deploy_browser
 from .Errors import BrowserConfigError, BrowserCrashError, ProfileLoadError
-from .MPLogger import loggingclient
 from .SocketInterface import clientsocket
+from .utilities.multiprocess_utils import Process, parse_traceback_for_sentry
 
 pickling_support.install()
 
@@ -43,7 +46,6 @@ class Browser:
         # manager parameters
         self.current_profile_path = None
         self.db_socket_address = manager_params['aggregator_address']
-        self.logger_address = manager_params['logger_address']
         self.crawl_id = browser_params['crawl_id']
         self.curr_visit_id = None
         self.browser_params = browser_params
@@ -59,10 +61,6 @@ class Browser:
         self.status_queue = None
         # pid for browser instance controlled by BrowserManager
         self.browser_pid = None
-        # the pid of the display for the headless browser (if it exists)
-        self.display_pid = None
-        # the port of the display for the headless browser (if it exists)
-        self.display_port = None
 
         # boolean that says if the BrowserManager new (to optimize restarts)
         self.is_fresh = True
@@ -73,7 +71,8 @@ class Browser:
         # dict of additional browser profile settings (e.g. screen_res)
         self.browser_settings = None
         self.browser_manager = None  # process that controls browser
-        self.logger = loggingclient(*self.logger_address)
+
+        self.logger = logging.getLogger('openwpm')
 
     def ready(self):
         """ return if the browser is ready to accept a command """
@@ -110,6 +109,9 @@ class Browser:
             crash_recovery = True
         else:
         """
+        self.logger.info(
+            "BROWSER %i: Launching browser..." % self.crawl_id
+        )
         tempdir = None
         crash_recovery = False
         self.is_fresh = not crash_recovery
@@ -150,12 +152,9 @@ class Browser:
                 spawned_profile_path = check_queue(launch_status)
                 # 2. Profile tar loaded (if necessary)
                 check_queue(launch_status)
-                # 3. Display launched
-                (self.display_pid, self.display_port) = check_queue(
-                    launch_status)
-                # 4. Browser launch attempted
+                # 3. Browser launch attempted
                 check_queue(launch_status)
-                # 5. Browser launched
+                # 4. Browser launched
                 (self.browser_pid, self.browser_settings) = check_queue(
                     launch_status)
 
@@ -180,7 +179,7 @@ class Browser:
                 self.logger.error(
                     "BROWSER %i: Spawn unsuccessful %s" % (self.crawl_id,
                                                            error_string))
-                self.kill_browser_manager()
+                self.close_browser_manager()
                 if 'Profile Created' in launch_status:
                     shutil.rmtree(spawned_profile_path, ignore_errors=True)
 
@@ -213,7 +212,7 @@ class Browser:
                              "is a fresh instance already" % self.crawl_id)
             return True
 
-        self.kill_browser_manager()
+        self.close_browser_manager()
 
         # if crawl should be stateless we can clear profile
         if clear_profile and self.current_profile_path is not None:
@@ -223,14 +222,98 @@ class Browser:
 
         return self.launch_browser_manager()
 
+    def close_browser_manager(self):
+        """Attempt to close the webdriver and browser manager processes.
+
+        If the browser manager process is unresponsive, the process is killed.
+        """
+        self.logger.debug(
+            "BROWSER %i: Closing browser..." % self.crawl_id
+        )
+
+        # Join current command thread (if it exists)
+        in_command_thread = threading.current_thread() == self.command_thread
+        if not in_command_thread and self.command_thread is not None:
+            self.logger.debug(
+                "BROWSER %i: Joining command thread" % self.crawl_id)
+            start_time = time.time()
+            if self.current_timeout is not None:
+                self.command_thread.join(self.current_timeout + 10)
+            else:
+                self.command_thread.join(60)
+
+            # If command thread is still alive, process is locked
+            if self.command_thread.is_alive():
+                self.logger.debug(
+                    "BROWSER %i: command thread failed to join during close. "
+                    "Assuming the browser process is locked..." %
+                    self.crawl_id
+                )
+                self.kill_browser_manager()
+                return
+
+            self.logger.debug(
+                "BROWSER %i: %f seconds to join command thread" % (
+                    self.crawl_id, time.time() - start_time))
+
+        # If command queue doesn't exist, this likely means the browser
+        # failed to launch properly. Let's kill any child processes that
+        # we can find.
+        if self.command_queue is None:
+            self.logger.debug(
+                "BROWSER %i: Command queue not found while closing." %
+                self.crawl_id
+            )
+            self.kill_browser_manager()
+            return
+
+        # Send the shutdown command
+        self.command_queue.put(("SHUTDOWN",))
+
+        # Verify that webdriver has closed (30 second timeout)
+        try:
+            status = self.status_queue.get(True, 30)
+        except EmptyQueue:
+            self.logger.debug(
+                "BROWSER %i: Status queue timeout while closing browser." %
+                self.crawl_id
+            )
+            self.kill_browser_manager()
+            return
+        if status != "OK":
+            self.logger.debug(
+                "BROWSER %i: Command failure while closing browser." %
+                self.crawl_id
+            )
+            self.kill_browser_manager()
+            return
+
+        # Verify that the browser process has closed (30 second timeout)
+        if self.browser_manager is not None:
+            self.browser_manager.join(30)
+        if self.browser_manager.is_alive():
+            self.logger.debug(
+                "BROWSER %i: Browser manager process still alive 30 seconds "
+                "after executing shutdown command." %
+                self.crawl_id
+            )
+            self.kill_browser_manager()
+            return
+
+        self.logger.debug(
+            "BROWSER %i: Browser manager closed successfully." %
+            self.crawl_id
+        )
+
     def kill_browser_manager(self):
         """Kill the BrowserManager process and all of its children"""
         self.logger.debug(
             "BROWSER %i: Attempting to kill BrowserManager with pid %i. "
-            "Display PID: %s | Display Port: %s | Browser PID: %s" % (
-                self.crawl_id, self.browser_manager.pid, self.display_pid,
-                self.display_port, self.browser_pid)
+            "Browser PID: %s" % (
+                self.crawl_id, self.browser_manager.pid,
+                self.browser_pid)
         )
+
         if self.browser_manager is not None and \
                 self.browser_manager.pid is not None:
             try:
@@ -239,25 +322,7 @@ class Browser:
                 self.logger.debug("BROWSER %i: Browser manager process does "
                                   "not exist" % self.crawl_id)
                 pass
-        if self.display_pid is not None:
-            try:
-                os.kill(self.display_pid, signal.SIGKILL)
-            except OSError:
-                self.logger.debug("BROWSER %i: Display process does not "
-                                  "exit" % self.crawl_id)
-                pass
-            except TypeError:
-                self.logger.error("BROWSER %i: PID may not be the correct "
-                                  "type %s" % (self.crawl_id,
-                                               str(self.display_pid)))
-        if self.display_port is not None:  # xvfb diplay lock
-            lockfile = "/tmp/.X%s-lock" % self.display_port
-            try:
-                os.remove(lockfile)
-            except OSError:
-                self.logger.debug("BROWSER %i: Screen lockfile (%s) already "
-                                  "removed" % (self.crawl_id, lockfile))
-                pass
+
         if self.browser_pid is not None:
             """`browser_pid` is the geckodriver process. We first kill
             the child processes (i.e. firefox) and then kill the geckodriver
@@ -288,28 +353,15 @@ class Browser:
 
     def shutdown_browser(self, during_init):
         """ Runs the closing tasks for this Browser/BrowserManager """
-        # Join command thread
-        if self.command_thread is not None:
-            self.logger.debug(
-                "BROWSER %i: Joining command thread" % self.crawl_id)
-            start_time = time.time()
-            if self.current_timeout is not None:
-                self.command_thread.join(self.current_timeout + 10)
-            else:
-                self.command_thread.join(60)
-            self.logger.debug(
-                "BROWSER %i: %f seconds to join command thread" % (
-                    self.crawl_id, time.time() - start_time))
-
-        # Kill BrowserManager process and children
+        # Close BrowserManager process and children
         self.logger.debug(
-            "BROWSER %i: Killing browser manager..." % self.crawl_id)
-        self.kill_browser_manager()
+            "BROWSER %i: Closing browser manager..." % self.crawl_id)
+        self.close_browser_manager()
 
         # Archive browser profile (if requested)
         if not during_init and \
                 self.browser_params['profile_archive_dir'] is not None:
-            self.logger.warn(
+            self.logger.warning(
                 "BROWSER %i: Archiving the browser profile directory is "
                 "currently unsupported. "
                 "See: https://github.com/mozilla/OpenWPM/projects/2" %
@@ -352,10 +404,9 @@ def BrowserManager(command_queue, status_queue, browser_params,
     and interface with Selenium. Command execution status is sent back
     to the TaskManager.
     """
+    logger = logging.getLogger('openwpm')
     try:
-        logger = loggingclient(*manager_params['logger_address'])
-
-        # Start the virtualdisplay (if necessary), webdriver, and browser
+        # Start webdriver and browser
         driver, prof_folder, browser_settings = deploy_browser.deploy_browser(
             status_queue, browser_params, manager_params, crash_recovery)
         if prof_folder[-1] != '/':
@@ -395,7 +446,7 @@ def BrowserManager(command_queue, status_queue, browser_params,
         logger.debug(
             "BROWSER %i: BrowserManager ready." % browser_params['crawl_id'])
 
-        # passes the profile folder, WebDriver pid and display pid back to the
+        # passes the profile folder, WebDriver pid back to the
         # TaskManager to signal a successful startup
         status_queue.put(('STATUS', 'Browser Ready', (prof_folder, 'READY')))
         browser_params['profile_path'] = prof_folder
@@ -410,25 +461,59 @@ def BrowserManager(command_queue, status_queue, browser_params,
             # reads in the command tuple of form:
             # (command, arg0, arg1, arg2, ..., argN) where N is variable
             command = command_queue.get()
+
+            if command[0] == "SHUTDOWN":
+                # Geckodriver creates a copy of the profile (and the original
+                # temp file created by FirefoxProfile() is deleted).
+                # We clear the profile attribute here to prevent prints from:
+                # https://github.com/SeleniumHQ/selenium/blob/4e4160dd3d2f93757cafb87e2a1c20d6266f5554/py/selenium/webdriver/firefox/webdriver.py#L193-L199
+                if driver.profile and not os.path.isdir(driver.profile.path):
+                    driver.profile = None
+                driver.quit()
+                status_queue.put("OK")
+                return
+
             logger.info("BROWSER %i: EXECUTING COMMAND: %s" % (
                 browser_params['crawl_id'], str(command)))
+
             # attempts to perform an action and return an OK signal
             # if command fails for whatever reason, tell the TaskManager to
             # kill and restart its worker processes
-            command_executor.execute_command(
-                command, driver, browser_settings,
-                browser_params, manager_params, extension_socket)
-            status_queue.put("OK")
+            try:
+                command_executor.execute_command(
+                    command, driver, browser_settings,
+                    browser_params, manager_params, extension_socket)
+                status_queue.put("OK")
+            except WebDriverException:
+                # We handle WebDriverExceptions separately here because they
+                # are quite common, and we often still have a handle to the
+                # browser, allowing us to run the SHUTDOWN command.
+                tb = traceback.format_exception(*sys.exc_info())
+                if 'about:neterror' in tb[-1]:
+                    status_queue.put(
+                        ('NETERROR', pickle.dumps(sys.exc_info()))
+                    )
+                    continue
+                extra = parse_traceback_for_sentry(tb)
+                extra['exception'] = tb[-1]
+                logger.error(
+                    "BROWSER %i: WebDriverException while executing command" %
+                    browser_params['crawl_id'], exc_info=True, extra=extra
+                )
+                status_queue.put(('FAILED', pickle.dumps(sys.exc_info())))
 
     except (ProfileLoadError, BrowserConfigError, AssertionError) as e:
-        logger.info("BROWSER %i: %s thrown, informing parent and raising" % (
+        logger.error("BROWSER %i: %s thrown, informing parent and raising" % (
             browser_params['crawl_id'], e.__class__.__name__))
-        err_info = sys.exc_info()
-        status_queue.put(('CRITICAL', pickle.dumps(err_info)))
+        status_queue.put(('CRITICAL', pickle.dumps(sys.exc_info())))
         return
     except Exception:
-        excp = traceback.format_exception(*sys.exc_info())
-        logger.info("BROWSER %i: Crash in driver, restarting browser manager "
-                    "\n %s" % (browser_params['crawl_id'], ''.join(excp)))
-        status_queue.put(('FAILED', None))
+        tb = traceback.format_exception(*sys.exc_info())
+        extra = parse_traceback_for_sentry(tb)
+        extra['exception'] = tb[-1]
+        logger.error(
+            "BROWSER %i: Crash in driver, restarting browser manager" %
+            browser_params['crawl_id'], exc_info=True, extra=extra
+        )
+        status_queue.put(('FAILED', pickle.dumps(sys.exc_info())))
         return

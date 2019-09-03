@@ -25,7 +25,7 @@ for i in range(NUM_BROWSERS):
     # Record JS Web API calls
     browser_params[i]['js_instrument'] = True
     # Enable flash for all three browsers
-    browser_params[i]['disable_flash'] = False
+    browser_params[i]['disable_flash'] = True
 browser_params[0]['headless'] = True  # Launch only browser 0 headless
 
 # Update TaskManager configuration (use this for crawl-wide settings)
@@ -43,8 +43,8 @@ for site in sites:
     # Start by visiting the page
     command_sequence.get(sleep=3, timeout=60)
 
-    # index='**' synchronizes visits between the three browsers
-    manager.execute_command_sequence(command_sequence, index='**')
+    # Run commands across the three browsers (simple parallelization)
+    manager.execute_command_sequence(command_sequence)
 
 # Shuts down the browsers and waits for the data to finish logging
 manager.close()

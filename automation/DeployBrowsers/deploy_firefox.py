@@ -1,15 +1,15 @@
 from __future__ import absolute_import
 
 import json
+import logging
 import os.path
 import random
-import sys
 
-from pyvirtualdisplay import Display
+import six
 from selenium import webdriver
 
 from ..Commands.profile_commands import load_profile
-from ..MPLogger import loggingclient
+from ..Errors import BrowserConfigError
 from ..utilities.platform_utils import (get_firefox_binary_path,
                                         get_geckodriver_exec_path)
 from . import configure_firefox
@@ -17,6 +17,29 @@ from .selenium_firefox import (FirefoxBinary, FirefoxLogInterceptor,
                                FirefoxProfile, Options)
 
 DEFAULT_SCREEN_RES = (1366, 768)
+ALL_RESOURCE_TYPES = {
+    "beacon",
+    "csp_report",
+    "font",
+    "image",
+    "imageset",
+    "main_frame",
+    "media",
+    "object",
+    "object_subrequest",
+    "ping",
+    "script",
+    "stylesheet",
+    "sub_frame",
+    "web_manifest",
+    "websocket",
+    "xbl",
+    "xml_dtd",
+    "xmlhttprequest",
+    "xslt",
+    "other",
+}
+logger = logging.getLogger('openwpm')
 
 
 def deploy_firefox(status_queue, browser_params, manager_params,
@@ -28,10 +51,7 @@ def deploy_firefox(status_queue, browser_params, manager_params,
     geckodriver_executable_path = get_geckodriver_exec_path()
 
     root_dir = os.path.dirname(__file__)  # directory of this file
-    logger = loggingclient(*manager_params['logger_address'])
 
-    display_pid = None
-    display_port = None
     fp = FirefoxProfile()
     browser_profile_path = fp.path + '/'
     status_queue.put(('STATUS', 'Profile Created', browser_profile_path))
@@ -45,7 +65,7 @@ def deploy_firefox(status_queue, browser_params, manager_params,
     if browser_params['profile_tar'] and not crash_recovery:
         logger.debug("BROWSER %i: Loading initial browser profile from: %s"
                      % (browser_params['crawl_id'],
-                        browser_params['profile_tar']))
+                         browser_params['profile_tar']))
         load_flash = browser_params['disable_flash'] is False
         profile_settings = load_profile(browser_profile_path,
                                         manager_params,
@@ -55,7 +75,7 @@ def deploy_firefox(status_queue, browser_params, manager_params,
     elif browser_params['profile_tar']:
         logger.debug("BROWSER %i: Loading recovered browser profile from: %s"
                      % (browser_params['crawl_id'],
-                        browser_params['profile_tar']))
+                         browser_params['profile_tar']))
         profile_settings = load_profile(browser_profile_path,
                                         manager_params,
                                         browser_params,
@@ -90,22 +110,23 @@ def deploy_firefox(status_queue, browser_params, manager_params,
     if profile_settings['ua_string'] is not None:
         logger.debug("BROWSER %i: Overriding user agent string to '%s'"
                      % (browser_params['crawl_id'],
-                        profile_settings['ua_string']))
+                         profile_settings['ua_string']))
         fo.set_preference("general.useragent.override",
                           profile_settings['ua_string'])
 
     if browser_params['headless']:
-        if sys.platform == 'darwin':
-            logger.warn(
-                "BROWSER %i: headless mode is not supported on MacOS. "
-                "Browser window will be visible." % browser_params['crawl_id']
-            )
-        else:
-            display = Display(visible=0, size=profile_settings['screen_res'])
-            display.start()
-            display_pid = display.pid
-            display_port = display.cmd_param[-1][1:]
-    status_queue.put(('STATUS', 'Display', (display_pid, display_port)))
+        fo.set_headless(True)
+        fo.add_argument('--width={}'.format(DEFAULT_SCREEN_RES[0]))
+        fo.add_argument('--height={}'.format(DEFAULT_SCREEN_RES[1]))
+
+    if browser_params['save_content']:
+        if isinstance(browser_params['save_content'], six.string_types):
+            configured_types = set(browser_params['save_content'].split(','))
+            if not configured_types.issubset(ALL_RESOURCE_TYPES):
+                diff = configured_types.difference(ALL_RESOURCE_TYPES)
+                raise BrowserConfigError(
+                    ("Unrecognized resource types provided ",
+                     "in browser_params['save_content`] (%s)" % diff))
 
     if browser_params['extension_enabled']:
         # Write config file
@@ -146,7 +167,7 @@ def deploy_firefox(status_queue, browser_params, manager_params,
     # main logger.  This will also inform us where the real profile
     # directory is hiding.
     interceptor = FirefoxLogInterceptor(
-        browser_params['crawl_id'], logger, browser_profile_path)
+        browser_params['crawl_id'], browser_profile_path)
     interceptor.start()
 
     # Set custom prefs. These are set after all of the default prefs to allow
