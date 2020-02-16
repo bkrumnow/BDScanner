@@ -234,8 +234,6 @@ CREATE TABLE IF NOT EXISTS navigations(
   committed_time_stamp DATETIME
 );
 
-<<<<<<< HEAD:automation/schema.sql
-
 /* Bot detection tables */
 CREATE TABLE IF NOT EXISTS Scripts (
     id TEXT PRIMARY KEY,
@@ -261,22 +259,6 @@ CREATE TABLE IF NOT EXISTS DetectionPatterns (
 
 CREATE INDEX IF NOT EXISTS hash_index ON Scripts (hash)
 
-/*CREATE TABLE IF NOT EXISTS HoneypotElements (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    visit_id INTEGER NOT NULL,
-    element_id TEXT,
-    name TEXT,
-    categories TEXT,
-    patterns TEXT,
-    score DECIMAL,
-    FOREIGN KEY(visit_id) REFERENCES site_visits(id));
-
-*/
-
-=======
-/*
-# Callstacks
- */
 CREATE TABLE IF NOT EXISTS callstacks(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   request_id INTEGER NOT NULL,
@@ -284,4 +266,3 @@ CREATE TABLE IF NOT EXISTS callstacks(
   visit_id INTEGER NOT NULL,
   call_stack TEXT
 )
->>>>>>> 8150bbbf2f1e9bc4583fc0efe28c311664718a02:automation/DataAggregator/schema.sql
