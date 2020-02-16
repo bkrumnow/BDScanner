@@ -1,3 +1,14 @@
+Bot detection Scanner
+=======
+This is a detector for fingerprint-based bot detectors (see this [site](http://www.gm.fh-koeln.de/%7Ekrumnow/fp_bot/index.html) for a detailed description.)
+
+Installation and quick start
+----------------------------
+
+1. Follow the OpenWPM documentation to set up the scanner.
+2. Run python scan.py to execute a scan
+
+
 OpenWPM [![Build Status](https://travis-ci.org/mozilla/OpenWPM.svg?branch=master)](https://travis-ci.org/mozilla/OpenWPM)
 =======
 
