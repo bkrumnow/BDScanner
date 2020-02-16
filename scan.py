@@ -2,6 +2,7 @@ from automation import TaskManager, CommandSequence
 from six.moves import range
 import csv
 import os
+import requests
 
 # Number of parallel browsers
 NUM_BROWSERS = 1
@@ -24,16 +25,16 @@ manager_params['log_directory'] = './Results/'
 # Instantiates the measurement platform
 manager = TaskManager.TaskManager(manager_params, browser_params)
 
-fileReader = csv.reader(open('detection/alexa/test_set.csv'), delimiter=',')
+fileReader = csv.reader(open('detection/alexa/top-1m.csv'), delimiter=',')
 
 urls = []
 for (index, url) in fileReader:
     urls.append(url);
 del fileReader
 
-for i in range(0, len(urls),1):
+for i in range(0, 1,1):#len(urls),1):
     url = urls[i]
-
+    
     print ("Command creation %s %s" % (i, url))
     #second parameter will clear the profile (reset)
     command_sequence = CommandSequence.CommandSequence('http://' + url, True)
