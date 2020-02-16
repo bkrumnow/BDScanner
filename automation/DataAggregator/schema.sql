@@ -257,7 +257,7 @@ CREATE TABLE IF NOT EXISTS DetectionPatterns (
     score DECIMAL,
     FOREIGN KEY(script_id) REFERENCES Scripts(id));
 
-CREATE INDEX IF NOT EXISTS hash_index ON Scripts (hash)
+CREATE INDEX IF NOT EXISTS hash_index ON Scripts (hash);
 
 CREATE TABLE IF NOT EXISTS callstacks(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -265,4 +265,4 @@ CREATE TABLE IF NOT EXISTS callstacks(
   crawl_id INTEGER NOT NULL,
   visit_id INTEGER NOT NULL,
   call_stack TEXT
-)
+);
