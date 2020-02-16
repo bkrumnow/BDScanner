@@ -1,21 +1,17 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
 
 import base64
 import json
 import os
 from hashlib import sha256
 from time import sleep
+from urllib.parse import urlparse
 
 import pytest
-import six
-from six.moves import range
-from six.moves.urllib.parse import urlparse
 
 from ..automation import CommandSequence, TaskManager
 from ..automation.utilities import db_utils
-from ..automation.utilities.platform_utils import parse_http_stack_trace_str
 from . import utilities
 from .openwpmtest import OpenWPMTest
 
@@ -364,45 +360,95 @@ HTTP_CACHED_REDIRECTS = {
      u'http://localtest.me:8000/test_pages/shared/test_image_2.png'),
 }
 
-# HTTP request call stack instrumentation
-# Expected stack frames
-HTTP_STACKTRACE_TEST_URL = utilities.BASE_TEST_URL + "/http_stacktrace.html"
-STACK_TRACE_INJECT_IMAGE =\
-    "inject_image@" + HTTP_STACKTRACE_TEST_URL + ":18:7;null\n"\
-    "inject_all@" + HTTP_STACKTRACE_TEST_URL + ":22:7;null\n"\
-    "onload@" + HTTP_STACKTRACE_TEST_URL + ":1:1;null"
+# Test URL attribution for worker script requests
+HTTP_WORKER_SCRIPT_REQUESTS = {
+    (
+        u'http://localtest.me:8000/test_pages/http_worker_page.html',
+        u'http://localtest.me:8000/test_pages/http_worker_page.html',
+        u'undefined',
+        u'undefined',
+        u'undefined',
+        0, 0, 1, None, None, u'main_frame',
+    ),
+    (
+        u'http://localtest.me:8000/test_pages/shared/test_favicon.ico',
+        u'http://localtest.me:8000/test_pages/http_worker_page.html',
+        u'http://localtest.me:8000',
+        u'http://localtest.me:8000',
+        u'http://localtest.me:8000/test_pages/http_worker_page.html',
+        0, 0, 1, None, None, u'image',
+    ),
+    (
+        u'http://localtest.me:8000/test_pages/shared/worker.js',
+        u'http://localtest.me:8000/test_pages/http_worker_page.html',
+        u'http://localtest.me:8000',
+        u'http://localtest.me:8000',
+        u'http://localtest.me:8000/test_pages/http_worker_page.html',
+        0, 0, 1, None, None, u'script'
+    ),
+    (
+        u'http://localtest.me:8000/test_pages/shared/test_image.png',
+        u'http://localtest.me:8000/test_pages/http_worker_page.html',
+        u'http://localtest.me:8000',
+        u'http://localtest.me:8000',
+        u'http://localtest.me:8000/test_pages/http_worker_page.html',
+        1, 0, 1, None, None, u'xmlhttprequest'
+    ),
+    (
+        u'http://localtest.me:8000/test_pages/shared/test_image.png',
+        u'http://localtest.me:8000/test_pages/shared/worker.js',
+        u'http://localtest.me:8000',
+        u'http://localtest.me:8000',
+        u'http://localtest.me:8000/test_pages/shared/worker.js',
+        1, 0, 1, None, None, u'xmlhttprequest'
+    ),
+}
 
-RAWGIT_HTTP_STACKTRACE_TEST_URL = "https://rawgit.com/gunesacar/b927d3fe69f3e7bf456da5192f74beea/raw/8d3e490b5988c633101ec45ef1443e61b1fd495e/inject_pixel.js"  # noqa
-# https://gist.github.com/gunesacar/b927d3fe69f3e7bf456da5192f74beea
-STACK_TRACE_INJECT_PIXEL =\
-    "inject_pixel@" + RAWGIT_HTTP_STACKTRACE_TEST_URL + ":4:3;null\n"\
-    "null@" + RAWGIT_HTTP_STACKTRACE_TEST_URL + ":6:1;null"
-
-STACK_TRACE_INJECT_JS =\
-    "inject_js@" + HTTP_STACKTRACE_TEST_URL + ":13:7;null\n"\
-    "inject_all@" + HTTP_STACKTRACE_TEST_URL + ":21:7;null\n"\
-    "onload@" + HTTP_STACKTRACE_TEST_URL + ":1:1;null"
-
-HTTP_STACKTRACES = set((STACK_TRACE_INJECT_IMAGE,
-                        STACK_TRACE_INJECT_PIXEL,
-                        STACK_TRACE_INJECT_JS))
-# parsed HTTP call stack dict
-CALL_STACK_INJECT_IMAGE =\
-    [{"func_name": "inject_image",
-      "filename": HTTP_STACKTRACE_TEST_URL,
-      "line_no": "18",
-      "col_no": "7",
-      "async_cause": "null"},
-     {"func_name": "inject_all",
-      "filename": HTTP_STACKTRACE_TEST_URL,
-      "line_no": "22",
-      "col_no": "7",
-      "async_cause": "null"},
-     {"func_name": "onload",
-      "filename": HTTP_STACKTRACE_TEST_URL,
-      "line_no": "1",
-      "col_no": "1",
-      "async_cause": "null"}]
+# Test URL-attribution for Service Worker requests.
+# localhost URLs are used instead of localtest.me because service workers
+# are only loaded from secure contexts.
+HTTP_SERVICE_WORKER_REQUESTS = {
+    (
+        u'http://localhost:8000/test_pages/http_service_worker_page.html',
+        u'http://localhost:8000/test_pages/http_service_worker_page.html',
+        u'undefined',
+        u'undefined',
+        u'undefined',
+        0, 0, 1, None, None, u'main_frame',
+    ),
+    (
+        u'http://localhost:8000/test_pages/shared/test_favicon.ico',
+        u'http://localhost:8000/test_pages/http_service_worker_page.html',
+        u'http://localhost:8000',
+        u'http://localhost:8000',
+        u'http://localhost:8000/test_pages/http_service_worker_page.html',
+        0, 0, 1, None, None, u'image',
+    ),
+    (
+        u'http://localhost:8000/test_pages/shared/service_worker.js',
+        u'http://localhost:8000/test_pages/http_service_worker_page.html',
+        u'http://localhost:8000',
+        u'http://localhost:8000',
+        u'http://localhost:8000/test_pages/http_service_worker_page.html',
+        0, 0, 1, None, None, u'script'
+    ),
+    (
+        u'http://localhost:8000/test_pages/shared/test_image.png',
+        u'http://localhost:8000/test_pages/http_service_worker_page.html',
+        u'http://localhost:8000',
+        u'http://localhost:8000',
+        u'http://localhost:8000/test_pages/http_service_worker_page.html',
+        1, 0, 1, None, None, u'xmlhttprequest'
+    ),
+    (
+        u'http://localhost:8000/test_pages/shared/test_image_2.png',
+        u'http://localhost:8000/test_pages/shared/service_worker.js',
+        u'http://localhost:8000',
+        u'http://localhost:8000',
+        u'http://localhost:8000/test_pages/shared/service_worker.js',
+        1, 0, 1, None, None, u'xmlhttprequest'
+    ),
+}
 
 BASE_PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -536,38 +582,6 @@ class TestHTTPInstrument(OpenWPMTest):
             observed_records.add((src, dst))
         assert HTTP_CACHED_REDIRECTS == observed_records
 
-    # TODO: webext instrumentation doesn't support req_call_stack yet.
-    # def test_http_stacktrace(self):
-    #     test_url = utilities.BASE_TEST_URL + '/http_stacktrace.html'
-    #     db = self.visit(test_url, sleep_after=3)
-    #     rows = db_utils.query_db(db, (
-    #         "SELECT url, req_call_stack FROM http_requests"))
-    #     observed_records = set()
-    #     for row in rows:
-    #         print(row)
-    #         url, stacktrace = row
-    #         if (url.endswith("inject_pixel.js") or
-    #                 url.endswith("test_image.png") or
-    #                 url.endswith("Blank.gif")):
-    #             observed_records.add(stacktrace)
-    #     assert HTTP_STACKTRACES == observed_records
-
-    def test_parse_http_stack_trace_str(self):
-        stacktrace = STACK_TRACE_INJECT_IMAGE
-        stack_frames = parse_http_stack_trace_str(stacktrace)
-        assert stack_frames == CALL_STACK_INJECT_IMAGE
-
-    # TODO: webext instrumentation doesn't support req_call_stack yet.
-    # def test_http_stacktrace_nonjs_loads(self):
-    #     # stacktrace should be empty for requests NOT triggered by scripts
-    #     test_url = utilities.BASE_TEST_URL + '/http_test_page.html'
-    #     db = self.visit(test_url, sleep_after=3)
-    #     rows = db_utils.query_db(db, (
-    #         "SELECT url, req_call_stack FROM http_requests"))
-    #     for row in rows:
-    #         _, stacktrace = row
-    #         assert stacktrace == ""
-
     def test_javascript_saving(self, tmpdir):
         """ check that javascript content is saved and hashed correctly """
         test_url = utilities.BASE_TEST_URL + '/http_test_page.html'
@@ -638,6 +652,57 @@ class TestHTTPInstrument(OpenWPMTest):
         for k, v in disk_content.items():
             assert v == ldb_content[k]
 
+    def test_worker_script_requests(self):
+        """Check correct URL attribution for requests made by worker script"""
+        test_url = utilities.BASE_TEST_URL + '/http_worker_page.html'
+        db = self.visit(test_url)
+
+        request_id_to_url = dict()
+
+        # HTTP Requests
+        rows = db_utils.query_db(db, "SELECT * FROM http_requests")
+        observed_records = set()
+        for row in rows:
+            observed_records.add((
+                row['url'].split('?')[0],
+                row['top_level_url'],
+                row['triggering_origin'], row['loading_origin'],
+                row['loading_href'], row['is_XHR'],
+                row['is_frame_load'], row['is_full_page'],
+                row['is_third_party_channel'],
+                row['is_third_party_to_top_window'],
+                row['resource_type'])
+            )
+            request_id_to_url[row['request_id']] = row['url']
+
+        assert HTTP_WORKER_SCRIPT_REQUESTS == observed_records
+
+    def test_service_worker_requests(self):
+        """Check correct URL attribution for requests made by service worker"""
+        test_url = 'http://localhost:8000/test_pages' + \
+            '/http_service_worker_page.html'
+        db = self.visit(test_url)
+
+        request_id_to_url = dict()
+
+        # HTTP Requests
+        rows = db_utils.query_db(db, "SELECT * FROM http_requests")
+        observed_records = set()
+        for row in rows:
+            observed_records.add((
+                row['url'].split('?')[0],
+                row['top_level_url'],
+                row['triggering_origin'], row['loading_origin'],
+                row['loading_href'], row['is_XHR'],
+                row['is_frame_load'], row['is_full_page'],
+                row['is_third_party_channel'],
+                row['is_third_party_to_top_window'],
+                row['resource_type'])
+            )
+            request_id_to_url[row['request_id']] = row['url']
+
+        assert HTTP_SERVICE_WORKER_REQUESTS == observed_records
+
 
 class TestPOSTInstrument(OpenWPMTest):
     """Make sure we can capture all the POST request data.
@@ -689,7 +754,7 @@ class TestPOSTInstrument(OpenWPMTest):
         encoding_type = "text/plain"
         db = self.visit('/post_request.html?encoding_type=' + encoding_type)
         post_body = self.get_post_request_body_from_db(db, True)
-        if not isinstance(self.post_data_multiline_raw, six.text_type):
+        if not isinstance(self.post_data_multiline_raw, str):
             expected = self.post_data_multiline_raw.decode('utf-8')
         else:
             expected = self.post_data_multiline_raw
@@ -739,7 +804,7 @@ class TestPOSTInstrument(OpenWPMTest):
         db = self.visit("/post_request_ajax.html?format=" + post_format)
         post_body = self.get_post_request_body_from_db(db, True)
         # Binary strings get put into the database as-if they were latin-1.
-        assert six.binary_type(bytearray(range(100))) == post_body
+        assert bytes(bytearray(range(100))) == post_body
 
     @pytest.mark.skip(reason="Firefox is currently not able to return the "
                       "file content for an upload, only the filename")

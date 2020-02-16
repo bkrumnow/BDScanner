@@ -1,5 +1,6 @@
+<<<<<<< HEAD
 Bot detection Scanner
-=======
+=====================
 This is a detector for fingerprint-based bot detectors (see this [site](http://www.gm.fh-koeln.de/%7Ekrumnow/fp_bot/index.html) for a detailed description.)
 
 Installation and quick start
@@ -8,8 +9,9 @@ Installation and quick start
 1. Follow the OpenWPM documentation to set up the scanner.
 2. Run python scan.py to execute a scan
 
-
-OpenWPM [![Build Status](https://travis-ci.org/mozilla/OpenWPM.svg?branch=master)](https://travis-ci.org/mozilla/OpenWPM)
+OpenWPM 
+[![Build Status](https://travis-ci.org/mozilla/OpenWPM.svg?branch=master)](https://travis-ci.org/mozilla/OpenWPM)
+[![OpenWPM Matrix Channel](https://img.shields.io/matrix/OpenWPM:mozilla.org?label=Join%20us%20on%20matrix&server_fqdn=mozilla.modular.im)](https://matrix.to/#/!pFJihVSEWzcMCcOzSH:mozilla.org?via=mozilla.org)
 =======
 
 OpenWPM is a web privacy measurement framework which makes it easy to
@@ -18,10 +20,41 @@ of websites. OpenWPM is built on top of Firefox, with automation provided
 by Selenium. It includes several hooks for data collection. Check out
 the instrumentation section below for more details.
 
+Table of Contents
+-----------------
+
+* [Installation](#installation)
+* [Quick Start](#quick-start)
+* [Instrumentation and Data Access](#instrumentation-and-data-access)
+* [Output Formats](#output-format)
+  * [Local Databases](#local-databases)
+  * [Parquet on Amazon S3 (Experimental)](#parquet-on-amazon-s3-experimental)
+* [Browser and Platform Configuration](#browser-and-platform-configuration)
+  * [Browser Configuration Options](#platform-configuration-options)
+* [Browser Profile Support](#browser-profile-support)
+  * [Stateful vs Stateless crawls](#stateful-vs-stateless-crawls)
+  * [Loading and saving a browser profile](#loading-and-saving-a-browser-profile)
+* [Development pointers](#development-pointers)
+  * [Editing instrumentation](#editing-instrumentation)
+  * [Debugging the platform](#debugging-the-platform)
+  * [Managing requirements](#managing-requirements)
+  * [Running tests](#running-tests)
+  * [Mac OSX (Limited support for developers)](#mac-osx-limited-support-for-developers)
+* [Troubleshooting](#troubleshooting)
+* [Docker Deployment for OpenWPM](#docker-deployment-for-openwpm)
+  * [Building the Docker Container](#building-the-docker-container)
+  * [Running Measurements from inside the Container](#running-measurements-from-inside-the-container)
+  * [MacOS GUI applications in Docker](#macos-gui-applications-in-docker)
+* [Disclaimer](#disclaimer)
+* [Citation](#citation)
+* [License](#license)
+
+
 Installation
 ------------
 
-OpenWPM has been developed and tested on Ubuntu 14.04/16.04. An installation
+OpenWPM is a Python 3 application developed and tested for Ubuntu 18.04.
+Python 2 is not supported. An installation
 script, `install.sh` is included to install both the system and python
 dependencies automatically. A few of the python dependencies require specific
 versions, so you should install the dependencies in a virtual environment if
@@ -192,7 +225,7 @@ bodies are saved in a LevelDB database named `content.ldb`, and are keyed by
 the hash of the content. In addition, the browser commands that dump page
 source and save screenshots save them in the `sources` and `screenshots`
 subdirectories of the main output directory. The SQLite schema
-specified by: `automation/schema.sql`. You can specify additional tables
+specified by: `automation/DataAggregator/schema.sql`. You can specify additional tables
 inline by sending a `create_table` message to the data aggregator.
 
 #### Parquet on Amazon S3 **Experimental**
@@ -212,7 +245,7 @@ location.
 **NOTE:** The schemas should be kept in sync with the exception of
 output-specific columns (e.g., `instance_id` in the S3 output). You can compare
 the two schemas by running
-`diff -y automation/schema.sql automation/DataAggregator/parquet_schema.py`.
+`diff -y automation/DataAggregator/schema.sql automation/DataAggregator/parquet_schema.py`.
 
 Browser and Platform Configuration
 ----------------------------------
@@ -407,10 +440,11 @@ continuing the crawl). We recommend using
 This utility allows manual debugging of the extension instrumentation with or
 without Selenium enabled, as well as makes it easy to launch a Selenium
 instance (without any instrumentation)
-* `python -m test.manual_test` uses `jpm` to build the current extension directory
-  and launch a Firefox instance with it.
+* `build-extension.sh` 
+* `python -m test.manual_test` builds the current extension directory
+  and launches a Firefox instance with it.
 * `python -m test.manual_test --selenium` launches a Firefox Selenium instance
-  after using `jpm` to automatically rebuild `openwpm.xpi`. The script then
+  after automatically rebuilding `openwpm.xpi`. The script then
   drops into an `ipython` shell where the webdriver instance is available
   through variable `driver`.
 * `python -m test.manual_test --selenium --no_extension` launches a Firefox Selenium
@@ -418,6 +452,28 @@ instance (without any instrumentation)
   drops into an `ipython` shell where the webdriver instance is available
   through variable `driver`.
 
+
+### Managing requirements
+
+We use [`pip-tools`](https://github.com/jazzband/pip-tools) to pin
+requirements. This means that the `requirements.txt` and `requirements-dev.txt`
+files should not be edited directly. Instead, place new requirements in
+`requirements.in` or `requirements-dev.in`. Requirements necessary to run
+OpenWPM should be placed in the former, while those only required to run the
+tests (or perform other development tasks) should be placed in the latter.
+
+To update dependencies, run the following two commands **in order**:
+* `pip-compile --upgrade requirements.in`
+* `pip-compile --upgrade requirements-dev.in`
+
+It's important that these are run in order, as we layer the dev
+dependencies on the output of the pinned production dependencies as per
+[the official documentation](https://github.com/jazzband/pip-tools#workflow-for-layered-requirements).
+This means you may need to manually pin some versions of a dependency in
+`requirements.in` so there exists a compatible version for a dependency in
+`requirements-dev.in`. Before you run an upgrade, check if the previous pins
+that are related to layering in `requirements.in` are still necessary by
+removing them and attempting an upgrade without the pins.
 
 ### Running tests
 
@@ -527,10 +583,8 @@ Then you can run the demo script using:
 ```
     mkdir -p docker-volume && docker run -v $PWD/docker-volume:/root/Desktop \
     -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix --shm-size=2g \
-    -it openwpm python /opt/OpenWPM/demo.py
+    -it openwpm python3 /opt/OpenWPM/demo.py
 ```
-
-Instead of _python_, _python3_ can be used here as well.
 
 **Note:** the `--shm-size=2g` parameter is required, as it increases the
 amount of shared memory available to Firefox. Without this parameter you can
@@ -562,8 +616,10 @@ Alternatively, it is possible to run jobs as the user _openwpm_ in the container
 too, but this might cause problems with none headless browers. It is therefore
 only recommended for headless crawls.
 
-Instruction on how to run Docker GUI applications in Mac OSX are available
-[here](https://stackoverflow.com/questions/37523980/running-gui-apps-on-docker-container-with-a-macbookpro-host).
+### MacOS GUI applications in Docker
+
+**Requirements**: Install XQuartz by following [these instructions](https://stackoverflow.com/a/47309184).
+
 Given properly installed prerequisites (including a reboot), the helper script
 `run-on-osx-via-docker.sh` in the project root folder can be used to facilitate
 working with Docker in Mac OSX.

@@ -8,6 +8,7 @@ docker-volume/
 firefox-bin/
 Firefox*.app/
 Nightly*.app/
+firefox-profile
 
 # VIM tmp files
 *~
@@ -20,6 +21,9 @@ C:\\nppdf32Log\\debuglog.txt
 .idea/*
 *.idea
 */idea
+
+#VSCode
+.vscode
 
 # Local Python virtual environments
 venv/

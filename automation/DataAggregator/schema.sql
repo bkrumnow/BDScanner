@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS site_visits (
     dist_a INTEGER,
     dist_b INTEGER,
     dist_c INTEGER,
+    site_rank INTEGER,
     FOREIGN KEY(crawl_id) REFERENCES crawl(id));
 
 /*
@@ -233,6 +234,7 @@ CREATE TABLE IF NOT EXISTS navigations(
   committed_time_stamp DATETIME
 );
 
+<<<<<<< HEAD:automation/schema.sql
 
 /* Bot detection tables */
 CREATE TABLE IF NOT EXISTS Scripts (
@@ -271,3 +273,15 @@ CREATE INDEX IF NOT EXISTS hash_index ON Scripts (hash)
 
 */
 
+=======
+/*
+# Callstacks
+ */
+CREATE TABLE IF NOT EXISTS callstacks(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  request_id INTEGER NOT NULL,
+  crawl_id INTEGER NOT NULL,
+  visit_id INTEGER NOT NULL,
+  call_stack TEXT
+)
+>>>>>>> 8150bbbf2f1e9bc4583fc0efe28c311664718a02:automation/DataAggregator/schema.sql

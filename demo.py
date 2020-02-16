@@ -1,6 +1,3 @@
-from __future__ import absolute_import
-
-from six.moves import range
 
 from automation import CommandSequence, TaskManager
 
@@ -26,6 +23,8 @@ for i in range(NUM_BROWSERS):
     browser_params[i]['js_instrument'] = True
     # Enable flash for all three browsers
     browser_params[i]['disable_flash'] = True
+    # Record the callstack of all WebRequests made
+    browser_params[i]['callstack_instrument'] = True
 browser_params[0]['headless'] = True  # Launch only browser 0 headless
 
 # Update TaskManager configuration (use this for crawl-wide settings)
@@ -36,8 +35,11 @@ manager_params['log_directory'] = '~/Desktop/'
 # Commands time out by default after 60 seconds
 manager = TaskManager.TaskManager(manager_params, browser_params)
 
-# Visits the sites with all browsers simultaneously
+# Visits the sites
 for site in sites:
+
+    # Parallelize sites over all number of browsers set above.
+    # (To have all browsers go to the same sites, add `index='**'`)
     command_sequence = CommandSequence.CommandSequence(site, reset=True)
 
     # Start by visiting the page
