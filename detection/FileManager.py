@@ -7,8 +7,7 @@
 ## Project: Detecting Web bot Detecting | BotDetectionScanner (https://github.com/GabryVlot/BotDetectionScanner)
 ###############################################################################################################
 
-import requests
-import urllib
+import urllib3
 from io import StringIO
 import gzip
 import sys
@@ -43,14 +42,17 @@ def downloadFile(url):
             url = 'http:' + url
 
         try:
-            r = requests.get(url, headers=http_header)
-        except requests.exceptions.RequestException as e:
-            print("Could not open: {} {}".format(url, e, sys.exc_info()[0]))
+            http = urllib3.PoolManager()
+            r = http.request('GET', url, http_header)
+        except (urllib3.exceptions.MaxRetryError):
+            print("Could not download script at: {}".format(url))
             return
 
-        data = r.content
-        contentEncoding = r.encoding
+        data = r.data
+        contentEncoding = r.getheader("Content-Encoding")
 
+        if contentEncoding:
+            data = decompressData(data, contentEncoding, fileName)
 
         if data == None:
             print("No content found {}".format(url))
@@ -148,6 +150,21 @@ def persistFile(name, data, path):
         except Exception as e:
             print("Could not write file {}: {}".format(name, e))
 
+
+def decompressData(data, contentEncoding, fileName):
+    try:
+        if contentEncoding.lower() == 'gzip':
+            compressedstream = StringIO.StringIO(data)
+            unzipper = gzip.GzipFile(fileobj=compressedstream)
+            data = unzipper.read()
+        else:
+            print("Not supported encoding %s".format(contentEncoding))
+    except:
+        print("Not able to de-compress content %s" % (fileName))
+
+    return data
+    
+    
 def decodeData(data):
     try:
         content = data.decode('utf-8')
