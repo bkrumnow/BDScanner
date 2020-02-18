@@ -7,7 +7,9 @@
 ## Project: Detecting Web bot Detecting | BotDetectionScanner (https://github.com/GabryVlot/BotDetectionScanner)
 ###############################################################################################################
 
-import RegisteredDetectionTopic, BotDetectionValueManager
+from . import RegisteredDetectionTopic
+from . import BotDetectionValueManager
+import hashlib
 
 class Script:
 
@@ -49,14 +51,21 @@ class Script:
 
     #After looping through the detection pattern the detection score based upon detection pattern will be calulated
     def calculateDetectionValue(self):
-        for key, detectionPattern in self.detectionPatterns.iteritems():
+        for key, detectionPattern in self.detectionPatterns.items():
             detectionPattern.totalScore = BotDetectionValueManager.getDetectionValue(key, self.detectionPatterns, detectionPattern)
             self.score = self.score + detectionPattern.totalScore
 
         self.detectionPatternHash = self.detectionPatternHash + detectionPattern.hash
 
+
+    def get_ssh224(self):
+        data = self.data.replace(" ", "")
+        data = data.replace("\n","")
+        my_hash = hashlib.sha224(data.encode('utf-8'))
+        return my_hash.hexdigest()
+
     #Override build in function __hash__
     def __hash__(self):
             if not self.hash:
-                self.hash = hash((self.score, self.scriptLength, self.detectionPatternHash, self.repeatingPatternHash))
+                self.hash = hash((self.score, self.scriptLength, self.detectionPatternHash))
             return self.hash

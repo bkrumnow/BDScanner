@@ -8,8 +8,12 @@
 ###############################################################################################################
 
 from selenium.common.exceptions import StaleElementReferenceException
-from detectionPatterns import DetectorPatterns, BotFingerprintingSurface, BrowserFingerprints, ManuallyFoundLiterals
-from detection import PatternChecker, Script
+from detection.detectionPatterns import DetectorPatterns
+from detection.detectionPatterns import BotFingerprintingSurface
+from detection.detectionPatterns import BrowserFingerprints
+from detection.detectionPatterns import ManuallyFoundLiterals
+from detection import PatternChecker
+from detection import Script
 from detection import FileManager
 
 class Scanner:
@@ -54,9 +58,9 @@ class Scanner:
                         self.analyseCode(outerHTML, fileName, fileName)
                         counter = counter +1
                     except StaleElementReferenceException:
-                        print 'element became invalid'
+                        print('element became invalid')
                     except:
-                        print 'element cannot be targeted'
+                        print('element cannot be targeted')
 
     #preprocesses script (de-obfuscating and remove comments) and script persistence
     def analyseCode(self, data, identifier, path):
@@ -67,16 +71,17 @@ class Scanner:
         if currentScript:
             currentScript.calculateDetectionValue()
             if currentScript.score >= 12:
+            #if currentScript.score >= 0:
                 currentScript.URL = path
 
-#                now that we have a pattern detected .. is it a familiar one (only for non-knowndetection patterns)?
+                # now that we have a pattern detected .. is it a familiar one (only for unknown detection patterns)?
                 if currentScript.checkForRepeatingPatterns:
                     for pattern in self.manuallyFoundLiterals.patterns:
                         result = PatternChecker.checkPattern(res, pattern[1], path)[0]
 
                         if result:
                             currentScript.addRepeatingPattern(pattern)
-
+                            
                 self.scripts.append(currentScript)
                 print("\n@append: %s %s %s" % (len(self.scripts), identifier, currentScript.score))
             else:

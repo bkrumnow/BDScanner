@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 from .Errors import CommandExecutionError
 
 
@@ -10,36 +10,45 @@ class CommandSequence:
 
     sequence = CommandSequence(url)
     sequence.get()
-    sequence.dump_profile_cookies()
+    sequence.save_screenshot()
     task_manager.execute_command_sequence(sequence)
 
     CommandSequence guarantees that a series of commands will be performed
     by a single browser instance.
 
-    NOTE: Commands dump_profile_cookies and dump_flash_cookies will close
+    NOTE: Command dump_flash_cookies will close
     the current tab - any command that relies on the page still being open,
     like save_screenshot, extract_links, or dump_page_source, should be
-    called prior to one of those two commands.
+    called prior to that.
     """
 
-    def __init__(self, url, reset=False, blocking=False):
+    def __init__(self, url, reset=False,
+                 blocking=False, retry_number=None, site_rank=None):
         """Initialize command sequence.
 
         Parameters
         ----------
         url : string
             url of page visit the command sequence should execute on
-        reset : bool
+        reset : bool, optional
             True if browser should clear state and restart after sequence
-        blocking : bool
+        blocking : bool, optional
             True if sequence should block parent process during execution
+        retry_number : int, optional
+            Integer denoting the number of attempts that have been made to
+            execute this command. Will be saved in `crawl_history`.
+        site_rank : int, optional
+            Integer indicating the ranking of the page to visit, saved
+            to `site_visits`
         """
         self.url = url
         self.reset = reset
         self.blocking = blocking
+        self.retry_number = retry_number
         self.commands_with_timeout = []
         self.total_timeout = 0
         self.contains_get_or_browse = False
+        self.site_rank = site_rank
 
     def get(self, sleep=0, timeout=60):
         """ goes to a url """
@@ -66,32 +75,14 @@ class CommandSequence:
         command = ('DUMP_FLASH_COOKIES',)
         self.commands_with_timeout.append((command, timeout))
 
-    def dump_profile_cookies(self, timeout=60):
-        """ dumps from the profile path to a given file (absolute path)
-        Side effect: closes the current tab."""
-        self.total_timeout += timeout
-        if not self.contains_get_or_browse:
-            raise CommandExecutionError(
-                "No get or browse request preceding "
-                "the dump storage vectors command", self)
-        command = ('DUMP_PROFILE_COOKIES',)
-        self.commands_with_timeout.append((command, timeout))
-
     def dump_profile(self, dump_folder, close_webdriver=False,
                      compress=True, timeout=120):
         """ dumps from the profile path to a given file (absolute path) """
+        raise NotImplementedError(
+            "Profile saving is currently unsupported. "
+            "See: https://github.com/mozilla/OpenWPM/projects/2.")
         self.total_timeout += timeout
         command = ('DUMP_PROF', dump_folder, close_webdriver, compress)
-        self.commands_with_timeout.append((command, timeout))
-
-    def extract_links(self, timeout=30):
-        """Extracts links found on web page and dumps them externally"""
-        self.total_timeout += timeout
-        if not self.contains_get_or_browse:
-            raise CommandExecutionError(
-                "No get or browse request preceding "
-                "the dump storage vectors command", self)
-        command = ('EXTRACT_LINKS',)
         self.commands_with_timeout.append((command, timeout))
 
     def save_screenshot(self, suffix='', timeout=30):

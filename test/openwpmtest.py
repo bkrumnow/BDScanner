@@ -1,11 +1,11 @@
-from __future__ import absolute_import
 
 import os
-from os.path import join, isfile
+from os.path import isfile, join
+
 import pytest
 
-from . import utilities
 from ..automation import TaskManager
+from . import utilities
 
 
 class OpenWPMTest(object):
@@ -39,7 +39,8 @@ class OpenWPMTest(object):
             load_default_params(num_browsers)
         manager_params['data_directory'] = data_dir
         manager_params['log_directory'] = data_dir
-        browser_params[0]['headless'] = True
+        for i in range(num_browsers):
+            browser_params[i]['headless'] = True
         manager_params['db'] = join(manager_params['data_directory'],
                                     manager_params['database_name'])
         return manager_params, browser_params
@@ -55,19 +56,3 @@ class OpenWPMTest(object):
 
     def assert_is_installed(self, cmd):
         assert self.is_installed(cmd), 'Cannot find %s in your system' % cmd
-
-    def assert_py_pkg_installed(self, pkg):
-        # some modules are imported using a different name than the ones used
-        # at the installation.
-        pkg_name_mapping = {"pyopenssl": "OpenSSL",
-                            "beautifulsoup4": "bs4",
-                            "python-dateutil": "dateutil",
-                            "mini-amf": "miniamf",
-                            "pillow": "PIL"
-                            }
-        # get the mapped name if it exists.
-        pkg_importable = pkg_name_mapping.get(pkg.lower(), pkg)
-        try:
-            __import__(pkg_importable)
-        except ImportError:
-            pytest.fail("Cannot find python package %s in your system" % pkg)

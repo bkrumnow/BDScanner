@@ -1,13 +1,13 @@
-from __future__ import absolute_import
-import tarfile
-from six.moves import cPickle as pickle
-import shutil
+
+import logging
 import os
+import pickle
+import shutil
+import tarfile
 
 from ..Errors import ProfileLoadError
-from ..MPLogger import loggingclient
-from .utils.firefox_profile import sleep_until_sqlite_checkpoint
 from .utils.file_utils import rmsubtree
+from .utils.firefox_profile import sleep_until_sqlite_checkpoint
 
 # Flash Plugin Storage Location -- Linux ONLY
 HOME = os.path.expanduser('~')
@@ -15,6 +15,7 @@ FLASH_LOCS = [
     HOME + '/.macromedia/Flash_Player/#SharedObjects',
     HOME + '/.macromedia/Flash_Player/macromedia.com/support/flashplayer/sys'
 ]
+logger = logging.getLogger('openwpm')
 
 
 def save_browser_settings(location, browser_settings):
@@ -41,7 +42,7 @@ def load_browser_settings(location):
     return browser_settings
 
 
-def save_flash_files(logger, browser_params, dump_location, clear=False):
+def save_flash_files(browser_params, dump_location, clear=False):
     """
     save all files from the default flash storage locations
     clear: sets whether to clear storage locations after backup
@@ -74,7 +75,7 @@ def save_flash_files(logger, browser_params, dump_location, clear=False):
             rmsubtree(location)
 
 
-def load_flash_files(logger, browser_params, tar_location):
+def load_flash_files(browser_params, tar_location):
     """ clear old flash cookies and load ones from dump """
     # Clear previous objects prior to loading
     for location in FLASH_LOCS:
@@ -109,8 +110,10 @@ def dump_profile(browser_profile_folder, manager_params, browser_params,
     if <browser_settings> exists they are also saved
     <save_flash> specifies whether to dump flash files
     """
-    # Connect to logger
-    logger = loggingclient(*manager_params['logger_address'])
+    logger.debug("BROWSER %i: Profile dumping is currently unsupported. "
+                 "See: https://github.com/mozilla/OpenWPM/projects/2." %
+                 browser_params['crawl_id'])
+    return
 
     # ensures that folder paths end with slashes
     if browser_profile_folder[-1] != '/':
@@ -163,14 +166,14 @@ def dump_profile(browser_profile_folder, manager_params, browser_params,
     ]
     for item in storage_vector_files:
         full_path = os.path.join(browser_profile_folder, item)
-        if (not os.path.isfile(full_path)
-                and full_path[-3:] != 'shm'
-                and full_path[-3:] != 'wal'):
+        if not os.path.isfile(full_path) and \
+                full_path[-3:] != 'shm' and \
+                full_path[-3:] != 'wal':
             logger.critical(
                 "BROWSER %i: %s NOT FOUND IN profile folder, skipping." %
                 (browser_params['crawl_id'], full_path))
-        elif (not os.path.isfile(full_path)
-              and (full_path[-3:] == 'shm' or full_path[-3:] == 'wal')):
+        elif not os.path.isfile(full_path) and \
+                (full_path[-3:] == 'shm' or full_path[-3:] == 'wal'):
             continue  # These are just checkpoint files
         tar.add(full_path, arcname=item)
     for item in storage_vector_dirs:
@@ -185,7 +188,7 @@ def dump_profile(browser_profile_folder, manager_params, browser_params,
 
     # save flash cookies
     if save_flash:
-        save_flash_files(logger, browser_params, tar_location)
+        save_flash_files(browser_params, tar_location)
 
     # save the browser settings
     if browser_settings is not None:
@@ -200,9 +203,6 @@ def load_profile(browser_profile_folder, manager_params, browser_params,
     is in the folder, either full_profile.tar.gz or profile.tar.gz
     """
     try:
-        # Connect to logger
-        logger = loggingclient(*manager_params['logger_address'])
-
         # ensures that folder paths end with slashes
         if browser_profile_folder[-1] != '/':
             browser_profile_folder = browser_profile_folder + "/"
@@ -217,7 +217,7 @@ def load_profile(browser_profile_folder, manager_params, browser_params,
         # Copy and untar the loaded profile
         logger.debug(
             "BROWSER %i: Copying profile tar from %s to %s" %
-            (browser_params['crawl_id'], tar_location+tar_name,
+            (browser_params['crawl_id'], tar_location + tar_name,
              browser_profile_folder)
         )
         shutil.copy(tar_location + tar_name, browser_profile_folder)
@@ -236,7 +236,7 @@ def load_profile(browser_profile_folder, manager_params, browser_params,
 
         # clear and load flash cookies
         if load_flash:
-            load_flash_files(logger, browser_params, tar_location)
+            load_flash_files(browser_params, tar_location)
 
         # load the browser settings
         browser_settings = load_browser_settings(tar_location)

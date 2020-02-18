@@ -1,33 +1,41 @@
-from __future__ import absolute_import
-from . import utilities
-from ..automation import CommandSequence
-from ..automation import TaskManager
+
+import pytest
+
+from ..automation import CommandSequence, TaskManager
 from ..automation.utilities import db_utils
+from . import utilities
 from .openwpmtest import OpenWPMTest
 
 expected_lso_content_a = [
-               1,  # visit id
-               u'localtest.me',
-               u'FlashCookie.sol',
-               u'localtest.me/FlashCookie.sol',
-               u'test_key',
-               u'REPLACEME']
+    1,  # visit id
+    u'localtest.me',
+    u'FlashCookie.sol',
+    u'localtest.me/FlashCookie.sol',
+    u'test_key',
+    u'REPLACEME']
 
 expected_lso_content_b = [
-               2,  # visit id
-               u'localtest.me',
-               u'FlashCookie.sol',
-               u'localtest.me/FlashCookie.sol',
-               u'test_key',
-               u'REPLACEME']
+    2,  # visit id
+    u'localtest.me',
+    u'FlashCookie.sol',
+    u'localtest.me/FlashCookie.sol',
+    u'test_key',
+    u'REPLACEME']
 
 expected_js_cookie = (
-             1,  # visit id
-             u'%s' % utilities.BASE_TEST_URL_DOMAIN,
-             u'test_cookie',
-             u'Test-0123456789',
-             u'%s' % utilities.BASE_TEST_URL_DOMAIN,
-             u'/')
+    1,                                       # visit_id
+    u'added-or-changed',                     # record_type
+    u'explicit',                             # change_cause
+    0,                                       # is_http_only
+    1,                                       # is_host_only
+    0,                                       # is_session
+    u'%s' % utilities.BASE_TEST_URL_DOMAIN,  # host
+    0,                                       # is_secure
+    u'test_cookie',                          # name
+    u'/',                                    # path
+    u'Test-0123456789',                      # value
+    u'no_restriction'                        # same_site
+)
 
 
 class TestStorageVectors(OpenWPMTest):
@@ -41,6 +49,7 @@ class TestStorageVectors(OpenWPMTest):
     def get_config(self, data_dir=""):
         return self.get_test_config(data_dir)
 
+    @pytest.mark.xfail(reason='Flash cookies no longer supported')
     def test_flash_cookies(self):
         """ Check that some Flash LSOs are saved and
         are properly keyed in db."""
@@ -87,43 +96,26 @@ class TestStorageVectors(OpenWPMTest):
         assert lso_content_a == expected_lso_content_a
         assert lso_content_b == expected_lso_content_b
 
-    def test_profile_cookies(self):
-        """ Check that some profile cookies are saved """
-        # Run the test crawl
-        manager_params, browser_params = self.get_config()
-        manager = TaskManager.TaskManager(manager_params, browser_params)
-        # TODO update this to local test site
-        url = 'http://www.yahoo.com'
-        cs = CommandSequence.CommandSequence(url)
-        cs.get(sleep=3, timeout=120)
-        cs.dump_profile_cookies()
-        manager.execute_command_sequence(cs)
-        manager.close()
-
-        # Check that some flash cookies are recorded
-        qry_res = db_utils.query_db(manager_params['db'],
-                                    "SELECT COUNT(*) FROM profile_cookies")
-        prof_cookie_count = qry_res[0][0]
-        assert prof_cookie_count > 0
-
     def test_js_profile_cookies(self):
         """ Check that profile cookies set by JS are saved """
         # Run the test crawl
         manager_params, browser_params = self.get_config()
+        browser_params[0]['cookie_instrument'] = True
         manager = TaskManager.TaskManager(manager_params, browser_params)
         url = utilities.BASE_TEST_URL + "/js_cookie.html"
         cs = CommandSequence.CommandSequence(url)
         cs.get(sleep=3, timeout=120)
-        cs.dump_profile_cookies()
         manager.execute_command_sequence(cs)
         manager.close()
         # Check that the JS cookie we stored is recorded
         qry_res = db_utils.query_db(
-            manager_params['db'],
-            "SELECT * FROM profile_cookies",
+            manager_params['db'], (
+                "SELECT visit_id, record_type, change_cause, is_http_only, "
+                "is_host_only, is_session, host, is_secure, name, path, "
+                "value, same_site FROM javascript_cookies"),
             as_tuple=True
         )
         assert len(qry_res) == 1  # we store only one cookie
         cookies = qry_res[0]  # take the first cookie
         # compare URL, domain, name, value, origin, path
-        assert cookies[2:8] == expected_js_cookie
+        assert cookies == expected_js_cookie

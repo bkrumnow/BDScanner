@@ -1,14 +1,11 @@
-from __future__ import absolute_import
-from __future__ import print_function
-from six.moves.queue import Queue
-import threading
-import traceback
+import json
 import socket
 import struct
-import json
+import threading
+import traceback
+from queue import Queue
+
 import dill
-import six
-from six.moves import input
 
 # TODO - Implement a cleaner shutdown for server socket
 # see: https://stackoverflow.com/a/1148237
@@ -16,14 +13,16 @@ from six.moves import input
 
 class serversocket:
     """
-    A server socket to recieve and process string messages
+    A server socket to receive and process string messages
     from client sockets to a central queue
     """
-    def __init__(self, verbose=False):
+
+    def __init__(self, name=None, verbose=False):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.bind(('localhost', 0))
         self.sock.listen(10)  # queue a max of n connect requests
         self.verbose = verbose
+        self.name = name
         self.queue = Queue()
         if self.verbose:
             print("Server bound to: " + str(self.sock.getsockname()))
@@ -32,20 +31,28 @@ class serversocket:
         """ Start the listener thread """
         thread = threading.Thread(target=self._accept, args=())
         thread.daemon = True  # stops from blocking shutdown
+        if self.name is not None:
+            thread.name = thread.name + "-" + self.name
         thread.start()
 
     def _accept(self):
         """ Listen for connections and pass handling to a new thread """
         while True:
-            (client, address) = self.sock.accept()
-            thread = threading.Thread(target=self._handle_conn,
-                                      args=(client, address))
-            thread.daemon = True
-            thread.start()
+            try:
+                (client, address) = self.sock.accept()
+                thread = threading.Thread(target=self._handle_conn,
+                                          args=(client, address))
+                thread.daemon = True
+                thread.start()
+            except ConnectionAbortedError:
+                # Workaround for #278
+                print("A connection establish request was performed "
+                      "on a closed socket")
+                return
 
     def _handle_conn(self, client, address):
         """
-        Recieve messages and pass to queue. Messages are prefixed with
+        Receive messages and pass to queue. Messages are prefixed with
         a 4-byte integer to specify the message length and 1-byte character
         to indicate the type of serialization applied to the message.
 
@@ -80,7 +87,7 @@ class serversocket:
                             continue
                     except (UnicodeDecodeError, ValueError) as e:
                         print("Error de-serializing message: %s \n %s" % (
-                                msg, traceback.format_exc(e)))
+                            msg, traceback.format_exc(e)))
                         continue
                 self.queue.put(msg)
         except RuntimeError:
@@ -90,7 +97,7 @@ class serversocket:
     def receive_msg(self, client, msglen):
         msg = b''
         while len(msg) < msglen:
-            chunk = client.recv(msglen-len(msg))
+            chunk = client.recv(msglen - len(msg))
             if not chunk:
                 raise RuntimeError("socket connection broken")
             msg = msg + chunk
@@ -102,6 +109,7 @@ class serversocket:
 
 class clientsocket:
     """A client socket for sending messages"""
+
     def __init__(self, serialization='json', verbose=False):
         """ `serialization` specifies the type of serialization to use for
         non-string messages. Supported formats:
@@ -126,9 +134,9 @@ class clientsocket:
         using dill if not string, and prepends msg len (4-bytes) and
         serialization type (1-byte).
         """
-        if isinstance(msg, six.binary_type):
+        if isinstance(msg, bytes):
             serialization = b'n'
-        elif isinstance(msg, six.text_type):
+        elif isinstance(msg, str):
             serialization = b'u'
             msg = msg.encode('utf-8')
         elif self.serialization == 'dill':

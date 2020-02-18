@@ -1,14 +1,13 @@
-from __future__ import absolute_import
 
 import os
-import pytest
 import tarfile
-from six.moves.urllib.parse import urlparse
+from urllib.parse import urlparse
+
+import pytest
 
 from ..automation import TaskManager
-from ..automation.utilities import domain_utils, db_utils
+from ..automation.utilities import db_utils, domain_utils
 from .openwpmtest import OpenWPMTest
-
 
 TEST_SITES = [
     'http://google.com',
@@ -51,6 +50,7 @@ class TestCrawl(OpenWPMTest):
         browser_params[0]['http_instrument'] = True
         return manager_params, browser_params
 
+    @pytest.mark.xfail(run=False)
     @pytest.mark.slow
     def test_browser_profile_coverage(self, tmpdir):
         """ Test the coverage of the browser's profile
@@ -84,14 +84,14 @@ class TestCrawl(OpenWPMTest):
         for url, in rows:
             req_ps.add(psl.get_public_suffix(urlparse(url).hostname))
 
-        hist_ps = set()  # visited domains from CrawlHistory Table
-        successes = dict()
-        rows = db_utils.query_db(crawl_db, "SELECT arguments, bool_success "
-                                  "FROM CrawlHistory WHERE command='GET'")
-        for url, success in rows:
+        hist_ps = set()  # visited domains from crawl_history Table
+        statuses = dict()
+        rows = db_utils.query_db(crawl_db, "SELECT arguments, command_status "
+                                 "FROM crawl_history WHERE command='GET'")
+        for url, command_status in rows:
             ps = psl.get_public_suffix(urlparse(url).hostname)
             hist_ps.add(ps)
-            successes[ps] = success
+            statuses[ps] = command_status
 
         # Grab urls from Firefox database
         profile_ps = set()  # visited domains from firefox profile
@@ -106,31 +106,32 @@ class TestCrawl(OpenWPMTest):
         # 1. We've made requests to it
         # 2. The url is a top_url we entered into the address bar
         # 3. The url successfully loaded (see: Issue #40)
-        # 4. The site does not respond to the initial request with a 204 (won't show in FF DB)
+        # 4. The site does not respond to the initial request with a 204
+        #    (won't show in FF DB)
         missing_urls = req_ps.intersection(hist_ps).difference(profile_ps)
         unexpected_missing_urls = set()
         for url in missing_urls:
-            if successes[url] == 0 or successes[url] == -1:
+            if command_status[url] != 'ok':
                 continue
 
             # Get the visit id for the url
             rows = db_utils.query_db(crawl_db,
-                                      "SELECT visit_id FROM site_visits "
-                                      "WHERE site_url = ?",
-                                      ('http://' + url,))
+                                     "SELECT visit_id FROM site_visits "
+                                     "WHERE site_url = ?",
+                                     ('http://' + url,))
             visit_id = rows[0]
 
             rows = db_utils.query_db(crawl_db,
-                                      "SELECT COUNT(*) FROM http_responses "
-                                      "WHERE visit_id = ?",
-                                      (visit_id,))
+                                     "SELECT COUNT(*) FROM http_responses "
+                                     "WHERE visit_id = ?",
+                                     (visit_id,))
             if rows[0] > 1:
                 continue
 
             rows = db_utils.query_db(crawl_db,
-                                      "SELECT response_status, location FROM "
-                                      "http_responses WHERE visit_id = ?",
-                                      (visit_id,))
+                                     "SELECT response_status, location FROM "
+                                     "http_responses WHERE visit_id = ?",
+                                     (visit_id,))
             response_status, location = rows[0]
             if response_status == 204:
                 continue
