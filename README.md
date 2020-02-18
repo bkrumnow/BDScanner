@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 Bot detection Scanner
 =====================
 This is a detector for fingerprint-based bot detectors (see this [site](http://www.gm.fh-koeln.de/%7Ekrumnow/fp_bot/index.html) for a detailed description.)
