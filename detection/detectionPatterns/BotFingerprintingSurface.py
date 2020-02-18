@@ -31,7 +31,7 @@ class BotFingerprintingSurface:
             re.escape("(?=.*scrollHeight)(?=.*694)"),
             re.escape("(?=.*clientHeight)(?=.*131)"),
             re.escape("(?=.*scrollHeight)(?=.*131)"),
-])
+        ])
 
         instrumentation = DetectionPatternFactory.createDetectionPattern(100.0, "instrumentation", [
             "instrumentObject",
