@@ -7,7 +7,8 @@
 ## Project: Detecting Web bot Detecting | BotDetectionScanner (https://github.com/GabryVlot/BotDetectionScanner)
 ###############################################################################################################
 
-import urllib3
+import requests
+import urllib
 from io import StringIO
 import gzip
 import sys
@@ -28,31 +29,26 @@ with open(os.path.join('detection/configuration','config.json')) as json_data_fi
 def downloadFile(url):
         data = ''
         # TODO: Needs to be switched with a recent user agent each start
-        http_header = {
-                'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko)\
-                Chrome/23.0.1271.64 Safari/537.11',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
-                'Accept-Encoding': 'none',
-                'Accept-Language': 'en-US,en;q=0.8',
-                'Connection': 'keep-alive'}
+        http_header = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
+               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+               'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+               'Accept-Encoding': 'none',
+               'Accept-Language': 'en-US,en;q=0.8',
+               'Connection': 'keep-alive'}
 
         # A src attribute may not contain a http(s) prefix
         if url.startswith('//'):
             url = 'http:' + url
-
+               
         try:
-            http = urllib3.PoolManager()
-            r = http.request('GET', url, http_header)
-        except (urllib3.exceptions.MaxRetryError):
-            print("Could not download script at: {}".format(url))
+            r = requests.get(url, headers=http_header)
+        except requests.exceptions.RequestException as e:
+            print("Could not open: {} {}".format(url, e, sys.exc_info()[0]))
             return
 
-        data = r.data
-        contentEncoding = r.getheader("Content-Encoding")
+        data = r.content
+        contentEncoding = r.encoding
 
-        if contentEncoding:
-            data = decompressData(data, contentEncoding, fileName)
 
         if data == None:
             print("No content found {}".format(url))
@@ -150,21 +146,6 @@ def persistFile(name, data, path):
         except Exception as e:
             print("Could not write file {}: {}".format(name, e))
 
-
-def decompressData(data, contentEncoding, fileName):
-    try:
-        if contentEncoding.lower() == 'gzip':
-            compressedstream = StringIO.StringIO(data)
-            unzipper = gzip.GzipFile(fileobj=compressedstream)
-            data = unzipper.read()
-        else:
-            print("Not supported encoding %s".format(contentEncoding))
-    except:
-        print("Not able to de-compress content %s" % (fileName))
-
-    return data
-    
-    
 def decodeData(data):
     try:
         content = data.decode('utf-8')
