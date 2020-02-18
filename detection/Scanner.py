@@ -28,9 +28,11 @@ class Scanner:
 
     #register detection patterns
     def initDetectionPatterns(self):
-        self.detectionPatterns.extend((DetectorPatterns.DetectorPatterns(),
-        BotFingerprintingSurface.BotFingerprintingSurface(),
-        BrowserFingerprints.BrowserFingerprints()))
+        self.detectionPatterns.extend((
+        	#DetectorPatterns.DetectorPatterns(),
+        	BotFingerprintingSurface.BotFingerprintingSurface(),
+        	#BrowserFingerprints.BrowserFingerprints(),
+        ))
 
     #extracts inline and external script inclusions
     def extractScriptInclusions(self, driver):
