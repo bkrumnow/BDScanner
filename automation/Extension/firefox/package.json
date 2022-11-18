@@ -20,7 +20,7 @@
     "typescript-eslint-parser": "^20.0.0",
     "web-ext": "^3.2.1",
     "webpack": "^4.41.3",
-    "webpack-cli": "^3.3.10"
+    "webpack-cli": "^3.3.12"
   },
   "engines": {
     "node": ">=8.11.1"
